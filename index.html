@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111514">
+<title>ArkHimar Consults — Architecture Beyond the Expected</title>
+<meta name="description" content="ArkHimar Consults — contemporary Nigerian architecture, interiors, visualization and development.">
+<style>
+:root{
+  --ink:#101312;
+  --paper:#e9e8e2;
+  --glass:rgba(19,23,22,.34);
+  --glass-strong:rgba(19,23,22,.58);
+  --line:rgba(255,255,255,.24);
+  --white:rgba(255,255,255,.94);
+  --muted:rgba(255,255,255,.67);
+  --green:#71836f;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ink)}
+body{margin:0;background:var(--ink);color:#fff;font-family:Inter,Arial,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+.hero{
+  position:relative;height:100svh;min-height:680px;overflow:hidden;background:#111;
+}
+.hero-media,.hero-poster{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.hero-media{z-index:0;opacity:1;filter:saturate(.92) contrast(1.03)}
+.hero-poster{z-index:-1;background:url("assets/hero-poster.png") center/cover no-repeat}
+.hero:after{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(5,8,7,.38),transparent 30%,rgba(5,8,7,.12) 58%,rgba(5,8,7,.72));
+  pointer-events:none;
+}
+.glass{
+  background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.045));
+  border:1px solid var(--line);
+  box-shadow:0 18px 60px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.16);
+  backdrop-filter:blur(22px) saturate(125%);
+  -webkit-backdrop-filter:blur(22px) saturate(125%);
+}
+.nav{
+  position:absolute;z-index:5;left:3vw;right:3vw;top:2.2vw;
+  min-height:64px;padding:10px 12px 10px 20px;border-radius:22px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.brand{font-size:13px;letter-spacing:.22em;font-weight:700;white-space:nowrap}
+.navlinks{display:flex;gap:5px;align-items:center}
+.navlinks a,.nav-cta{
+  padding:12px 15px;border-radius:14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  transition:.45s var(--ease);color:rgba(255,255,255,.8)
+}
+.navlinks a:hover,.nav-cta:hover{background:rgba(255,255,255,.11);color:#fff;transform:translateY(-1px)}
+.menu{display:none;border:0;background:transparent;padding:12px}
+.hero-copy{
+  position:absolute;z-index:4;left:7vw;bottom:11vh;max-width:900px;
+}
+.kicker{display:flex;align-items:center;gap:10px;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.kicker:before{content:"";width:38px;height:1px;background:rgba(255,255,255,.65)}
+h1{margin:0;font-size:clamp(58px,9.2vw,148px);line-height:.83;letter-spacing:-.065em;font-weight:500;max-width:1000px}
+.hero-sub{max-width:590px;margin:30px 0 0;font-size:15px;line-height:1.65;color:rgba(255,255,255,.72)}
+.hero-actions{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:20px;padding:15px 17px 15px 20px;border-radius:15px;
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;transition:.5s var(--ease);
+}
+.btn .arrow{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,255,255,.3);border-radius:8px}
+.btn:hover{transform:translateY(-3px);background:rgba(255,255,255,.16)}
+.hero-meta{
+  position:absolute;z-index:4;right:3vw;bottom:4vh;display:flex;align-items:center;gap:14px;
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.6)
+}
+.scroll-line{width:60px;height:1px;background:rgba(255,255,255,.35)}
+.section{position:relative;padding:140px 7vw;background:var(--paper);color:var(--ink)}
+.dark{background:#121615;color:#fff}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:8vw;align-items:start}
+.eyebrow{font-size:10px;letter-spacing:.25em;text-transform:uppercase;opacity:.55;margin-bottom:25px}
+.display{font-size:clamp(45px,7vw,105px);line-height:.9;letter-spacing:-.055em;font-weight:500;margin:0}
+.bodycopy{font-size:16px;line-height:1.8;max-width:560px;opacity:.68}
+.arch-frame{
+  position:relative;min-height:460px;border:1px solid rgba(15,19,18,.18);overflow:hidden;
+  background:linear-gradient(135deg,#d9d8d0,#bdbcb5);
+}
+.arch-frame:before,.arch-frame:after{content:"";position:absolute;pointer-events:none}
+.arch-frame:before{left:12%;top:10%;bottom:10%;width:1px;background:rgba(0,0,0,.16);box-shadow:37% 0 0 rgba(0,0,0,.1)}
+.arch-frame:after{left:8%;right:8%;top:50%;height:1px;background:rgba(0,0,0,.14)}
+.frame-label{position:absolute;left:20px;top:18px;font:10px/1.5 monospace;letter-spacing:.14em;opacity:.5}
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:70px}
+.card{
+  min-height:300px;padding:28px;border-radius:26px;position:relative;overflow:hidden;
+  transition:.65s var(--ease);background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.15);
+}
+.card:hover{transform:translateY(-8px);background:rgba(255,255,255,.09)}
+.card-no{font:11px monospace;opacity:.45}
+.card h3{position:absolute;left:28px;right:28px;bottom:65px;font-size:27px;line-height:1;letter-spacing:-.04em;font-weight:500;margin:0}
+.card p{position:absolute;left:28px;right:28px;bottom:27px;font-size:11px;line-height:1.5;opacity:.5;margin:0}
+.card .corner{position:absolute;right:20px;top:20px;width:34px;height:34px;border:1px solid rgba(255,255,255,.18);border-radius:10px}
+.projects{display:grid;grid-template-columns:1.45fr .8fr;gap:12px;margin-top:70px}
+.project{
+  position:relative;min-height:520px;overflow:hidden;border-radius:28px;background:#252a28;
+}
+.project.small{min-height:250px}
+.project-img{position:absolute;inset:0;background:url("assets/hero-poster.png") center/cover;filter:saturate(.72)}
+.project:nth-child(2) .project-img{filter:hue-rotate(18deg) saturate(.45) brightness(.7)}
+.project:nth-child(3) .project-img{filter:grayscale(.55) brightness(.7)}
+.project:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.7))}
+.project-info{position:absolute;z-index:2;left:26px;right:26px;bottom:24px}
+.project-info h3{font-size:32px;letter-spacing:-.04em;font-weight:500;margin:5px 0}
+.project-info p{font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;margin:0}
+.project-stack{display:grid;gap:12px}
+.materials{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:65px}
+.material{height:250px;border-radius:24px;padding:20px;display:flex;align-items:flex-end;background:#353937;position:relative;overflow:hidden}
+.material:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.16),transparent 38%),linear-gradient(135deg,#8e8c83,#353735)}
+.material:nth-child(2):before{background:linear-gradient(135deg,#181b1a,#72716a)}
+.material:nth-child(3):before{background:linear-gradient(135deg,#9a7757,#33251b)}
+.material:nth-child(4):before{background:linear-gradient(135deg,#d7d8d2,#59605d)}
+.material span{position:relative;z-index:1;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.quote{font-size:clamp(50px,8vw,125px);line-height:.88;letter-spacing:-.065em;max-width:1200px;margin:0}
+.contact{min-height:85vh;display:grid;grid-template-columns:1fr 1fr;gap:8vw;align-items:center}
+.studio{display:grid;grid-template-columns:.85fr 1.15fr;gap:8vw;align-items:start}
+.studio-panel{padding:28px;border-radius:28px}
+.studio-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:28px}
+.studio-option{position:relative}
+.studio-option input{position:absolute;opacity:0;pointer-events:none}
+.studio-option label{display:block;padding:17px 16px;border:1px solid rgba(255,255,255,.16);border-radius:14px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.4s var(--ease)}
+.studio-option input:checked+label{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.58);transform:translateY(-2px)}
+.studio-result{margin-top:24px;padding:22px;border-top:1px solid rgba(255,255,255,.2);font-size:13px;line-height:1.7;color:rgba(255,255,255,.72)}
+.studio-result strong{display:block;margin-bottom:8px;color:#fff;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+.studio-note{font-size:12px;line-height:1.7;opacity:.58;max-width:460px}
+.lab{display:grid;grid-template-columns:.72fr 1.28fr;gap:8vw;align-items:start}
+.lab-copy{max-width:440px}
+.lab-copy .bodycopy{margin-top:28px}
+.lab-shell{border:1px solid rgba(255,255,255,.16);border-radius:28px;overflow:hidden;background:#171c1a}
+.lab-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.13);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.lab-mode{display:flex;gap:4px}
+.lab-mode button,.lab-action{border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.65);border-radius:9px;padding:8px 10px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.lab-mode button.active,.lab-action:hover{background:rgba(255,255,255,.14);color:#fff}
+.lab-canvas{position:relative;min-height:430px;background-color:#222925;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:28px 28px}
+.plan-room{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid rgba(229,232,219,.72);background:rgba(125,145,126,.3);color:#fff;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:.35s var(--ease);user-select:none}
+.plan-room:hover,.plan-room.selected{background:rgba(183,198,170,.48);box-shadow:0 0 0 2px rgba(225,235,208,.32);z-index:2}
+.lab-canvas.volume{background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:42px 42px}
+.lab-canvas.volume .plan-room{transform:skewY(-18deg) rotateX(18deg);box-shadow:10px 16px 0 rgba(7,10,9,.35),0 0 0 1px rgba(225,235,208,.18);background:rgba(126,150,131,.5)}
+.lab-footer{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:14px 16px;border-top:1px solid rgba(255,255,255,.13);font-size:10px;color:rgba(255,255,255,.5)}
+.lab-footer strong{color:#fff;font-weight:500}
+.lab-hint{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+@media(max-width:900px){.lab{grid-template-columns:1fr;gap:45px}.lab-canvas{min-height:370px}}
+.form{padding:30px;border-radius:30px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.5;margin-bottom:9px}
+.field input,.field textarea,.field select{
+  width:100%;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.16);
+  border-radius:14px;padding:15px;color:#fff;outline:none;font:14px Inter,Arial;backdrop-filter:blur(10px)
+}
+.field textarea{min-height:130px;resize:vertical}
+.field select{appearance:none}
+.footer{padding:30px 7vw 45px;background:#0c0f0e;color:#fff;display:flex;justify-content:space-between;gap:30px;align-items:flex-end}
+.footer-brand{font-size:12px;letter-spacing:.2em}
+.footer small{opacity:.4;line-height:1.6}
+.arch-grid{
+  position:absolute;inset:0;opacity:.08;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:80px 80px;
+}
+.reveal{opacity:0;transform:translateY(35px);transition:1s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+@media(max-width:900px){
+  .navlinks{display:none}.menu{display:block}.nav{left:18px;right:18px;top:18px}
+  .hero-copy{left:22px;right:22px;bottom:9vh}.hero-meta{right:22px}
+  .grid,.contact,.studio{grid-template-columns:1fr;gap:45px}.services{grid-template-columns:1fr}.projects{grid-template-columns:1fr}
+  .materials{grid-template-columns:1fr 1fr}.section{padding:100px 22px}.footer{padding:28px 22px}
+}
+@media(max-width:520px){
+  .brand{font-size:10px}.hero-sub{font-size:13px}.materials{grid-template-columns:1fr}
+  .project{min-height:420px}.project.small{min-height:300px}
+}
+</style>
+</head>
+<body>
+<section class="hero" id="top">
+  <div class="hero-poster" aria-hidden="true"></div>
+  <video id="heroVideo" class="hero-media" muted playsinline preload="metadata" poster="assets/hero-poster.png">
+    <source src="assets/arkhimar-veo3-hero.mp4" type="video/mp4">
+  </video>
+  <div class="arch-grid"></div>
+
+  <nav class="nav glass">
+    <a href="#top" class="brand">ARKHIMAR CONSULTS</a>
+    <div class="navlinks">
+      <a href="#about">About</a><a href="#services">Services</a><a href="#projects">Projects</a><a href="#studio">Design Studio</a><a href="#spatial-lab">Spatial Lab</a><a href="#contact">Contact</a>
+      <a class="nav-cta glass" href="#contact">Start a project ↗</a>
+    </div>
+    <button class="menu" aria-label="Open menu">☰</button>
+  </nav>
+
+  <div class="hero-copy">
+    <div class="kicker">Architecture / Design / Development</div>
+    <h1>WE DESIGN<br>WHAT COMES NEXT.</h1>
+    <p class="hero-sub">Contemporary Nigerian architecture shaped by vision, technology, climate and human experience.</p>
+    <div class="hero-actions">
+      <a class="btn glass" href="#projects">Explore our work <span class="arrow">↗</span></a>
+      <a class="btn glass" href="#about">Our philosophy <span class="arrow">↓</span></a>
+    </div>
+  </div>
+  <div class="hero-meta"><span>Scroll to control the camera</span><span class="scroll-line"></span><span>01 / 360°</span></div>
+</section>
+
+<section class="section" id="about">
+  <div class="grid reveal">
+    <div>
+      <div class="eyebrow">01 / The practice</div>
+      <h2 class="display">WE DON'T JUST DESIGN SPACES. WE SHAPE EXPERIENCES.</h2>
+    </div>
+    <div>
+      <p class="bodycopy">ArkHimar Consults is a contemporary Nigerian architecture practice focused on creating intelligent, expressive and enduring spaces. We combine architectural discipline with technology, materiality and a deep understanding of place.</p>
+      <a class="btn glass" style="color:#111;border-color:rgba(0,0,0,.16);margin-top:22px" href="#contact">Discover ArkHimar <span class="arrow">↗</span></a>
+    </div>
+  </div>
+  <div class="arch-frame reveal" style="margin-top:80px">
+    <span class="frame-label">ARKHIMAR / SECTION A-A / 001</span>
+  </div>
+</section>
+
+<section class="section dark" id="services">
+  <div class="eyebrow reveal">02 / Capabilities</div>
+  <h2 class="display reveal">BUILT AROUND<br>YOUR VISION.</h2>
+  <div class="services">
+    <article class="card glass reveal"><span class="card-no">01</span><span class="corner"></span><h3>Architectural Design</h3><p>Concept, planning, form and construction-ready architectural thinking.</p></article>
+    <article class="card glass reveal"><span class="card-no">02</span><span class="corner"></span><h3>Interior Architecture</h3><p>Spatial experiences, material palettes and refined interior environments.</p></article>
+    <article class="card glass reveal"><span class="card-no">03</span><span class="corner"></span><h3>3D Visualization</h3><p>Photorealistic imagery and cinematic visual narratives for your project.</p></article>
+    <article class="card glass reveal"><span class="card-no">04</span><span class="corner"></span><h3>Master Planning</h3><p>Connected environments designed around movement, landscape and community.</p></article>
+    <article class="card glass reveal"><span class="card-no">05</span><span class="corner"></span><h3>Project Development</h3><p>Design intelligence carried from vision through delivery.</p></article>
+    <article class="card glass reveal"><span class="card-no">06</span><span class="corner"></span><h3>Consultancy</h3><p>Strategic architectural guidance for ambitious developments.</p></article>
+  </div>
+</section>
+
+<section class="section dark" id="projects" style="padding-top:20px">
+  <div class="eyebrow reveal">03 / Selected works</div>
+  <h2 class="display reveal">SPACES WITH<br>A POINT OF VIEW.</h2>
+  <div class="projects">
+    <article class="project reveal"><div class="project-img"></div><div class="project-info"><p>Lagos / Residential / 2026</p><h3>Storm House</h3></div></article>
+    <div class="project-stack">
+      <article class="project small reveal"><div class="project-img"></div><div class="project-info"><p>Abuja / Hospitality</p><h3>Canopy Residence</h3></div></article>
+      <article class="project small reveal"><div class="project-img"></div><div class="project-info"><p>Ibadan / Mixed Use</p><h3>Terrace House</h3></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="eyebrow reveal">04 / Material intelligence</div>
+  <h2 class="display reveal">MATERIAL<br>MATTERS.</h2>
+  <div class="materials">
+    <div class="material reveal"><span>Concrete</span></div>
+    <div class="material reveal"><span>Stone</span></div>
+    <div class="material reveal"><span>Timber</span></div>
+    <div class="material reveal"><span>Glass</span></div>
+  </div>
+</section>
+
+<section class="section dark studio" id="studio">
+  <div class="reveal">
+    <div class="eyebrow">05 / Design Studio</div>
+    <h2 class="display">START WITH<br>A CLEAR BRIEF.</h2>
+    <p class="studio-note">Shape the first direction of your project in a few decisions. Your selections become a working brief for an ArkHimar consultation.</p>
+  </div>
+  <div class="studio-panel glass reveal">
+    <div class="eyebrow">Project profile</div>
+    <div class="studio-options">
+      <div class="studio-option"><input id="studio-residential" type="radio" name="studio-type" value="Residential architecture" checked><label for="studio-residential">Residential</label></div>
+      <div class="studio-option"><input id="studio-commercial" type="radio" name="studio-type" value="Commercial or mixed-use"><label for="studio-commercial">Commercial</label></div>
+      <div class="studio-option"><input id="studio-interior" type="radio" name="studio-type" value="Interior architecture"><label for="studio-interior">Interior</label></div>
+      <div class="studio-option"><input id="studio-visualization" type="radio" name="studio-type" value="3D visualization"><label for="studio-visualization">Visualization</label></div>
+    </div>
+    <div class="field" style="margin-top:22px"><label for="studio-location">Project location</label><input id="studio-location" placeholder="City, country"></div>
+    <div class="field"><label for="studio-scale">Approximate scale</label><select id="studio-scale"><option>Private residence</option><option>Multi-unit development</option><option>Hospitality or workplace</option><option>Site or masterplan</option></select></div>
+    <div class="studio-result" id="studioResult"><strong>Your starting brief</strong><span>Residential architecture for a private residence. Add a location to make this brief specific.</span></div>
+    <a class="btn glass" href="#contact" id="studioCta">Continue to consultation <span class="arrow">↗</span></a>
+  </div>
+</section>
+
+<section class="section dark">
+  <div class="lab" id="spatial-lab">
+    <div class="lab-copy reveal">
+      <div class="eyebrow">06 / Spatial Lab</div>
+      <h2 class="display">MAKE THE<br>FIRST MOVE.</h2>
+      <p class="bodycopy">Explore a small architectural study before the formal brief begins. Select a room, test the arrangement and see how a measured plan can become an experience.</p>
+      <p class="studio-note">This is a concept tool, not a construction document. Every serious project is refined with an ArkHimar architect.</p>
+    </div>
+    <div class="lab-shell reveal" aria-label="Interactive floor plan study">
+      <div class="lab-toolbar"><span id="labSelection">Ground floor / 01</span><div class="lab-mode"><button class="active" type="button" data-mode="plan">2D plan</button><button type="button" data-mode="volume">3D volume</button></div></div>
+      <div class="lab-canvas" id="labCanvas">
+        <button class="plan-room selected" type="button" data-room="Living / courtyard" data-area="42" style="left:8%;top:10%;width:56%;height:43%">Living / courtyard</button>
+        <button class="plan-room" type="button" data-room="Kitchen" data-area="18" style="left:64%;top:10%;width:28%;height:25%">Kitchen</button>
+        <button class="plan-room" type="button" data-room="Bedroom" data-area="20" style="left:64%;top:35%;width:28%;height:38%">Bedroom</button>
+        <button class="plan-room" type="button" data-room="Studio" data-area="24" style="left:8%;top:53%;width:34%;height:33%">Studio</button>
+        <button class="plan-room" type="button" data-room="Garden court" data-area="42" style="left:42%;top:53%;width:22%;height:33%">Garden court</button>
+      </div>
+      <div class="lab-footer"><span id="labHint" class="lab-hint">Living / courtyard selected</span><span><strong id="labArea">42 m²</strong> study area</span><button class="lab-action" id="labReset" type="button">Reset study</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="section dark">
+  <div class="eyebrow reveal">07 / Philosophy</div>
+  <p class="quote reveal">FORM FOLLOWS EXPERIENCE. LIGHT DEFINES SPACE. MATERIAL CREATES MEMORY.</p>
+</section>
+
+<section class="section dark contact" id="contact">
+  <div class="reveal">
+    <div class="eyebrow">08 / Start a project</div>
+    <h2 class="display">LET'S BUILD<br>WHAT'S NEXT.</h2>
+    <p class="bodycopy">Tell us what you're imagining. We'll bring architectural clarity, creativity and precision to the next step.</p>
+  </div>
+  <form class="form glass reveal" onsubmit="event.preventDefault(); alert('Thank you. Your project enquiry is ready to be connected to ArkHimar Consults.');">
+    <div class="field"><label>Name</label><input required placeholder="Your name"></div>
+    <div class="field"><label>Email</label><input required type="email" placeholder="you@example.com"></div>
+    <div class="field"><label>Project type</label><select><option>Architectural Design</option><option>Interior Architecture</option><option>3D Visualization</option><option>Master Planning</option><option>Consultancy</option></select></div>
+    <div class="field"><label>Tell us about your project</label><textarea placeholder="Project location, scale, brief..."></textarea></div>
+    <button class="btn glass" type="submit">Start a conversation <span class="arrow">↗</span></button>
+  </form>
+</section>
+
+<footer class="footer">
+  <div><div class="footer-brand">ARKHIMAR CONSULTS</div><small>Architecture / Design / Development<br>Contemporary Nigerian practice.</small></div>
+  <small>© 2026 ArkHimar Consults<br>06°XX'N / 03°XX'E</small>
+</footer>
+
+<script>
+const video = document.getElementById('heroVideo');
+let target = 0, current = 0, lastScroll = window.scrollY, raf = null;
+let duration = 0;
+
+video.addEventListener('loadedmetadata', () => {
+  duration = video.duration || 1;
+  video.pause();
+});
+
+function scrub(){
+  current += (target-current)*0.12;
+  if (duration && Number.isFinite(current)) video.currentTime = Math.max(0, Math.min(duration-.02, current));
+  raf = requestAnimationFrame(scrub);
+}
+scrub();
+
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const delta = y-lastScroll;
+  lastScroll = y;
+  if (!duration) return;
+  // Scroll progress maps to the 360° Veo orbit.
+  target += delta * 0.018;
+  target = Math.max(0, Math.min(duration-.02, target));
+}, {passive:true});
+
+// Reset the camera to the beginning when the user returns to the top.
+window.addEventListener('scroll', () => {
+  if(window.scrollY < 3 && duration) target = 0;
+}, {passive:true});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+const studioResult = document.getElementById('studioResult');
+const studioLocation = document.getElementById('studio-location');
+const studioScale = document.getElementById('studio-scale');
+const studioTypeInputs = document.querySelectorAll('input[name="studio-type"]');
+const studioCta = document.getElementById('studioCta');
+
+function updateStudioBrief(){
+  const selected = document.querySelector('input[name="studio-type"]:checked');
+  const type = selected ? selected.value : 'Architectural design';
+  const location = studioLocation.value.trim() || 'an unconfirmed location';
+  const scale = studioScale.value.toLowerCase();
+  studioResult.querySelector('span').textContent = `${type} in ${location}, focused on ${scale}.`;
+  studioCta.href = '#contact';
+  const contactBrief = document.querySelector('#contact textarea');
+  if(contactBrief && !contactBrief.value) contactBrief.value = `${type} in ${location}, focused on ${scale}.`;
+}
+
+studioTypeInputs.forEach(input=>input.addEventListener('change', updateStudioBrief));
+studioLocation.addEventListener('input', updateStudioBrief);
+studioScale.addEventListener('change', updateStudioBrief);
+
+const labCanvas = document.getElementById('labCanvas');
+const labRooms = document.querySelectorAll('.plan-room');
+const labHint = document.getElementById('labHint');
+const labArea = document.getElementById('labArea');
+const labModeButtons = document.querySelectorAll('[data-mode]');
+const labReset = document.getElementById('labReset');
+
+function selectRoom(room){
+  labRooms.forEach(item=>item.classList.toggle('selected', item === room));
+  labHint.textContent = `${room.dataset.room} selected`;
+  labArea.textContent = `${room.dataset.area} m²`;
+}
+
+labRooms.forEach(room=>room.addEventListener('click', ()=>selectRoom(room)));
+labModeButtons.forEach(button=>button.addEventListener('click', ()=>{
+  labModeButtons.forEach(item=>item.classList.toggle('active', item === button));
+  labCanvas.classList.toggle('volume', button.dataset.mode === 'volume');
+}));
+labReset.addEventListener('click', ()=>{
+  const firstRoom = labRooms[0];
+  selectRoom(firstRoom);
+  labModeButtons[0].click();
+});
+</script>
+</body>
+</html>
