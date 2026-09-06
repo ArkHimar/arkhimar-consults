@@ -24,6 +24,10 @@ Updated: 2026-09-06
 - Private project-document bucket with membership policies and short-lived signed URLs.
 - Client-side type/size checks backed by storage-bucket limits and database constraints.
 - CSP, private-app noindex and non-cached public runtime configuration.
+- Workspace Communications Studio with structured branded email/letter blocks, live preview, templates, private attachments and delivery history.
+- Workspace brand settings for colors, sender identity, logo and letterhead assets.
+- Integration Hub with one-time API-key display, SHA-256 hashes, scopes, revocation, rate limits and a validated form-submission endpoint.
+- Server-side Resend adapter with verified user sessions, role checks, idempotency and HTML/plain-text output.
 
 The production code is present but the repository is not yet connected to a provisioned Supabase project. Until the migration and public environment variables are configured, `/pm/` correctly routes to a login page that reports authentication is not configured.
 
@@ -36,7 +40,7 @@ This release is a coherent product-validation build, not the production multi-us
 - malware scanning/quarantine integration;
 - server-transactional controlled approvals and protected share links;
 - full FS/SS/FF/SF calendar scheduling and high-volume Gantt virtualization;
-- server-generated DOCX, XLSX and PPTX controlled documents;
+- server-generated DOCX, XLSX and PPTX controlled documents (branded HTML and print/PDF letter output is now available);
 - notification jobs, secure AI provider integration and organization knowledge retrieval;
 - automated tenant-isolation, authorization and full browser E2E suites.
 

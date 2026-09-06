@@ -1,6 +1,7 @@
 {
   "name": "arkhimar-consults",
   "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "ArkHimar Consult public website and ArkHimar PM foundation",
   "scripts": {
@@ -10,10 +11,11 @@
     "build": "node scripts/build.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.115.0"
+    "@supabase/supabase-js": "^2.115.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
