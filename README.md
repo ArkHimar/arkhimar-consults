@@ -4,7 +4,7 @@ Production reconstruction of the ArkHimar public site, plus a connected browser-
 
 ## Run locally
 
-Requires Node.js 20 or newer.
+Requires Node.js 20 or newer. Copy `.env.example` to `.env.local` and supply a Supabase public URL and publishable anonymous key for the authenticated PM application.
 
 ```sh
 npm run dev
@@ -43,7 +43,7 @@ The production-ready static artifact is written to `dist/` and can be served by 
 
 The public site and enquiry UI are complete static routes. The PM validation workspace now includes a six-step project setup, readiness scoring, business-case calculations, versioned charter approval, scope/requirements/WBS planning, schedule critical path, cost/EVM controls, RAID/change registers, status snapshots, audit events and JSON/CSV/TXT/print exports. It includes tested deterministic financial, EVM, risk, weighted-scoring and critical-path engines.
 
-The workspace still stores its data in the local browser and clearly labels this limitation in the UI. Do not use it for confidential or multi-user project data until authentication, PostgreSQL tenancy, server-side authorization, private file storage and server-generated controlled exports are implemented. See [docs/PM_IMPLEMENTATION_STATUS.md](docs/PM_IMPLEMENTATION_STATUS.md) for the phase-by-phase boundary.
+The PM workspace now uses Supabase Auth, PostgreSQL tenancy with row-level security, role-restricted mutations, append-only server audit events and private object storage with expiring signed links. The integration requires backend provisioning and environment variables before it becomes operational on a deployment. See [docs/PRODUCTION_BACKEND_SETUP.md](docs/PRODUCTION_BACKEND_SETUP.md) and [docs/PM_IMPLEMENTATION_STATUS.md](docs/PM_IMPLEMENTATION_STATUS.md).
 
 The public PM marketing system is configured for `private_beta`. Its pricing is explicitly labelled as a hypothesis, its claim registry hides planned capabilities, and its provider-neutral analytics layer rejects project content. Lead forms use the already configured `projects@arkhimar.com` FormSubmit route. See [docs/MARKETING_IMPLEMENTATION_STATUS.md](docs/MARKETING_IMPLEMENTATION_STATUS.md).
 

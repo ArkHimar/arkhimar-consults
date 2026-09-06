@@ -1,15 +1,17 @@
 import {access,readFile} from 'node:fs/promises';
 
 const pages=[
-  'index.html','start-a-project/index.html','project-management/index.html','pm/index.html',
+  'index.html','start-a-project/index.html','project-management/index.html','pm/index.html','pm/login/index.html',
   ...['features','pricing','demo','early-access','templates','resources','tools','solutions','compare','security','privacy','terms','changelog'].map(route=>`project-management/${route}/index.html`)
 ];
-const required=['styles.css','app.js','robots.txt','sitemap.xml','lib/calculators.mjs','project-management/marketing-config.mjs','project-management/entitlements.mjs','project-management/analytics.mjs','project-management/marketing.js','project-management/marketing.css','pm/pm.js','pm/pm.css','assets/images/hero-architecture.jpg','assets/images/studio-drawings.jpg','assets/images/project-duplex.jpg','assets/images/project-commercial.jpg','assets/images/project-interior.jpg'];
+const required=['.env.example','styles.css','app.js','robots.txt','sitemap.xml','lib/calculators.mjs','project-management/marketing-config.mjs','project-management/entitlements.mjs','project-management/analytics.mjs','project-management/marketing.js','project-management/marketing.css','pm/pm.js','pm/backend.js','pm/auth.js','pm/pm.css','supabase/migrations/202609060001_pm_foundation.sql','assets/images/hero-architecture.jpg','assets/images/studio-drawings.jpg','assets/images/project-duplex.jpg','assets/images/project-commercial.jpg','assets/images/project-interior.jpg'];
 const errors=[];
 for(const file of [...pages,...required]){try{await access(file)}catch{errors.push(`Missing ${file}`)}}
 for(const page of pages){const html=await readFile(page,'utf8');if(!/<title>[^<]+<\/title>/.test(html))errors.push(`${page}: missing title`);if(!/<meta name="description"/.test(html))errors.push(`${page}: missing description`);if(!/<main(?:\s|>)/.test(html))errors.push(`${page}: missing main landmark`);if(page.startsWith('project-management/')&&!/<link rel="canonical"/.test(html))errors.push(`${page}: missing canonical URL`)}
 const enquiry=await readFile('start-a-project/index.html','utf8');if(!/enctype="multipart\/form-data"/.test(enquiry))errors.push('Project form must use multipart encoding');if(!/<input[^>]+type="file"[^>]+multiple/.test(enquiry))errors.push('Project form must support multiple attachments');
 const pm=await readFile('pm/index.html','utf8');if(!/<meta name="robots" content="noindex,nofollow">/.test(pm))errors.push('Private PM route must be noindex');if(!/data-other-industry hidden/.test(pm))errors.push('Other project type must have an optional specification field');
+const migration=await readFile('supabase/migrations/202609060001_pm_foundation.sql','utf8');for(const contract of ['enable row level security','project-documents','audit_events','bootstrap_workspace','projects_manager_insert','projects_manager_update','project_files_member_read','project_files_contributor_insert','revoke insert,update,delete on public.audit_events'])if(!migration.includes(contract))errors.push(`Migration missing ${contract}`);
+const auth=await readFile('pm/auth.js','utf8');for(const contract of ['signInWithPassword','signUp','resetPasswordForEmail','PASSWORD_RECOVERY','updateUser'])if(!auth.includes(contract))errors.push(`Authentication flow missing ${contract}`);
 const sitemap=await readFile('sitemap.xml','utf8');if(sitemap.includes('/pm/'))errors.push('Private PM app must not be in sitemap');
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
 console.log(`Checked ${pages.length} routes, ${required.length} assets, SEO policy and form contracts.`);

@@ -25,6 +25,7 @@
         <button type="button" data-view="planning"><b>⌘</b><span>Scope &amp; Planning</span></button>
         <button type="button" data-view="schedule"><b>↝</b><span>Schedule &amp; Cost</span></button>
         <button type="button" data-view="controls"><b>△</b><span>Risks &amp; Controls</span></button>
+        <button type="button" data-view="documents"><b>▱</b><span>Documents</span></button>
         <button type="button" data-view="reports"><b>▤</b><span>Reports &amp; Export</span></button>
         <button type="button" data-view="audit"><b>◷</b><span>Audit Trail</span></button>
       </nav>
@@ -33,12 +34,12 @@
     <div class="app-body">
       <header class="topbar">
         <button class="mobile-rail" type="button" data-mobile aria-controls="rail" aria-expanded="false">Menu</button>
-        <button class="workspace-switch" type="button" data-home><small>PERSONAL WORKSPACE</small><strong data-project-context>My Projects</strong></button>
+        <button class="workspace-switch" type="button" data-home><small data-workspace-name>SECURE WORKSPACE</small><strong data-project-context>My Projects</strong></button>
         <button class="search" type="button" data-command>⌕ <span>Search or run a command</span><kbd>⌘ K</kbd></button>
         <button class="icon-button" type="button" data-notifications aria-label="Notifications">○</button>
         <button class="avatar" type="button" data-account aria-label="Account information">AH</button>
       </header>
-      <div class="safety-banner" role="note"><strong>Local validation workspace</strong><span>Data stays in this browser. Do not enter confidential project information until secure accounts and cloud storage are connected.</span></div>
+      <div class="safety-banner secure" role="status"><strong>Secure cloud workspace</strong><span data-security-context>Session, tenancy and file access are enforced by the backend.</span></div>
       <main id="workspace" class="workspace" tabindex="-1" data-workspace></main>
     </div>
   </div>
@@ -76,6 +77,6 @@
 
   <dialog class="command-dialog" data-command-dialog aria-label="Command palette"><form method="dialog"><label>Search ArkHimar PM<input type="search" placeholder="Type a command or project…" data-command-input></label><button value="cancel" aria-label="Close">×</button><ul data-command-results></ul></form></dialog>
   <dialog class="notice-dialog" data-notice-dialog><form method="dialog"><h2 data-notice-title>Notice</h2><p data-notice-copy></p><button class="primary" value="close">Close</button></form></dialog>
-  <script type="module" src="/pm/pm.js"></script>
+  <script src="/runtime-config.js"></script><script type="module" src="/pm/pm.js"></script>
 </body>
 </html>
