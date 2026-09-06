@@ -1,6 +1,18 @@
 # ArkHimar PM production backend setup
 
-The application integration and database migration are committed in this repository. A Supabase project must be provisioned before the hosted login can operate.
+The application integration is active on the Vercel demo deployment. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, both checked-in migrations were applied, and the hosted login now detects the configured backend.
+
+## Activation status
+
+- Supabase project created and healthy.
+- 10 expected application tables verified.
+- 24 public-schema row-level security policies verified.
+- `project-documents` and `workspace-brand-assets` verified as private buckets.
+- Replacement publishable and server secret keys stored in Vercel; no server secret is written to source control or browser runtime configuration.
+- Legacy JWT-based API keys disabled and the previous HS256 signing key revoked.
+- Demo and `www.arkhimar.com` PM login redirect URLs allow-listed.
+- Vercel deployment `dpl_Dv61h4cMhitL7coL8wV9gAjz6rPS` completed and aliased to `https://arkhimar-consults-demo.vercel.app`.
+- Initial owner account, email confirmation, workspace bootstrap and two-user tenancy tests remain to be completed.
 
 ## Architecture
 
