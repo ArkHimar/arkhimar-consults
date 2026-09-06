@@ -51,6 +51,14 @@ test('built private workspace remains noindex and out of sitemap',async()=>{
   const pm=await readFile('dist/pm/index.html','utf8');const sitemap=await readFile('dist/sitemap.xml','utf8');assert.match(pm,/noindex,nofollow/);assert.doesNotMatch(sitemap,/\/pm/);
 });
 
+test('account creation requires password confirmation',async()=>{
+  const login=await readFile('dist/pm/login/index.html','utf8');
+  const auth=await readFile('pm/auth.js','utf8');
+  assert.match(login,/name="confirm_password"/);
+  assert.match(auth,/values\.password!==values\.confirm_password/);
+  assert.match(auth,/Passwords do not match/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });

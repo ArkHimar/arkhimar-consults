@@ -10,9 +10,11 @@ function setMode(next){
   $$('[data-auth-mode]').forEach(button=>button.classList.toggle('active',button.dataset.authMode===mode));
   $('[data-email]').hidden=mode==='recovery';
   $('[data-password]').hidden=mode==='reset';
+  $('[data-confirm-password]').hidden=!['signup','recovery'].includes(mode);
   $('[data-display-name]').hidden=mode!=='signup';
   $('[name=email]').required=mode!=='recovery';
   $('[name=password]').required=mode!=='reset';
+  $('[name=confirm_password]').required=['signup','recovery'].includes(mode);
   $('[name=password]').autocomplete=['signup','recovery'].includes(mode)?'new-password':'current-password';
   $('[data-auth-intro]').textContent=mode==='recovery'?'Choose a strong new password for your account.':'Sign in with your verified account to continue.';
   $('[data-auth-submit]').textContent=mode==='signin'?'Sign in securely':mode==='signup'?'Create secure account':mode==='reset'?'Send reset link':'Set new password';
@@ -38,6 +40,10 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
   button.disabled=true;
   status.textContent='Working…';
   try{
+    if(['signup','recovery'].includes(mode)&&values.password!==values.confirm_password){
+      $('[name=confirm_password]').focus();
+      throw new Error('Passwords do not match. Type the same password in both fields.');
+    }
     if(mode==='signin'){
       const {error}=await supabase.auth.signInWithPassword({email:values.email,password:values.password});
       if(error)throw error;
