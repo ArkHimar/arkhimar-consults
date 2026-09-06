@@ -22,6 +22,13 @@ test('metadata renderer adds social, canonical, schema and preview noindex',()=>
   const preview=applySeo('<html><head><title>Old</title></head><body></body></html>','/',{indexable:false});assert.match(preview,/noindex,nofollow/);assert.doesNotMatch(preview,/>Old<\/title>/);
 });
 
+test('generated public pages load the approved Inter and Syne font families',async()=>{
+  const projects=await readFile('dist/projects/index.html','utf8');
+  assert.match(projects,/family=Inter:wght@300;400;500;600/);
+  assert.match(projects,/family=Syne:wght@400;500;600;700/);
+  assert.doesNotMatch(projects,/font-family:[^;]*(monospace|Courier)/i);
+});
+
 test('built private workspace remains noindex and out of sitemap',async()=>{
   const pm=await readFile('dist/pm/index.html','utf8');const sitemap=await readFile('dist/sitemap.xml','utf8');assert.match(pm,/noindex,nofollow/);assert.doesNotMatch(sitemap,/\/pm/);
 });
