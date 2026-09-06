@@ -26,4 +26,4 @@ The deployment remains static and dependency-free to preserve the repository's h
 - The enquiry workflow still relies on a third-party FormSubmit endpoint. Confirm its activation and privacy terms before launch, or replace it with an owned serverless handler.
 - ArkHimar PM currently stores projects in the local browser. It is suitable for product validation, not confidential multi-user production use.
 - Authentication, relational storage, tenant isolation, server-side authorization and controlled-document exports require a production backend milestone before PM launch.
-- The placeholder phone number in the Lovable reference should be replaced with the owner's verified business number.
+- The business phone number was updated to the owner-supplied `+234 805 871 6249` on 2026-09-06.
