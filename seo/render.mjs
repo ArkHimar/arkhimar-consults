@@ -44,6 +44,12 @@ ${schemasFor(route).map(jsonScript).join('\n')}`;
 
 export function applySeo(html,route,options={}){
   html=html.replace(/<title>[\s\S]*?<\/title>/gi,'').replace(/<meta\s+(?:name|property)="(?:description|robots|og:[^"]+|twitter:[^"]+)"[^>]*>/gi,'').replace(/<link\s+rel="canonical"[^>]*>/gi,'').replace(/<link\s+rel="(?:icon|apple-touch-icon|manifest)"[^>]*>/gi,'').replace(/<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/gi,'');
+  if(!route.startsWith('/project-management')&&!html.includes('data-pm-nav'))html=html.replace('</nav>','<a data-pm-nav href="/project-management">ArkHimar PM</a></nav>');
+  if(!html.includes('data-auth-nav')){
+    const control='<a class="auth-nav-link" data-auth-nav href="/pm/login/?mode=signup">Sign Up</a>';
+    html=html.includes('</nav>')?html.replace('</nav>',`${control}</nav>`):html.replace('</header>',`${control}</header>`);
+  }
+  if(!html.includes('/auth-nav.js'))html=html.replace('</body>','<script src="/runtime-config.js"></script><script type="module" src="/auth-nav.js"></script></body>');
   return html.replace('</head>',`${seoHead(route,options)}\n</head>`);
 }
 

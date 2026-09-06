@@ -2,7 +2,8 @@ import {backendConfigured,currentSession,supabase} from './backend.js';
 
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
-let mode=location.hash.includes('type=recovery')?'recovery':'signin';
+const requestedMode=new URLSearchParams(location.search).get('mode');
+let mode=location.hash.includes('type=recovery')?'recovery':requestedMode==='signup'?'signup':'signin';
 
 function setMode(next){
   mode=next;
