@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {roi,npv,payback,evm,riskScore,weightedScore,calculateCpm} from '../lib/calculators.mjs';
+test('financial calculations are deterministic',()=>{assert.equal(roi(150,100),.5);assert.equal(roi(100,0),null);assert.equal(Math.round(npv(.1,[-100,60,60])*100)/100,4.13);assert.equal(payback([-100,40,80]),1.75)});
+test('earned value handles zero denominators',()=>{assert.deepEqual(evm({pv:0,ev:0,ac:0,bac:100}),{cv:0,sv:0,cpi:null,spi:null,eac:null,vac:null});assert.equal(evm({pv:80,ev:90,ac:75,bac:200}).cpi,1.2)});
+test('risk and weighted scoring',()=>{assert.equal(riskScore(4,5),20);assert.equal(weightedScore([{weight:30,score:4},{weight:70,score:2}]),2.6)});
+test('CPM finds duration, float and critical activities',()=>{const result=calculateCpm([{id:'A',duration:3},{id:'B',duration:4},{id:'C',duration:2},{id:'D',duration:1}],[{from:'A',to:'B'},{from:'A',to:'C'},{from:'B',to:'D'},{from:'C',to:'D'}]);assert.equal(result.duration,8);assert.deepEqual(result.critical,['A','B','D']);assert.equal(result.tasks.find(t=>t.id==='C').float,2)});
+test('CPM rejects cycles',()=>{assert.throws(()=>calculateCpm([{id:'A',duration:1},{id:'B',duration:1}],[{from:'A',to:'B'},{from:'B',to:'A'}]),/cycle/i)});

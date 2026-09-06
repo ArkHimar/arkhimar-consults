@@ -1,0 +1,13 @@
+{
+  "name": "arkhimar-consults",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ArkHimar Consult public website and ArkHimar PM foundation",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
