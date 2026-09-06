@@ -5,6 +5,12 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/work", "destination": "/projects", "permanent": true },
+    { "source": "/works", "destination": "/projects", "permanent": true },
+    { "source": "/start-project", "destination": "/start-a-project", "permanent": true },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "arkhimar.com" }], "destination": "https://www.arkhimar.com/:path*", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -18,6 +24,14 @@
     {
       "source": "/runtime-config.js",
       "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
+    },
+    {
+      "source": "/pm/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     }
   ]
 }

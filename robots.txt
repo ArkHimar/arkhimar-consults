@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /pm/
+Disallow: /pm
+Disallow: /api
 
 Sitemap: https://www.arkhimar.com/sitemap.xml
