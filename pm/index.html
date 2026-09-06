@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#181815">
   <meta name="description" content="ArkHimar PM project control workspace">
+  <meta name="robots" content="noindex,nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -48,7 +49,8 @@
       <div class="step-track"><i data-track></i></div>
       <section class="wizard-step active" data-step="1"><h3>Project identity</h3><p>Give the investment a stable identity and operating context.</p><div class="form-grid">
         <label>Project title *<input name="title" required autocomplete="off"></label><label>Short code *<input name="code" required maxlength="12" placeholder="AKH-001" autocomplete="off"></label>
-        <label class="wide">Description *<textarea name="description" rows="3" required></textarea></label><label>Project type / industry<select name="industry"><option>Architecture / Construction</option><option>Technology</option><option>Education</option><option>Development / NGO</option><option>Research</option><option>Other</option></select></label>
+        <label class="wide">Description *<textarea name="description" rows="3" required></textarea></label><label>Project type / industry<select name="industry" data-industry><option>Architecture / Construction</option><option>Technology</option><option>Education</option><option>Development / NGO</option><option>Research</option><option>Other</option></select></label>
+        <label data-other-industry hidden>Specify another type (optional)<input name="industryOther" autocomplete="off" placeholder="e.g. Healthcare, events, energy"></label>
         <label>Delivery approach<select name="approach"><option>Predictive</option><option>Agile</option><option>Hybrid</option></select></label><label>Country / region<input name="region" value="Nigeria"></label><label>Primary timezone<input name="timezone" value="Africa/Lagos"></label>
         <label>Reporting currency<select name="currency"><option>NGN</option><option>USD</option><option>GBP</option><option>EUR</option></select></label><label>Confidentiality<select name="confidentiality"><option>Internal</option><option>Confidential</option><option>Public</option></select></label>
       </div></section>
