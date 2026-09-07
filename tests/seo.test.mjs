@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {SITE_ORIGIN,canonicalFor,indexableRoutes,pageMeta,robotsText,sitemapXml} from '../seo/config.mjs';
 import {applySeo,seoHead} from '../seo/render.mjs';
+import {normalizeBrand,renderEmailHtml,renderEmailText} from '../lib/email-template.mjs';
 
 test('all public routes have unique metadata and normalized production canonicals',()=>{
   const titles=new Set();const descriptions=new Set();
@@ -64,6 +65,28 @@ test('server role migration grants only operations used by production API routes
   assert.match(sql,/grant insert on table[\s\S]+public\.form_submissions[\s\S]+to service_role/i);
   assert.match(sql,/grant update on table[\s\S]+public\.outbound_messages[\s\S]+to service_role/i);
   assert.doesNotMatch(sql,/grant all|to anon|public\.api_keys/i);
+});
+
+test('membership policies prevent admins from taking ownership or changing themselves',async()=>{
+  const sql=await readFile('supabase/migrations/202609070005_membership_role_boundaries.sql','utf8');
+  assert.match(sql,/user_id\s*<>\s*auth\.uid\(\)/i);
+  assert.match(sql,/workspace_role_for\(workspace_id\)\s*=\s*'owner'[\s\S]+role in \('admin','project_manager','member','viewer'\)/i);
+  assert.match(sql,/workspace_role_for\(workspace_id\)\s*=\s*'admin'[\s\S]+role in \('project_manager','member','viewer'\)/i);
+  assert.doesNotMatch(sql,/role in \([^)]*'owner'/i);
+});
+
+test('outbound message recipients use the API object contract',async()=>{
+  const sql=await readFile('supabase/migrations/202609070006_outbound_recipient_contract.sql','utf8');
+  assert.match(sql,/jsonb_typeof\(recipients\)\s*=\s*'object'/i);
+  assert.match(sql,/recipients->'to'[\s\S]+jsonb_array_length\(recipients->'to'\) between 1 and 50/i);
+  assert.match(sql,/recipients->'cc'[\s\S]+recipients->'bcc'/i);
+});
+
+test('email rendering uses safe ArkHimar defaults when a workspace has no brand settings',()=>{
+  assert.equal(normalizeBrand(null).senderName,'ArkHimar PM');
+  const message={subject:'Project update',blocks:[{type:'heading',text:'Your update'}],brand:null};
+  assert.match(renderEmailHtml(message),/ArkHimar PM/);
+  assert.match(renderEmailText(message),/^ArkHimar PM/);
 });
 
 test('account creation requires password confirmation',async()=>{

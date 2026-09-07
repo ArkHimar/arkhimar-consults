@@ -43,6 +43,8 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `supabase/migrations/202609060002_integrations_communications.sql`
    - `supabase/migrations/202609070003_authenticated_privileges.sql`
    - `supabase/migrations/202609070004_service_role_privileges.sql`
+   - `supabase/migrations/202609070005_membership_role_boundaries.sql`
+   - `supabase/migrations/202609070006_outbound_recipient_contract.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
