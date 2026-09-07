@@ -30,6 +30,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Temporary role-test projects, messages, memberships and the temporary authentication account were removed after verification; all four cleanup counts returned zero.
 - Production deployment `dpl_BmMJLjmrAHGGfZWRNGEkovGKEcuG` contains the role-boundary, recipient-contract and no-brand email fallback fixes.
 - Expiring, email-bound workspace invitations and the Team & Access administration screen were deployed in `dpl_7GKB2RGt8NitH9azhN3dKVNvADKe`; the production endpoint rejects unauthenticated invitation requests and keeps invite tokens out of HTTP query strings.
+- TOTP enrollment, enforced AAL2 challenges for enrolled accounts, factor removal and “sign out other sessions” controls were deployed in `dpl_21yDJtezW6pHonJ1DEmSFHWfzDmB`. Ordinary sign-out now ends only the current device session.
 
 ## Architecture
 
@@ -115,7 +116,7 @@ The API key is an ArkHimar integration credential. It is not the Resend key and 
 
 - Configure backup and point-in-time recovery appropriate to the plan.
 - Configure production SMTP, custom email templates and abuse/rate-limit thresholds.
-- Add MFA policy and session-revocation administration.
+- Decide whether MFA becomes mandatory for privileged roles before opening general production access.
 - Run an owner-sent two-user invitation acceptance and revocation exercise before opening public self-service onboarding.
 - Add malware scanning/quarantine integration for files.
 - Repeat the two-user role matrix after material authorization, schema or storage-policy changes.

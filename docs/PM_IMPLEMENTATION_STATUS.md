@@ -30,6 +30,7 @@ Updated: 2026-09-07
 - Server-side Resend adapter with verified user sessions, role checks, idempotency and HTML/plain-text output.
 - Workspace Team & Access screen with member role controls, member removal and expiring email invitations.
 - One-time invitation acceptance bound to the authenticated email address, with revocation, audit events and owner/admin escalation boundaries.
+- TOTP authenticator enrollment, AAL2 sign-in challenges, factor removal and selective session revocation from the profile security panel.
 
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 
@@ -37,7 +38,7 @@ The production code is connected to the ArkHimar Supabase project and deployed a
 
 This release is a coherent product-validation build, not the production multi-user system described by the full brief. The source repository began as a static site with no backend. The following require a separately provisioned server/database and deployment secrets:
 
-- MFA enrollment, recovery and session-revocation administration;
+- Administrative account recovery and organization-wide session policy controls;
 - normalized relational storage for every advanced control register and full concurrent-edit conflict UI;
 - malware scanning/quarantine integration;
 - server-transactional controlled approvals and protected share links;
