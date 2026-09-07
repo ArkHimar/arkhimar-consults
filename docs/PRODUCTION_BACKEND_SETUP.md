@@ -17,7 +17,10 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Workspace `ArkHimar Consults` bootstrapped with the initial user as `owner` on 7 September 2026.
 - Demonstration project `Lagos Civic Learning Hub` (`AKH-DEMO`) created through the authenticated owner role on 7 September 2026; its insert audit event was verified.
 - A simulated unrelated authenticated identity saw zero workspaces, projects and audit events through row-level security.
-- Document upload and a full two-real-user role matrix remain to be completed.
+- Private DOCX upload verified against `AKH-DEMO`; document metadata, non-public bucket state and the insert audit event were confirmed.
+- Scoped key `TS Academy assignment` created with only `forms:submit` access. A production submission returned `201`, was associated with `AKH-DEMO`, incremented key usage and created its receive audit event; an invalid key returned `401`.
+- Vercel production deployment `dpl_8D2shfSZ4gRvUvDhGdfVmUn5xhkx` includes the encrypted Supabase server secret and API request hash salt.
+- A full two-real-user role matrix and production email delivery remain to be completed.
 
 ## Architecture
 
@@ -35,6 +38,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `supabase/migrations/202609060001_pm_foundation.sql`
    - `supabase/migrations/202609060002_integrations_communications.sql`
    - `supabase/migrations/202609070003_authenticated_privileges.sql`
+   - `supabase/migrations/202609070004_service_role_privileges.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -50,7 +54,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `PUBLIC_SITE_URL`
    - `API_IP_HASH_SALT` (random server-only value)
 6. Redeploy. The build generates `/runtime-config.js` and prevents that file from being cached.
-7. Create an account, verify email, sign in, create the first workspace, create a project and upload a harmless test PDF. The production activation completed through project creation on 7 September 2026; the test upload is the next checkpoint.
+7. Create an account, verify email, sign in, create the first workspace, create a project and upload a harmless test document. The production activation completed through the first project, private upload and scoped form API submission on 7 September 2026.
 
 ## Required verification
 

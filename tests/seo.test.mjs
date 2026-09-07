@@ -58,6 +58,14 @@ test('authenticated database migration grants only the application operations re
   assert.doesNotMatch(sql,/grant all|to anon/i);
 });
 
+test('server role migration grants only operations used by production API routes',async()=>{
+  const sql=await readFile('supabase/migrations/202609070004_service_role_privileges.sql','utf8');
+  assert.match(sql,/grant select on table[\s\S]+public\.projects[\s\S]+to service_role/i);
+  assert.match(sql,/grant insert on table[\s\S]+public\.form_submissions[\s\S]+to service_role/i);
+  assert.match(sql,/grant update on table[\s\S]+public\.outbound_messages[\s\S]+to service_role/i);
+  assert.doesNotMatch(sql,/grant all|to anon|public\.api_keys/i);
+});
+
 test('account creation requires password confirmation',async()=>{
   const login=await readFile('dist/pm/login/index.html','utf8');
   const auth=await readFile('pm/auth.js','utf8');
