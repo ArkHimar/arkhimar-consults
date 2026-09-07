@@ -5,8 +5,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 ## Activation status
 
 - Supabase project created and healthy.
-- 10 expected application tables verified.
-- 24 public-schema row-level security policies verified.
+- Controlled-document tables and their membership-scoped row-level security policies are active.
 - Authenticated table privileges verified; anonymous access to workspace membership remains denied.
 - `project-documents` and `workspace-brand-assets` verified as private buckets, with three project-file policies and four brand-asset policies.
 - Replacement publishable and server secret keys stored in Vercel; no server secret is written to source control or browser runtime configuration.
@@ -31,6 +30,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Production deployment `dpl_BmMJLjmrAHGGfZWRNGEkovGKEcuG` contains the role-boundary, recipient-contract and no-brand email fallback fixes.
 - Expiring, email-bound workspace invitations and the Team & Access administration screen were deployed in `dpl_7GKB2RGt8NitH9azhN3dKVNvADKe`; the production endpoint rejects unauthenticated invitation requests and keeps invite tokens out of HTTP query strings.
 - TOTP enrollment, enforced AAL2 challenges for enrolled accounts, factor removal and “sign out other sessions” controls were deployed in `dpl_21yDJtezW6pHonJ1DEmSFHWfzDmB`. Ordinary sign-out now ends only the current device session.
+- Controlled document registration, review, owner/admin approval, immutable approved versions and audited revision creation were activated on 7 September 2026. A create → review → approve → revise lifecycle test completed inside a rolled-back transaction.
 
 ## Architecture
 
@@ -52,6 +52,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `supabase/migrations/202609070005_membership_role_boundaries.sql`
    - `supabase/migrations/202609070006_outbound_recipient_contract.sql`
    - `supabase/migrations/202609070007_workspace_invitations.sql`
+   - `supabase/migrations/202609070008_controlled_documents.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -85,6 +86,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - A repeated email idempotency key does not send a duplicate message.
 - Owners can invite admins, project managers, members and viewers; admins cannot invite or modify admins.
 - Invitation acceptance requires a non-expired, non-revoked token and an authenticated account whose email exactly matches the invitation.
+- Project managers can register and submit controlled documents; only owners/admins can approve or archive them; approved version content cannot be altered or deleted.
 
 ## Connected-form assignment
 

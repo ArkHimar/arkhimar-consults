@@ -119,6 +119,19 @@ test('account security supports enforced TOTP and selective session revocation',
   assert.match(backend,/signOut\(\{scope:'local'\}\)/);
 });
 
+test('controlled documents are tenant-scoped, versioned and immutable after approval',async()=>{
+  const sql=await readFile('supabase/migrations/202609070008_controlled_documents.sql','utf8');
+  const client=await readFile('pm/backend.js','utf8');
+  assert.match(sql,/foreign key\(project_id,workspace_id\) references public\.projects\(id,workspace_id\)/i);
+  assert.match(sql,/old\.status in \('approved','superseded'\)[\s\S]+immutable/i);
+  assert.match(sql,/new\.status='superseded'[\s\S]+to_jsonb\(new\)-'status'/i);
+  assert.match(sql,/actor_role in \('owner','admin'\)[\s\S]+status='approved'/i);
+  assert.match(sql,/create policy controlled_documents_member_read/i);
+  assert.doesNotMatch(sql,/grant (insert|update|delete) on table public\.controlled_documents/i);
+  assert.match(client,/listControlledDocuments[\s\S]+controlled_document_versions/);
+  assert.match(client,/transitionControlledDocument[\s\S]+transition_controlled_document/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });

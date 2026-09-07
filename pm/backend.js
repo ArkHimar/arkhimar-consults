@@ -4,7 +4,7 @@ const config=globalThis.__ARKHIMAR_CONFIG__||{};
 export const backendConfigured=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
 export const supabase=backendConfigured?createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
 
-function publicProject(project){const {_version,_documents,...data}=project;return data}
+function publicProject(project){const {_version,_documents,_controlledDocuments,...data}=project;return data}
 export async function currentSession(){if(!supabase)return null;const {data:{session},error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;if(!session)return null;const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)return null;return{...session,user}}
 export async function loadWorkspaceContext(){
   if(!backendConfigured)return{configured:false,session:null,workspace:null,role:null,projects:[]};
@@ -18,6 +18,15 @@ export async function bootstrapWorkspace(name){const {data,error}=await supabase
 export async function createProject(workspaceId,project,userId){const payload=publicProject(project);const {data,error}=await supabase.from('projects').insert({id:project.id,workspace_id:workspaceId,title:project.title,code:project.code,data:payload,created_by:userId}).select('id,title,code,data,version').single();if(error)throw error;return{...data.data,id:data.id,title:data.title,code:data.code,_version:data.version}}
 export async function updateProject(project){const payload=publicProject(project);const {data,error}=await supabase.from('projects').update({title:project.title,code:project.code,data:payload}).eq('id',project.id).eq('version',project._version||1).select('version').maybeSingle();if(error)throw error;if(!data)throw new Error('This project changed in another session. Reload before saving again.');project._version=data.version;return project}
 export async function listDocuments(projectId){const {data,error}=await supabase.from('project_documents').select('id,filename,content_type,size_bytes,created_at,storage_path').eq('project_id',projectId).order('created_at',{ascending:false});if(error)throw error;return data||[]}
+export async function listControlledDocuments(projectId){
+  const {data:documents,error}=await supabase.from('controlled_documents').select('*').eq('project_id',projectId).order('updated_at',{ascending:false});if(error)throw error;
+  const ids=(documents||[]).map(document=>document.id);if(!ids.length)return[];
+  const {data:versions,error:versionError}=await supabase.from('controlled_document_versions').select('*').in('document_id',ids).order('version',{ascending:false});if(versionError)throw versionError;
+  return documents.map(document=>({...document,versions:(versions||[]).filter(version=>version.document_id===document.id)}));
+}
+export async function createControlledDocument(projectId,values){const {data,error}=await supabase.rpc('create_controlled_document',{target_project:projectId,document_id_code:values.document_code,document_type:values.artifact_type,document_title:values.title,document_owner:values.owner_name||'',document_confidentiality:values.confidentiality||'Internal',document_tags:(values.tags||'').split(',').map(tag=>tag.trim()).filter(Boolean),document_content:{summary:values.summary||''},revision_note:values.revision_notes||''});if(error)throw error;return data}
+export async function transitionControlledDocument(documentId,status){const {error}=await supabase.rpc('transition_controlled_document',{target_document:documentId,next_status:status});if(error)throw error}
+export async function reviseControlledDocument(documentId,summary,revisionNotes){const {data,error}=await supabase.rpc('revise_controlled_document',{target_document:documentId,document_content:{summary},revision_note:revisionNotes});if(error)throw error;return data}
 export async function uploadDocument({workspaceId,projectId,userId,file}){const safe=file.name.normalize('NFKC').replace(/[^a-zA-Z0-9._-]+/g,'-').slice(-120),path=`${workspaceId}/${projectId}/${crypto.randomUUID()}-${safe}`;const {error:uploadError}=await supabase.storage.from('project-documents').upload(path,file,{contentType:file.type,upsert:false});if(uploadError)throw uploadError;const {data,error}=await supabase.from('project_documents').insert({workspace_id:workspaceId,project_id:projectId,storage_path:path,filename:file.name,content_type:file.type,size_bytes:file.size,uploaded_by:userId}).select().single();if(error){await supabase.storage.from('project-documents').remove([path]);throw error}return data}
 export async function signedDocumentUrl(path){const {data,error}=await supabase.storage.from('project-documents').createSignedUrl(path,60);if(error)throw error;return data.signedUrl}
 export async function loadWorkspaceTools(workspaceId,role){

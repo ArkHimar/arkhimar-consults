@@ -31,6 +31,7 @@ Updated: 2026-09-07
 - Workspace Team & Access screen with member role controls, member removal and expiring email invitations.
 - One-time invitation acceptance bound to the authenticated email address, with revocation, audit events and owner/admin escalation boundaries.
 - TOTP authenticator enrollment, AAL2 sign-in challenges, factor removal and selective session revocation from the profile security panel.
+- Tenant-scoped controlled document register with document IDs, metadata, confidentiality, draft/review/approval/archive transitions, immutable approved versions and audited revisions.
 
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 
@@ -41,7 +42,7 @@ This release is a coherent product-validation build, not the production multi-us
 - Administrative account recovery and organization-wide session policy controls;
 - normalized relational storage for every advanced control register and full concurrent-edit conflict UI;
 - malware scanning/quarantine integration;
-- server-transactional controlled approvals and protected share links;
+- protected external document share links with expiry, revocation and download controls;
 - full FS/SS/FF/SF calendar scheduling and high-volume Gantt virtualization;
 - server-generated DOCX, XLSX and PPTX controlled documents (branded HTML and print/PDF letter output is now available);
 - notification jobs, secure AI provider integration and organization knowledge retrieval;
