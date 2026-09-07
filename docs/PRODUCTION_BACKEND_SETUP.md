@@ -15,7 +15,9 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Production bundle at `https://www.arkhimar.com/pm/pm.js` verified to include the workspace startup recovery added in commit `b5b761f`.
 - Initial owner account and email confirmation completed.
 - Workspace `ArkHimar Consults` bootstrapped with the initial user as `owner` on 7 September 2026.
-- First-project/document verification and two-user tenancy tests remain to be completed.
+- Demonstration project `Lagos Civic Learning Hub` (`AKH-DEMO`) created through the authenticated owner role on 7 September 2026; its insert audit event was verified.
+- A simulated unrelated authenticated identity saw zero workspaces, projects and audit events through row-level security.
+- Document upload and a full two-real-user role matrix remain to be completed.
 
 ## Architecture
 
@@ -48,7 +50,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `PUBLIC_SITE_URL`
    - `API_IP_HASH_SALT` (random server-only value)
 6. Redeploy. The build generates `/runtime-config.js` and prevents that file from being cached.
-7. Create an account, verify email, sign in, create the first workspace, create a project and upload a harmless test PDF.
+7. Create an account, verify email, sign in, create the first workspace, create a project and upload a harmless test PDF. The production activation completed through project creation on 7 September 2026; the test upload is the next checkpoint.
 
 ## Required verification
 
