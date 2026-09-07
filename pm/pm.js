@@ -22,7 +22,15 @@ function projectModel(raw={}){return{
   controls:{risks:[],issues:[],changes:[],stakeholders:[],...raw.controls},
   reports:raw.reports||[],audit:raw.audit||[]
 }};
-const cloud=await loadWorkspaceContext();
+let cloud;
+try{cloud=await loadWorkspaceContext()}catch(error){
+  const target=$('[data-workspace]');
+  $('[data-security-context]').textContent='The secure workspace could not finish loading.';
+  target.innerHTML=`<header class="page-heading"><div><p>WORKSPACE STARTUP</p><h1>We could not load your workspace.</h1><span>Your signed-in session is safe. Retry the connection or sign out and return later.</span></div></header><section class="panel startup-error" role="alert"><strong>Workspace connection failed</strong><p>${esc(error.message||'An unexpected startup error occurred.')}</p><div class="button-group"><button class="primary" type="button" data-retry-workspace>Retry</button><button class="secondary" type="button" data-startup-signout>Sign out</button></div></section>`;
+  $('[data-retry-workspace]').addEventListener('click',()=>location.reload());
+  $('[data-startup-signout]').addEventListener('click',signOut);
+  await new Promise(()=>{});
+}
 if(!backendConfigured||!cloud.session){location.replace('/pm/login/');await new Promise(()=>{})}
 const canManageProject=['owner','admin','project_manager'].includes(cloud.role);
 const canUploadDocument=canManageProject||cloud.role==='member';

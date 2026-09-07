@@ -48,7 +48,14 @@ test('architecture navigation links directly to ArkHimar PM',async()=>{
 });
 
 test('built private workspace remains noindex and out of sitemap',async()=>{
-  const pm=await readFile('dist/pm/index.html','utf8');const sitemap=await readFile('dist/sitemap.xml','utf8');assert.match(pm,/noindex,nofollow/);assert.doesNotMatch(sitemap,/\/pm/);
+  const pm=await readFile('dist/pm/index.html','utf8');const sitemap=await readFile('dist/sitemap.xml','utf8');assert.match(pm,/noindex,nofollow/);assert.match(pm,/Loading your secure workspace/);assert.doesNotMatch(sitemap,/\/pm/);
+});
+
+test('authenticated database migration grants only the application operations required by the client',async()=>{
+  const sql=await readFile('supabase/migrations/202609070003_authenticated_privileges.sql','utf8');
+  assert.match(sql,/grant select on table[\s\S]+to authenticated/i);
+  assert.match(sql,/grant insert on table[\s\S]+public\.projects[\s\S]+to authenticated/i);
+  assert.doesNotMatch(sql,/grant all|to anon/i);
 });
 
 test('account creation requires password confirmation',async()=>{

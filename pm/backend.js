@@ -9,7 +9,7 @@ export async function currentSession(){if(!supabase)return null;const {data:{ses
 export async function loadWorkspaceContext(){
   if(!backendConfigured)return{configured:false,session:null,workspace:null,role:null,projects:[]};
   const session=await currentSession();if(!session)return{configured:true,session:null,workspace:null,role:null,projects:[]};
-  const {data:memberships,error:memberError}=await supabase.from('workspace_members').select('workspace_id,role,workspaces(id,name,slug)').order('joined_at',{ascending:true}).limit(1);if(memberError)throw memberError;
+  const {data:memberships,error:memberError}=await supabase.from('workspace_members').select('workspace_id,role,workspaces(id,name,slug)').order('joined_at',{ascending:true}).limit(1);if(memberError)throw new Error(memberError.code==='42501'?'Your account is verified, but authenticated database access has not been activated yet. Apply the latest ArkHimar database migration and retry.':memberError.message);
   const membership=memberships?.[0];if(!membership)return{configured:true,session,workspace:null,role:null,projects:[]};
   const {data:rows,error}=await supabase.from('projects').select('id,title,code,data,version,created_at,updated_at').eq('workspace_id',membership.workspace_id).is('archived_at',null).order('updated_at',{ascending:false});if(error)throw error;
   return{configured:true,session,workspace:membership.workspaces,role:membership.role,projects:(rows||[]).map(row=>({...row.data,id:row.id,title:row.title,code:row.code,_version:row.version}))};
