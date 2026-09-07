@@ -24,7 +24,11 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - A dedicated Resend key named `ArkHimar PM Production` was created with sending-only access restricted to `arkhimar.com` and stored only as an encrypted Vercel production secret.
 - Production sender `notifications@arkhimar.com` and notification recipient `projects@arkhimar.com` activated in Vercel deployment `dpl_AbVGdrE9wsQY8eg8bsrk2LPu3fnD`.
 - End-to-end form notification `ts-academy-email-delivery-test` was accepted by the ArkHimar API and reported `delivered` by Resend on 7 September 2026. Its temporary verification API key was revoked after the test.
-- A full two-real-user role matrix remains to be completed.
+- A two-real-user production role matrix was completed on 7 September 2026 with a temporary verified account: viewer reads were tenant-scoped and mutations were denied; member private upload/download/delete succeeded while controlled project and email mutations were denied; project manager project create/update and branded email send succeeded while deletion was denied; admin project deletion succeeded.
+- Membership policies were tightened and verified so an admin cannot promote their own account to owner or delete the workspace owner.
+- Branded email delivery to `projects@arkhimar.com` was reported `delivered` by Resend through the production message endpoint, and repeating the same idempotency key returned the original message without sending a duplicate.
+- Temporary role-test projects, messages, memberships and the temporary authentication account were removed after verification; all four cleanup counts returned zero.
+- Production deployment `dpl_BmMJLjmrAHGGfZWRNGEkovGKEcuG` contains the role-boundary, recipient-contract and no-brand email fallback fixes.
 
 ## Architecture
 
@@ -110,5 +114,5 @@ The API key is an ArkHimar integration credential. It is not the Resend key and 
 - Add MFA policy and session-revocation administration.
 - Add invitation UI and test role transitions.
 - Add malware scanning/quarantine integration for files.
-- Run two-user cross-tenant integration tests against a non-production project.
+- Repeat the two-user role matrix after material authorization, schema or storage-policy changes.
 - Review privacy, retention, deletion and incident-response procedures.
