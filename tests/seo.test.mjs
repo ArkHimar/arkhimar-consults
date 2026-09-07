@@ -106,6 +106,19 @@ test('account creation requires password confirmation',async()=>{
   assert.match(auth,/Passwords do not match/);
 });
 
+test('account security supports enforced TOTP and selective session revocation',async()=>{
+  const login=await readFile('dist/pm/login/index.html','utf8');
+  const auth=await readFile('pm/auth.js','utf8');
+  const account=await readFile('pm/account.js','utf8');
+  const backend=await readFile('pm/backend.js','utf8');
+  assert.match(login,/name="mfa_code"[^>]+pattern="\[0-9\]\{6\}"/);
+  assert.match(auth,/requirement\.required[\s\S]+setMode\('mfa'\)/);
+  assert.match(account,/mfa\.enroll\(\{factorType:'totp'/);
+  assert.match(account,/mfa\.unenroll/);
+  assert.match(account,/signOut\(\{scope:'others'\}\)/);
+  assert.match(backend,/signOut\(\{scope:'local'\}\)/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });
