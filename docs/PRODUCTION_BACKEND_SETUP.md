@@ -1,18 +1,21 @@
 # ArkHimar PM production backend setup
 
-The application integration is active on the Vercel demo deployment. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, both checked-in migrations were applied, and the hosted login now detects the configured backend.
+The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
 ## Activation status
 
 - Supabase project created and healthy.
 - 10 expected application tables verified.
 - 24 public-schema row-level security policies verified.
-- `project-documents` and `workspace-brand-assets` verified as private buckets.
+- Authenticated table privileges verified; anonymous access to workspace membership remains denied.
+- `project-documents` and `workspace-brand-assets` verified as private buckets, with three project-file policies and four brand-asset policies.
 - Replacement publishable and server secret keys stored in Vercel; no server secret is written to source control or browser runtime configuration.
 - Legacy JWT-based API keys disabled and the previous HS256 signing key revoked.
 - Demo and `www.arkhimar.com` PM login redirect URLs allow-listed.
-- Vercel deployment `dpl_Dv61h4cMhitL7coL8wV9gAjz6rPS` completed and aliased to `https://arkhimar-consults-demo.vercel.app`.
-- Initial owner account, email confirmation, workspace bootstrap and two-user tenancy tests remain to be completed.
+- Production bundle at `https://www.arkhimar.com/pm/pm.js` verified to include the workspace startup recovery added in commit `b5b761f`.
+- Initial owner account and email confirmation completed.
+- Workspace `ArkHimar Consults` bootstrapped with the initial user as `owner` on 7 September 2026.
+- First-project/document verification and two-user tenancy tests remain to be completed.
 
 ## Architecture
 
@@ -29,6 +32,7 @@ The application integration is active on the Vercel demo deployment. Supabase pr
 2. Open the SQL editor and apply the migrations in filename order:
    - `supabase/migrations/202609060001_pm_foundation.sql`
    - `supabase/migrations/202609060002_integrations_communications.sql`
+   - `supabase/migrations/202609070003_authenticated_privileges.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
