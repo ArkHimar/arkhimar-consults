@@ -20,7 +20,11 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Private DOCX upload verified against `AKH-DEMO`; document metadata, non-public bucket state and the insert audit event were confirmed.
 - Scoped key `TS Academy assignment` created with only `forms:submit` access. A production submission returned `201`, was associated with `AKH-DEMO`, incremented key usage and created its receive audit event; an invalid key returned `401`.
 - Vercel production deployment `dpl_8D2shfSZ4gRvUvDhGdfVmUn5xhkx` includes the encrypted Supabase server secret and API request hash salt.
-- A full two-real-user role matrix and production email delivery remain to be completed.
+- Resend workspace `emavericks22` verified as the owner of the verified `arkhimar.com` and `mail.arkhimar.com` sending domains.
+- A dedicated Resend key named `ArkHimar PM Production` was created with sending-only access restricted to `arkhimar.com` and stored only as an encrypted Vercel production secret.
+- Production sender `notifications@arkhimar.com` and notification recipient `projects@arkhimar.com` activated in Vercel deployment `dpl_AbVGdrE9wsQY8eg8bsrk2LPu3fnD`.
+- End-to-end form notification `ts-academy-email-delivery-test` was accepted by the ArkHimar API and reported `delivered` by Resend on 7 September 2026. Its temporary verification API key was revoked after the test.
+- A full two-real-user role matrix remains to be completed.
 
 ## Architecture
 
