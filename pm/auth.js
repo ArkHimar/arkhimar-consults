@@ -3,7 +3,12 @@ import {backendConfigured,currentSession,supabase} from './backend.js';
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
 const requestedMode=new URLSearchParams(location.search).get('mode');
+const invitationStorageKey='arkhimar.pm.pending-invitation';
+const invitationFromHash=new URLSearchParams(location.hash.slice(1)).get('invite');
+if(invitationFromHash){localStorage.setItem(invitationStorageKey,invitationFromHash);history.replaceState(null,'',`${location.pathname}${location.search}`)}
 let mode=location.hash.includes('type=recovery')?'recovery':requestedMode==='signup'?'signup':'signin';
+
+async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);return data}
 
 function setMode(next){
   mode=next;
@@ -30,7 +35,9 @@ if(!backendConfigured){
     if(event==='PASSWORD_RECOVERY')setMode('recovery');
   });
   const session=await currentSession();
-  if(session&&mode!=='recovery')location.replace('/pm/');
+  if(session&&mode!=='recovery'){
+    try{await acceptPendingInvitation();location.replace('/pm/')}catch(error){$('[data-auth-status]').textContent=error.message||'This invitation could not be accepted with the signed-in account.'}
+  }
 }
 
 $$('[data-auth-mode]').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.authMode)));
@@ -47,12 +54,13 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
     if(mode==='signin'){
       const {error}=await supabase.auth.signInWithPassword({email:values.email,password:values.password});
       if(error)throw error;
+      await acceptPendingInvitation();
       location.replace('/pm/');
     }else if(mode==='signup'){
       const {data,error}=await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{display_name:values.display_name},emailRedirectTo:`${location.origin}/pm/login/`}});
       if(error)throw error;
       status.textContent=data.session?'Account created. Redirecting…':'Check your email to verify your account before signing in.';
-      if(data.session)location.replace('/pm/');
+      if(data.session){await acceptPendingInvitation();location.replace('/pm/')}
     }else if(mode==='reset'){
       const {error}=await supabase.auth.resetPasswordForEmail(values.email,{redirectTo:`${location.origin}/pm/login/`});
       if(error)throw error;

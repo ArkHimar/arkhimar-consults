@@ -89,6 +89,15 @@ test('email rendering uses safe ArkHimar defaults when a workspace has no brand 
   assert.match(renderEmailText(message),/^ArkHimar PM/);
 });
 
+test('workspace invitations are expiring, email-bound and owner-safe',async()=>{
+  const sql=await readFile('supabase/migrations/202609070007_workspace_invitations.sql','utf8');
+  assert.match(sql,/role public\.workspace_role not null check \(role<>'owner'\)/i);
+  assert.match(sql,/token_hash=encode\(digest\(invite_token,'sha256'\),'hex'\)/i);
+  assert.match(sql,/signed_in_email<>matched\.email/i);
+  assert.match(sql,/expires_at>now\(\)/i);
+  assert.match(sql,/grant execute on function public\.accept_workspace_invitation\(text\) to authenticated/i);
+});
+
 test('account creation requires password confirmation',async()=>{
   const login=await readFile('dist/pm/login/index.html','utf8');
   const auth=await readFile('pm/auth.js','utf8');

@@ -1,6 +1,7 @@
 import {roi,npv,payback,evm,riskScore,calculateCpm} from '../lib/calculators.mjs';
 import {backendConfigured,bootstrapWorkspace,createProject,listDocuments,loadWorkspaceContext,signOut,signedDocumentUrl,updateProject,uploadDocument} from './backend.js';
 import {bindStudio,loadStudio,renderCommunications,renderIntegrations} from './studio.js';
+import {bindTeam,loadTeam,renderTeam} from './team.js';
 
 const UI_KEY='arkhimar.pm.ui.v1';
 const $=(selector,root=document)=>root.querySelector(selector);
@@ -37,6 +38,7 @@ const canUploadDocument=canManageProject||cloud.role==='member';
 const savedUi=(()=>{try{return JSON.parse(sessionStorage.getItem(UI_KEY)||'{}')}catch{return{}}})();
 let state={projects:cloud.projects.map(projectModel),activeId:savedUi.activeId||null,view:savedUi.view||'overview'};
 if(['communications','integrations'].includes(state.view)&&cloud.workspace){try{await loadStudio(cloud)}catch{state.view='overview'}}
+if(state.view==='team'&&cloud.workspace){try{await loadTeam(cloud)}catch{state.view='overview'}}
 function save(){sessionStorage.setItem(UI_KEY,JSON.stringify({activeId:state.activeId,view:state.view}));}
 function active(){return state.projects.find(project=>project.id===state.activeId)}
 const persistQueues=new Map();
@@ -84,6 +86,7 @@ function render(){
   $$('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===state.view));
   if(state.view==='communications')target.innerHTML=renderCommunications(cloud,state.projects);
   else if(state.view==='integrations')target.innerHTML=renderIntegrations(cloud);
+  else if(state.view==='team')target.innerHTML=renderTeam(cloud);
   else if(!project)target.innerHTML=renderHome();
   else{const views={overview:renderOverview,business:renderBusiness,charter:renderCharter,planning:renderPlanning,schedule:renderSchedule,controls:renderControls,documents:renderDocuments,reports:renderReports,audit:renderAudit};target.innerHTML=(views[state.view]||renderOverview)(project)}
   target.focus({preventScroll:true});bindDynamic();
@@ -103,6 +106,7 @@ function bindDynamic(){
   $$('[data-approve-change]').forEach(button=>button.addEventListener('click',()=>{const project=active(),change=project.controls.changes.find(x=>x.id===button.dataset.approveChange);change.status='Approved';change.decidedAt=new Date().toISOString();audit(project,'Approved','change request',change.title);setProject(project)}));
   $$('[data-export]').forEach(button=>button.addEventListener('click',()=>exportProject(button.dataset.export)));
   bindStudio(cloud,{notify,refresh:async(reload=true)=>{if(reload)await loadStudio(cloud,true);render()}});
+  bindTeam(cloud,{notify,refresh:async()=>{await loadTeam(cloud,true);render()}});
 }
 function applyPermissions(){
   if(!canManageProject){
@@ -113,7 +117,7 @@ function applyPermissions(){
   if(!canUploadDocument)$$('[data-document-upload] input,[data-document-upload] button').forEach(element=>element.disabled=true);
 }
 function charterAction(status){const project=active();if(status==='Submitted'&&!project.charter.purpose){notify('Charter incomplete','Save a purpose and justification before submitting the charter.');return}if(status==='Approved'){project.charter.approvedSnapshot=structuredClone({...project.charter,approvedSnapshot:null});project.status='Authorized'}if(status==='Draft'&&project.charter.status==='Approved'){project.charter.version+=1;project.charter.approvedSnapshot=null}project.charter.status=status;audit(project,status==='Draft'?'Revised':status,'project charter',`Charter version ${project.charter.version}`);setProject(project)}
-async function setView(view){const workspaceViews=['communications','integrations'];if(workspaceViews.includes(view)&&!cloud.workspace){notify('Create a workspace','Create your secure workspace before opening shared tools.');return}if(!active()&&view!=='overview'&&!workspaceViews.includes(view)){notify('Select a project','Open or create a project before using this control area.');return}state.view=view;save();$('#rail').classList.remove('open');if(workspaceViews.includes(view)){render();try{await loadStudio(cloud)}catch(error){notify('Workspace tools unavailable',error.message)}}if(view==='documents'&&active()._documents===null){render();try{active()._documents=await listDocuments(active().id)}catch(error){notify('Documents unavailable',error.message)}}render()}
+async function setView(view){const workspaceViews=['communications','integrations','team'];if(workspaceViews.includes(view)&&!cloud.workspace){notify('Create a workspace','Create your secure workspace before opening shared tools.');return}if(!active()&&view!=='overview'&&!workspaceViews.includes(view)){notify('Select a project','Open or create a project before using this control area.');return}state.view=view;save();$('#rail').classList.remove('open');if(['communications','integrations'].includes(view)){render();try{await loadStudio(cloud)}catch(error){notify('Workspace tools unavailable',error.message)}}if(view==='team'){render();try{await loadTeam(cloud)}catch(error){notify('Team unavailable',error.message)}}if(view==='documents'&&active()._documents===null){render();try{active()._documents=await listDocuments(active().id)}catch(error){notify('Documents unavailable',error.message)}}render()}
 function goHome(){state.activeId=null;state.view='overview';save();render()}
 function exportProject(format){const project=active();let content='',type='text/plain',extension=format;if(format==='json'){content=JSON.stringify({schemaVersion:'arkhimar-pm-project-v1',exportedAt:new Date().toISOString(),project},null,2);type='application/json'}else if(format==='csv'){const rows=[['register','id','title','owner','status'],...project.controls.risks.map(x=>['risk',x.id,x.title,x.owner,x.status]),...project.controls.issues.map(x=>['issue',x.id,x.title,x.owner,x.status]),...project.controls.changes.map(x=>['change',x.id,x.title,x.owner,x.status]),...project.planning.requirements.map(x=>['requirement',x.id,x.description,x.owner,x.priority])];content=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');type='text/csv'}else if(format==='txt'){content=`ARKHIMAR PM PROJECT PACK\n${project.title} (${project.code})\nGenerated: ${new Date().toISOString()}\nClassification: ${project.confidentiality}\n\nBUSINESS NEED\n${project.problem}\n\nEXPECTED OUTCOME\n${project.outcome}\n\nCHARTER (${project.charter.status} v${project.charter.version})\n${project.charter.purpose}\n\nSCOPE\n${project.planning.scope}\n\nSTATUS\nReadiness: ${completion(project)}%\nRisks: ${project.controls.risks.length}\nIssues: ${project.controls.issues.length}\n` }else{audit(project,'Exported','project report','Opened print/PDF view');save();window.print();return}const blob=new Blob([content],{type:`${type};charset=utf-8`}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`ARKHIMAR_PM_${project.code}_${today()}.${extension}`;link.click();URL.revokeObjectURL(link.href);audit(project,'Exported','project data',format.toUpperCase());save();render()}
 
