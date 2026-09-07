@@ -29,6 +29,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Branded email delivery to `projects@arkhimar.com` was reported `delivered` by Resend through the production message endpoint, and repeating the same idempotency key returned the original message without sending a duplicate.
 - Temporary role-test projects, messages, memberships and the temporary authentication account were removed after verification; all four cleanup counts returned zero.
 - Production deployment `dpl_BmMJLjmrAHGGfZWRNGEkovGKEcuG` contains the role-boundary, recipient-contract and no-brand email fallback fixes.
+- Expiring, email-bound workspace invitations and the Team & Access administration screen were deployed in `dpl_7GKB2RGt8NitH9azhN3dKVNvADKe`; the production endpoint rejects unauthenticated invitation requests and keeps invite tokens out of HTTP query strings.
 
 ## Architecture
 
@@ -49,6 +50,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `supabase/migrations/202609070004_service_role_privileges.sql`
    - `supabase/migrations/202609070005_membership_role_boundaries.sql`
    - `supabase/migrations/202609070006_outbound_recipient_contract.sql`
+   - `supabase/migrations/202609070007_workspace_invitations.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -80,6 +82,8 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Owners/admins can create a `forms:submit` API key, use it against `/api/v1/forms/submit`, and revoke it immediately.
 - Project managers can send a branded test email; viewers and members receive a server-side 403.
 - A repeated email idempotency key does not send a duplicate message.
+- Owners can invite admins, project managers, members and viewers; admins cannot invite or modify admins.
+- Invitation acceptance requires a non-expired, non-revoked token and an authenticated account whose email exactly matches the invitation.
 
 ## Connected-form assignment
 
@@ -112,7 +116,7 @@ The API key is an ArkHimar integration credential. It is not the Resend key and 
 - Configure backup and point-in-time recovery appropriate to the plan.
 - Configure production SMTP, custom email templates and abuse/rate-limit thresholds.
 - Add MFA policy and session-revocation administration.
-- Add invitation UI and test role transitions.
+- Run an owner-sent two-user invitation acceptance and revocation exercise before opening public self-service onboarding.
 - Add malware scanning/quarantine integration for files.
 - Repeat the two-user role matrix after material authorization, schema or storage-policy changes.
 - Review privacy, retention, deletion and incident-response procedures.

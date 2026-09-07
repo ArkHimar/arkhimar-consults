@@ -1,6 +1,6 @@
 # ArkHimar PM implementation status
 
-Updated: 2026-09-06
+Updated: 2026-09-07
 
 ## Delivered in the validation release
 
@@ -28,14 +28,16 @@ Updated: 2026-09-06
 - Workspace brand settings for colors, sender identity, logo and letterhead assets.
 - Integration Hub with one-time API-key display, SHA-256 hashes, scopes, revocation, rate limits and a validated form-submission endpoint.
 - Server-side Resend adapter with verified user sessions, role checks, idempotency and HTML/plain-text output.
+- Workspace Team & Access screen with member role controls, member removal and expiring email invitations.
+- One-time invitation acceptance bound to the authenticated email address, with revocation, audit events and owner/admin escalation boundaries.
 
-The production code is present but the repository is not yet connected to a provisioned Supabase project. Until the migration and public environment variables are configured, `/pm/` correctly routes to a login page that reports authentication is not configured.
+The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 
 ## Remaining production boundary
 
 This release is a coherent product-validation build, not the production multi-user system described by the full brief. The source repository began as a static site with no backend. The following require a separately provisioned server/database and deployment secrets:
 
-- invitation and session-revocation administration;
+- MFA enrollment, recovery and session-revocation administration;
 - normalized relational storage for every advanced control register and full concurrent-edit conflict UI;
 - malware scanning/quarantine integration;
 - server-transactional controlled approvals and protected share links;
