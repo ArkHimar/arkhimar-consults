@@ -1,6 +1,6 @@
 # ArkHimar PM marketing implementation status
 
-Updated: 2026-09-06
+Updated: 2026-09-08
 
 ## Delivered
 
@@ -12,12 +12,12 @@ Updated: 2026-09-06
 - M5 demo/comparison: interactive nine-step product demo and a comparison center that withholds detailed competitor claims until editorial re-verification.
 - M6 growth foundation: stage-aware CTAs, UTM/referral attribution capture and a marketing/product event abstraction. No spam lifecycle email or monetary referral programme was created.
 - M7 hardening: responsive layouts, keyboard focus, reduced motion, unique metadata, canonical URLs, robots policy, sitemap, private-app noindex and automated marketing configuration checks.
+- Digital-product growth release: a unified resource hub, six Consult resources, five connected PM workflow packs, interactive design-readiness and project-brief tools, substantive lead-magnet delivery, safe source attribution and a controlled-draft PM import path.
 
 ## Intentionally not represented as complete
 
 - Paid checkout and subscriptions: no billing provider exists.
-- Authenticated signup and automated lifecycle messages: no production auth/backend exists.
-- Server-side lead validation, durable deduplication and rate limiting: the current site uses FormSubmit; replace with an owned server endpoint before scale.
+- Automated marketing lifecycle campaigns are intentionally absent; resource delivery sends only the requested transactional copy unless separate consent is given.
 - Third-party analytics delivery: the adapter is ready, but no provider or consent manager is configured.
 - Individual competitor pages: require current official-source re-verification and owner editorial approval before publishing.
 - AI Copilot, SSO, SCIM, private cloud, on-premise, SLA, compliance certifications and Office exports: planned claims remain non-publishable.

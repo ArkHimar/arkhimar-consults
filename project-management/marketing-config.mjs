@@ -7,7 +7,8 @@ export const claims={
   exports:{label:'JSON, CSV, TXT and print/PDF exports',status:'beta',publishable:true,proof:'/pm/'},
   ai:{label:'ArkHimar AI Copilot',status:'planned',publishable:false,proof:null},
   sso:{label:'Enterprise SSO and SCIM',status:'planned',publishable:false,proof:null},
-  office:{label:'DOCX, XLSX and PPTX controlled exports',status:'planned',publishable:false,proof:null}
+  controlledExports:{label:'Controlled DOCX and PDF exports',status:'live',publishable:true,proof:'Server-generated, versioned document exports with audit events'},
+  office:{label:'XLSX and PPTX controlled exports',status:'planned',publishable:false,proof:null}
 };
 
 export const pricingPlans=[

@@ -37,6 +37,9 @@ The production-ready static artifact is written to `dist/` and can be served by 
 - `/project-management/compare/` — comparison publishing policy
 - `/project-management/security/` — current trust and production boundary
 - `/project-management/resources/` and `/project-management/changelog/`
+- `/resources/` and `/resources/architecture/` — Consult resources and lead magnets
+- `/tools/design-readiness/` and `/tools/project-brief-builder/` — privacy-conscious client preparation tools
+- `/project-management/workflow-packs/` — initiation, planning, controls, closeout and built-environment packs
 - `/pm/` — ArkHimar PM validation workspace
 
 ## Product status

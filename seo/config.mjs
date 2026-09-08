@@ -1,3 +1,5 @@
+import {architectureResources,pmWorkflowPacks} from '../lib/resource-catalog.mjs';
+
 export const SITE_ORIGIN='https://www.arkhimar.com';
 export const CONSULT_IMAGE='/assets/images/og-arkhimar-consult.jpg';
 export const PM_IMAGE='/assets/images/og-arkhimar-pm.png';
@@ -24,7 +26,11 @@ const architecturePages={
   '/projects': ['Architecture Projects | ArkHimar Consult','Explore selected ArkHimar Consult residential, commercial and interior architecture projects.'],
   '/how-it-works': ['How Our Architecture Process Works | ArkHimar Consult','Understand ArkHimar Consult’s process from project brief and consultation through proposal and architectural design.'],
   '/start-a-project': ['Start an Architecture Project | ArkHimar Consult','Submit your architectural project brief to ArkHimar Consult for professional review and a tailored project proposal.'],
-  '/contact': ['Contact ArkHimar Consult | Architecture Consultancy','Contact ArkHimar Consult about architectural design, project documentation and built-environment consultancy services.']
+  '/contact': ['Contact ArkHimar Consult | Architecture Consultancy','Contact ArkHimar Consult about architectural design, project documentation and built-environment consultancy services.'],
+  '/resources': ['Architecture and Project Management Resources | ArkHimar','Explore practical ArkHimar Consult client-preparation resources and ArkHimar PM tools and workflow packs.'],
+  '/resources/architecture': ['Architecture Client Resources | ArkHimar Consult','Use practical project brief, design readiness, site information, decision and handover resources before and during an architectural project.'],
+  '/tools/design-readiness': ['Free Architectural Design Readiness Tool | ArkHimar','Use an eight-question interactive check to identify missing client, site, budget, decision, survey and statutory preparation before architectural design.'],
+  '/tools/project-brief-builder': ['Architectural Project Brief Builder | ArkHimar Consult','Build a clear early architectural project brief in your browser, then choose whether to continue to a professional project enquiry.']
 };
 
 const pmPages={
@@ -41,8 +47,12 @@ const pmPages={
   '/project-management/changelog': ['ArkHimar PM Changelog | Product Updates','Follow verified ArkHimar PM product changes, beta improvements and current capability boundaries.'],
   '/project-management/early-access': ['ArkHimar PM Early Access | Join the Private Beta','Request ArkHimar PM private-beta access or apply to help validate professional project workflows.'],
   '/project-management/privacy': ['ArkHimar PM Privacy Notice','Read how ArkHimar PM handles marketing enquiries, beta workspace data and privacy choices.'],
-  '/project-management/terms': ['ArkHimar PM Private-Beta Terms','Read the plain-language evaluation terms for the current ArkHimar PM private beta.']
+  '/project-management/terms': ['ArkHimar PM Private-Beta Terms','Read the plain-language evaluation terms for the current ArkHimar PM private beta.'],
+  '/project-management/workflow-packs': ['Project Management Workflow Packs | ArkHimar PM','Explore connected initiation, planning, controls, closeout and built-environment workflow packs from ArkHimar PM.']
 };
+
+for(const resource of architectureResources)architecturePages[`/resources/architecture/${resource.slug}`]=[resource.seo.title,resource.seo.description];
+for(const resource of pmWorkflowPacks)pmPages[`/project-management/workflow-packs/${resource.slug}`]=[resource.seo.title,resource.seo.description];
 
 export const pages=new Map([...Object.entries(architecturePages),...Object.entries(pmPages)]);
 for(const [slug,name,description] of services){pages.set(`/services/${slug}`,[`${name} | ArkHimar Consult`,`${description} Discuss your project with ArkHimar Consult in Lagos, Nigeria.`]);}

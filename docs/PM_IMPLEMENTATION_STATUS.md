@@ -34,6 +34,11 @@ Updated: 2026-09-08
 - Tenant-scoped controlled document register with document IDs, metadata, confidentiality, draft/review/approval/archive transitions, immutable approved versions and audited revisions.
 - Server-authorized DOCX and PDF controlled-document exports with native editable DOCX content, embedded Unicode PDF fonts, deterministic filenames, document-control metadata and export audit events.
 - Expiring external shares for approved versions with one-time token display, SHA-256 token storage, revocation, download limits and public-token isolation from browser history and HTTP referrers.
+- Integrated Consult/PM resource registry with six architecture resources and five PM workflow packs, public resource routes, substantial original worksheets, deterministic design-readiness and brief-building tools, privacy-filtered funnel events and safe project-enquiry handoff.
+- Lead-resource delivery through a validated, honeypot-protected, database-rate-limited API with separate marketing consent and restricted lead access.
+- Allowlisted “Use in PM” workflow that requires explicit project selection, creates only a controlled draft, records source/version traceability and writes both import and audit events.
+
+Database migrations `202609070009_document_exports_and_shares.sql` and `202609080010_resource_growth_engine.sql` were applied and verified in Supabase project `mbveqvzlrpsyhmsfpdfk` on 2026-09-08. The growth delivery endpoint is bound to the ArkHimar Consults workspace through the production `ARKHIMAR_WORKSPACE_ID` configuration.
 
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 

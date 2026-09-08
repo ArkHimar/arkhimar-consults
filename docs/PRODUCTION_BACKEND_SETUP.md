@@ -33,6 +33,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Controlled document registration, review, owner/admin approval, immutable approved versions and audited revision creation were activated on 7 September 2026. A create → review → approve → revise lifecycle test completed inside a rolled-back transaction.
 - DOCX/PDF controlled exports and expiring, revocable, download-limited external shares were added as the next governed-document layer. Share tokens are returned once and only SHA-256 hashes are persisted.
 - Migration `202609070009_document_exports_and_shares.sql` was verified active on 8 September 2026, including all required columns, row-level security, the manager-read policy, both indexes and the least-privilege service-role grants.
+- Migration `202609080010_resource_growth_engine.sql` was applied and verified on 8 September 2026. The `resource_leads` and `resource_import_events` tables, two RLS policies and allowlisted draft-import RPC are active. Vercel production binds delivery to workspace `ArkHimar Consults` through `ARKHIMAR_WORKSPACE_ID`; no service credential is exposed to the browser.
 
 ## Architecture
 
@@ -56,6 +57,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `supabase/migrations/202609070007_workspace_invitations.sql`
    - `supabase/migrations/202609070008_controlled_documents.sql`
    - `supabase/migrations/202609070009_document_exports_and_shares.sql`
+   - `supabase/migrations/202609080010_resource_growth_engine.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -70,6 +72,7 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
    - `FORM_NOTIFICATION_EMAIL=projects@arkhimar.com`
    - `PUBLIC_SITE_URL`
    - `API_IP_HASH_SALT` (random server-only value)
+   - `ARKHIMAR_WORKSPACE_ID` (non-secret UUID of the workspace that receives resource leads)
 6. Redeploy. The build generates `/runtime-config.js` and prevents that file from being cached.
 7. Create an account, verify email, sign in, create the first workspace, create a project and upload a harmless test document. The production activation completed through the first project, private upload and scoped form API submission on 7 September 2026.
 
@@ -91,6 +94,12 @@ The application integration is active on `https://www.arkhimar.com`. Supabase pr
 - Invitation acceptance requires a non-expired, non-revoked token and an authenticated account whose email exactly matches the invitation.
 - Project managers can register and submit controlled documents; only owners/admins can approve or archive them; approved version content cannot be altered or deleted.
 - Authenticated workspace members can export authorized versions; project managers, admins and owners can create or revoke shares only for approved or superseded versions.
+- Lead-resource requests are validated server-side, immediately return the requested worksheet, store only allowlisted attribution and keep marketing consent separate from delivery.
+- Resource import accepts only catalogued importable packs, requires explicit project-manager-or-higher access and creates a traceable controlled draft with audit events.
+
+## Growth-release rollback
+
+Roll back application behavior by promoting the preceding Vercel deployment. The additive growth tables can remain dormant safely because anonymous/authenticated mutation grants are absent. If schema removal is later approved, first export retained lead/import records, then remove the RPC, policies and tables in dependency order through a new reviewed forward migration; do not edit or reverse the applied migration file.
 
 ## Connected-form assignment
 

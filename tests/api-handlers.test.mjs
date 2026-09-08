@@ -6,6 +6,7 @@ import invitationHandler from '../api/v1/workspace/invitations.js';
 import exportHandler from '../api/v1/documents/export.js';
 import sharesHandler from '../api/v1/documents/shares.js';
 import sharedHandler from '../api/v1/documents/shared.js';
+import resourceClaimHandler from '../api/v1/resources/claim.js';
 
 function response(){return{statusCode:200,headers:{},body:null,setHeader(name,value){this.headers[name]=value},status(code){this.statusCode=code;return this},json(value){this.body=value;return this}}}
 
@@ -40,4 +41,10 @@ test('controlled export and share administration require authentication',async()
 
 test('public shared download rejects malformed tokens before database access',async()=>{
   const result=response();await sharedHandler({method:'POST',headers:{},body:{token:'not-a-share'}},result);assert.equal(result.statusCode,400);assert.equal(result.body.error,'invalid_share_token');
+});
+
+test('resource delivery validates requests and catalog access before database use',async()=>{
+  const invalid=response();await resourceClaimHandler({method:'POST',headers:{},body:{}},invalid);assert.equal(invalid.statusCode,400);
+  const unavailable=response();await resourceClaimHandler({method:'POST',headers:{},body:{resourceSlug:'not-a-resource',name:'Ada Example',email:'ada@example.com',marketingConsent:false,attribution:{}}},unavailable);assert.equal(unavailable.statusCode,404);
+  const honeypot=response();await resourceClaimHandler({method:'POST',headers:{},body:{resourceSlug:'project-brief-starter-kit',name:'Ada Example',email:'ada@example.com',company:'bot value',marketingConsent:false,attribution:{}}},honeypot);assert.equal(honeypot.statusCode,202);
 });

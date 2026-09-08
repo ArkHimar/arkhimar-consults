@@ -1,3 +1,5 @@
+import {readSafeProjectPrefill} from '../lib/resource-tools.mjs';
+
 const form = document.querySelector('#brief-form');
 const statusBox = document.querySelector('#form-status');
 const attachmentInput = document.querySelector('#attachments');
@@ -5,6 +7,16 @@ const attachmentList = document.querySelector('#attachment-list');
 const attachmentError = document.querySelector('#attachment-error');
 const maxUploadBytes = 10 * 1024 * 1024;
 const allowedExtensions = new Set(['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx', 'dwg', 'dxf']);
+const prefill = readSafeProjectPrefill(location.search);
+
+if (form && prefill.source_resource) {
+  const source = document.createElement('input');
+  source.type = 'hidden';
+  source.name = 'source_resource';
+  source.value = prefill.source_resource;
+  form.append(source);
+}
+if (form && prefill.project_type) form.elements.project_type.value = prefill.project_type;
 
 const formatSize = bytes => bytes < 1024 * 1024
   ? `${Math.max(1, Math.round(bytes / 1024))} KB`
