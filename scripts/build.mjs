@@ -5,7 +5,7 @@ import {renderSeo} from '../seo/render.mjs';
 const output='dist';
 await rm(output,{recursive:true,force:true});
 await mkdir(output,{recursive:true});
-for(const entry of ['index.html','404.html','styles.css','app.js','robots.txt','sitemap.xml','site.webmanifest','favicon.svg','favicon-32.png','apple-touch-icon.png','assets','lib','start-a-project','project-management','pm'])await cp(entry,`${output}/${entry}`,{recursive:true});
+for(const entry of ['index.html','404.html','styles.css','app.js','robots.txt','sitemap.xml','site.webmanifest','favicon.svg','favicon-32.png','apple-touch-icon.png','assets','lib','start-a-project','project-management','pm','share'])await cp(entry,`${output}/${entry}`,{recursive:true});
 
 const publicConfig={supabaseUrl:process.env.PUBLIC_SUPABASE_URL||'',supabaseAnonKey:process.env.PUBLIC_SUPABASE_ANON_KEY||''};
 await writeFile(`${output}/runtime-config.js`,`globalThis.__ARKHIMAR_CONFIG__=${JSON.stringify(publicConfig)};\n`);

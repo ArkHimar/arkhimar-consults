@@ -132,6 +132,11 @@ test('controlled documents are tenant-scoped, versioned and immutable after appr
   assert.match(client,/transitionControlledDocument[\s\S]+transition_controlled_document/);
 });
 
+test('external document shares are hashed, expiring, revocable and download limited',async()=>{
+  const sql=await readFile('supabase/migrations/202609070009_document_exports_and_shares.sql','utf8'),shares=await readFile('api/v1/documents/shares.js','utf8'),shared=await readFile('api/v1/documents/shared.js','utf8'),page=await readFile('dist/share/index.html','utf8');
+  assert.match(sql,/token_hash text not null unique/);assert.match(sql,/expires_at timestamptz not null/);assert.match(sql,/max_downloads integer/);assert.match(sql,/revoked_at timestamptz/);assert.match(shares,/sha256\(token\)/);assert.match(shares,/approved_version_required/);assert.match(shared,/download_count>=share\.max_downloads/);assert.match(page,/noindex,nofollow/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });
