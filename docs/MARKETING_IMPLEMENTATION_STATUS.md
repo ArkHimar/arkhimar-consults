@@ -29,9 +29,9 @@ Production deployment: `dpl_7QcDK9qy7SWBd6fNw8CfCxtmM5it`
 
 ## Original PM build status
 
-The original production implementation sequence is formally at **Phase 1 of 8 after the completed Phase 0 audit**, because authenticated tenancy and server-side permissions—the gate for safely calling the foundation complete—do not yet exist. Later-phase workflows have been implemented as a browser-based validation layer.
+The original production implementation sequence is formally at **Phase 2 of 8 after the completed Phase 0 audit**. Phase 1 is complete with authenticated tenancy, server-side permissions, private storage, governed controlled documents and append-only auditing. Phase 2 Initiation is active with normalized business cases, structured options analysis and server-governed charter decisions. Later-phase workflows remain a browser-based validation layer until normalized in their respective phases.
 
 Estimated completion:
 
-- Product-validation UI and deterministic workflow coverage: approximately **65%**.
-- Full production brief, including backend, tenant security, collaboration, complete exports, AI and enterprise hardening: approximately **30%**.
+- Product-validation UI and deterministic workflow coverage: approximately **72%**.
+- Full production brief, including normalized controls, collaboration, complete exports, AI and enterprise hardening: approximately **42%**.

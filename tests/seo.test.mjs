@@ -146,6 +146,18 @@ test('external document shares are hashed, expiring, revocable and download limi
   assert.ok(shareHeaders.some(header=>header.key==='X-Robots-Tag'&&header.value==='noindex, nofollow'));assert.ok(shareHeaders.some(header=>header.key==='Referrer-Policy'&&header.value==='no-referrer'));assert.ok(shareHeaders.some(header=>header.key==='Cache-Control'&&header.value==='no-store'));
 });
 
+test('initiation artifacts are tenant-scoped, versioned and decided on the server',async()=>{
+  const sql=await readFile('supabase/migrations/202609080012_phase2_initiation.sql','utf8'),client=await readFile('pm/backend.js','utf8'),ui=await readFile('pm/pm.js','utf8');
+  assert.match(sql,/foreign key\(project_id,workspace_id\) references public\.projects\(id,workspace_id\)/i);
+  assert.match(sql,/protect_approved_initiation_version/);assert.match(sql,/Approved initiation versions are immutable/);
+  assert.match(sql,/actor_role in \('owner','admin'\)[\s\S]+status='approved'/i);
+  assert.match(sql,/At least two options are required/);assert.match(sql,/strategicFit'[\s\S]+\*30[\s\S]+benefit'[\s\S]+\*25/);
+  assert.match(sql,/create policy business_cases_member_read/);assert.match(sql,/create policy project_charters_member_read/);
+  assert.match(sql,/revoke insert,update,delete on public\.business_cases/);assert.match(sql,/grant execute on function public\.save_business_case/);
+  assert.match(client,/saveBusinessCase[\s\S]+save_business_case/);assert.match(client,/transitionProjectCharter[\s\S]+transition_project_charter/);
+  assert.match(ui,/transitionBusinessCase/);assert.match(ui,/transitionProjectCharter/);assert.doesNotMatch(ui,/charterAction\(/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });

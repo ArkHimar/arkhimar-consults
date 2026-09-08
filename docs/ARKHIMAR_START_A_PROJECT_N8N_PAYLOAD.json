@@ -1,0 +1,27 @@
+{
+  "_subject": "New ArkHimar project brief",
+  "_template": "table",
+  "_captcha": "false",
+  "name": "Ada Example",
+  "email": "ada@example.com",
+  "phone": "+234 800 000 0000",
+  "organisation": "Example Developments Ltd",
+  "project_title": "Proposed 4-Bedroom Duplex",
+  "service": "Architectural Design",
+  "project_type": "Residential",
+  "location": "Lagos, Nigeria",
+  "plot_size": "650 sqm",
+  "building_size": "400 sqm",
+  "floors": "2",
+  "budget": "₦50m–₦100m",
+  "completion_date": "2027-06-30",
+  "message": "Design a four-bedroom family home with accessible shared spaces, natural ventilation and provision for future solar installation.",
+  "additional_requirements": "Include a home office, staff room and two-car parking.",
+  "attachment": [
+    "site-survey.pdf",
+    "reference-image.jpg"
+  ],
+  "contact_method": "Email",
+  "consent": "on",
+  "source_resource": "project-brief-starter-kit"
+}

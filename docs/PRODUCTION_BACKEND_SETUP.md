@@ -37,7 +37,8 @@ Current production implementation: commit `abdf4d24824e0dd9e67d4fd5e46a333f49dda
 - Migration `202609070009_document_exports_and_shares.sql` was verified active on 8 September 2026, including all required columns, row-level security, the manager-read policy, both indexes and the least-privilege service-role grants.
 - Migration `202609080010_resource_growth_engine.sql` was applied and verified on 8 September 2026. The `resource_leads` and `resource_import_events` tables, two RLS policies and allowlisted draft-import RPC are active. Vercel production binds delivery to workspace `ArkHimar Consults` through `ARKHIMAR_WORKSPACE_ID`; no service credential is exposed to the browser.
 - Migration `202609080011_service_workspace_read.sql` adds the narrow workspace-identity read required by server-side document and invitation rendering; it was applied and verified on 8 September 2026 after live export verification exposed the previously missing explicit grant.
-- Live authenticated DOCX and PDF exports were reverified on 8 September 2026. Both downloads used deterministic filenames; the DOCX parsed as editable OOXML with the controlled document code and the PDF parsed as a one-page document with the expected title. The production download handler fix is covered by the 48-test suite.
+- Live authenticated DOCX and PDF exports were reverified on 8 September 2026. Both downloads used deterministic filenames; the DOCX parsed as editable OOXML with the controlled document code and the PDF parsed as a one-page document with the expected title. The production download handler fix remains covered by the automated suite.
+- Migration `202609080012_phase2_initiation.sql` was applied and verified on 8 September 2026. Business cases, structured options, charters, immutable versions and decision histories are tenant-scoped; mutations are limited to security-definer RPCs with project-manager submission and owner/admin decision boundaries. A complete save → submit → approve → revise lifecycle passed inside a rolled-back production transaction.
 
 ## Architecture
 
@@ -63,6 +64,7 @@ Current production implementation: commit `abdf4d24824e0dd9e67d4fd5e46a333f49dda
    - `supabase/migrations/202609070009_document_exports_and_shares.sql`
    - `supabase/migrations/202609080010_resource_growth_engine.sql`
    - `supabase/migrations/202609080011_service_workspace_read.sql`
+   - `supabase/migrations/202609080012_phase2_initiation.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -101,6 +103,8 @@ Current production implementation: commit `abdf4d24824e0dd9e67d4fd5e46a333f49dda
 - Authenticated workspace members can export authorized versions; project managers, admins and owners can create or revoke shares only for approved or superseded versions.
 - Lead-resource requests are validated server-side, immediately return the requested worksheet, store only allowlisted attribution and keep marketing consent separate from delivery.
 - Resource import accepts only catalogued importable packs, requires explicit project-manager-or-higher access and creates a traceable controlled draft with audit events.
+- Business-case submission requires an executive summary and at least two structured options; fixed weighted scores are calculated on the server.
+- Project managers can save and submit business cases and charters; only owners/admins can approve or request changes; approved versions can only be superseded through an audited revision transition.
 
 ## Growth-release rollback
 
