@@ -36,6 +36,7 @@ Current growth implementation: commit `d06becbad0781daf8738c88e8689116dd0cd8b19`
 - DOCX/PDF controlled exports and expiring, revocable, download-limited external shares were added as the next governed-document layer. Share tokens are returned once and only SHA-256 hashes are persisted.
 - Migration `202609070009_document_exports_and_shares.sql` was verified active on 8 September 2026, including all required columns, row-level security, the manager-read policy, both indexes and the least-privilege service-role grants.
 - Migration `202609080010_resource_growth_engine.sql` was applied and verified on 8 September 2026. The `resource_leads` and `resource_import_events` tables, two RLS policies and allowlisted draft-import RPC are active. Vercel production binds delivery to workspace `ArkHimar Consults` through `ARKHIMAR_WORKSPACE_ID`; no service credential is exposed to the browser.
+- Migration `202609080011_service_workspace_read.sql` adds the narrow workspace-identity read required by server-side document and invitation rendering; it was added after live export verification exposed the previously missing explicit grant.
 
 ## Architecture
 
@@ -60,6 +61,7 @@ Current growth implementation: commit `d06becbad0781daf8738c88e8689116dd0cd8b19`
    - `supabase/migrations/202609070008_controlled_documents.sql`
    - `supabase/migrations/202609070009_document_exports_and_shares.sql`
    - `supabase/migrations/202609080010_resource_growth_engine.sql`
+   - `supabase/migrations/202609080011_service_workspace_read.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.

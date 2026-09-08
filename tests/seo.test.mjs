@@ -67,6 +67,14 @@ test('server role migration grants only operations used by production API routes
   assert.doesNotMatch(sql,/grant all|to anon|public\.api_keys/i);
 });
 
+test('server document rendering can read workspace identity without broad mutation rights',async()=>{
+  const sql=await readFile('supabase/migrations/202609080011_service_workspace_read.sql','utf8');assert.match(sql,/grant select on table public\.workspaces to service_role/i);assert.doesNotMatch(sql,/grant all|grant (insert|update|delete)/i);
+});
+
+test('controlled export handler keeps the browser document available for downloads',async()=>{
+  const source=await readFile('pm/pm.js','utf8'),handler=source.match(/\$\$\('\[data-export-document\]'\).*?\n/)?.[0]||'';assert.match(handler,/const controlledDocument=/);assert.doesNotMatch(handler,/const document=/);
+});
+
 test('membership policies prevent admins from taking ownership or changing themselves',async()=>{
   const sql=await readFile('supabase/migrations/202609070005_membership_role_boundaries.sql','utf8');
   assert.match(sql,/user_id\s*<>\s*auth\.uid\(\)/i);
