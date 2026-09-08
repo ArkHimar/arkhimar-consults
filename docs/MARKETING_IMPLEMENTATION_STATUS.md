@@ -2,9 +2,9 @@
 
 Updated: 2026-09-08
 
-Growth implementation commit: `d06becbad0781daf8738c88e8689116dd0cd8b19`
+Current implementation commit: `8539e7cddc90862a74017dcaacecec66a0e3c8c7`
 
-Production deployment: `dpl_7QcDK9qy7SWBd6fNw8CfCxtmM5it`
+Production deployment: `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4`
 
 ## Delivered
 

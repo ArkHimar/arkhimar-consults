@@ -2,9 +2,9 @@
 
 Updated: 2026-09-08
 
-Growth implementation commit: `d06becbad0781daf8738c88e8689116dd0cd8b19`
+Phase 2 implementation commit: `8539e7cddc90862a74017dcaacecec66a0e3c8c7`
 
-Production deployment: `dpl_7QcDK9qy7SWBd6fNw8CfCxtmM5it`
+Production deployment: `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4`
 
 ## Current master-prompt phase
 
@@ -49,6 +49,8 @@ The formal production sequence is now at **Phase 2 of 8 — Initiation**. Phase 
 Database migrations through `202609080012_phase2_initiation.sql` were applied and verified in Supabase project `mbveqvzlrpsyhmsfpdfk` on 2026-09-08. The Phase 2 lifecycle was exercised through save, submit, approve and revision transitions inside a rolled-back production transaction. The growth delivery endpoint remains bound to the ArkHimar Consults workspace through the production `ARKHIMAR_WORKSPACE_ID` configuration.
 
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
+
+The Phase 2 production bundle, authenticated workspace loading, API authentication boundaries and private-page noindex headers were verified after deployment. The Consult start-a-project form remains on its existing FormSubmit delivery path; the n8n payload is a separate synthetic testing reference and no n8n webhook was added to production.
 
 ## Remaining production boundary
 

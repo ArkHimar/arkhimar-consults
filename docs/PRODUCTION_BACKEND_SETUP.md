@@ -2,7 +2,7 @@
 
 The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
-Current production implementation: commit `abdf4d24824e0dd9e67d4fd5e46a333f49dda5e1`, production deployment `dpl_Dm4odRajeeqgqDTguYCHpyJH6Ct8`.
+Current production implementation: commit `8539e7cddc90862a74017dcaacecec66a0e3c8c7`, production deployment `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4`.
 
 ## Activation status
 
@@ -39,6 +39,7 @@ Current production implementation: commit `abdf4d24824e0dd9e67d4fd5e46a333f49dda
 - Migration `202609080011_service_workspace_read.sql` adds the narrow workspace-identity read required by server-side document and invitation rendering; it was applied and verified on 8 September 2026 after live export verification exposed the previously missing explicit grant.
 - Live authenticated DOCX and PDF exports were reverified on 8 September 2026. Both downloads used deterministic filenames; the DOCX parsed as editable OOXML with the controlled document code and the PDF parsed as a one-page document with the expected title. The production download handler fix remains covered by the automated suite.
 - Migration `202609080012_phase2_initiation.sql` was applied and verified on 8 September 2026. Business cases, structured options, charters, immutable versions and decision histories are tenant-scoped; mutations are limited to security-definer RPCs with project-manager submission and owner/admin decision boundaries. A complete save → submit → approve → revise lifecycle passed inside a rolled-back production transaction.
+- Phase 2 deployment `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4` was aliased to `www.arkhimar.com` and verified with the authenticated owner workspace. The live bundle contains the governed initiation RPC contracts; `/pm` and `/share` remain noindex, unauthenticated export/share administration returns `401`, and malformed public share tokens fail before database access.
 
 ## Architecture
 
