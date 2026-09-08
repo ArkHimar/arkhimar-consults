@@ -2,7 +2,7 @@
 
 The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
-Current growth implementation: commit `d06becbad0781daf8738c88e8689116dd0cd8b19`, production deployment `dpl_7QcDK9qy7SWBd6fNw8CfCxtmM5it`.
+Current production implementation: commit `abdf4d24824e0dd9e67d4fd5e46a333f49dda5e1`, production deployment `dpl_Dm4odRajeeqgqDTguYCHpyJH6Ct8`.
 
 ## Activation status
 
@@ -36,7 +36,8 @@ Current growth implementation: commit `d06becbad0781daf8738c88e8689116dd0cd8b19`
 - DOCX/PDF controlled exports and expiring, revocable, download-limited external shares were added as the next governed-document layer. Share tokens are returned once and only SHA-256 hashes are persisted.
 - Migration `202609070009_document_exports_and_shares.sql` was verified active on 8 September 2026, including all required columns, row-level security, the manager-read policy, both indexes and the least-privilege service-role grants.
 - Migration `202609080010_resource_growth_engine.sql` was applied and verified on 8 September 2026. The `resource_leads` and `resource_import_events` tables, two RLS policies and allowlisted draft-import RPC are active. Vercel production binds delivery to workspace `ArkHimar Consults` through `ARKHIMAR_WORKSPACE_ID`; no service credential is exposed to the browser.
-- Migration `202609080011_service_workspace_read.sql` adds the narrow workspace-identity read required by server-side document and invitation rendering; it was added after live export verification exposed the previously missing explicit grant.
+- Migration `202609080011_service_workspace_read.sql` adds the narrow workspace-identity read required by server-side document and invitation rendering; it was applied and verified on 8 September 2026 after live export verification exposed the previously missing explicit grant.
+- Live authenticated DOCX and PDF exports were reverified on 8 September 2026. Both downloads used deterministic filenames; the DOCX parsed as editable OOXML with the controlled document code and the PDF parsed as a one-page document with the expected title. The production download handler fix is covered by the 48-test suite.
 
 ## Architecture
 
