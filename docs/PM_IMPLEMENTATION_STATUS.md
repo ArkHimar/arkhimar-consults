@@ -2,6 +2,10 @@
 
 Updated: 2026-09-08
 
+Growth implementation commit: `d06becbad0781daf8738c88e8689116dd0cd8b19`
+
+Production deployment: `dpl_7QcDK9qy7SWBd6fNw8CfCxtmM5it`
+
 ## Delivered in the validation release
 
 - Phase 0: repository, routes, visual language, deployment and risk audit.

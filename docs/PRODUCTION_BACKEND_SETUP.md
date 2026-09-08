@@ -2,6 +2,8 @@
 
 The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
+Current growth implementation: commit `d06becbad0781daf8738c88e8689116dd0cd8b19`, production deployment `dpl_7QcDK9qy7SWBd6fNw8CfCxtmM5it`.
+
 ## Activation status
 
 - Supabase project created and healthy.
