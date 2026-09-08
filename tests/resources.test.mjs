@@ -28,3 +28,7 @@ test('PM resource import is draft-only, allowlisted, role-checked and audited',a
 test('resource analytics rejects sensitive project fields',async()=>{
   const analytics=await readFile('project-management/analytics.mjs','utf8');assert.match(analytics,/resource_claim_completed/);assert.match(analytics,/pm_import_completed/);assert.match(analytics,/project_\(\?:title\|content\|location\|budget\)/);assert.doesNotMatch(analytics,/localStorage/);
 });
+
+test('shared built-environment pack resolves through the PM workflow namespace',async()=>{
+  const html=await readFile('dist/resources/index.html','utf8');assert.match(html,/href="\/project-management\/workflow-packs\/built-environment-project-pack"/);assert.doesNotMatch(html,/href="\/resources\/architecture\/built-environment-project-pack"/);
+});
