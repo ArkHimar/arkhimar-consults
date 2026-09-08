@@ -133,8 +133,9 @@ test('controlled documents are tenant-scoped, versioned and immutable after appr
 });
 
 test('external document shares are hashed, expiring, revocable and download limited',async()=>{
-  const sql=await readFile('supabase/migrations/202609070009_document_exports_and_shares.sql','utf8'),shares=await readFile('api/v1/documents/shares.js','utf8'),shared=await readFile('api/v1/documents/shared.js','utf8'),page=await readFile('dist/share/index.html','utf8');
+  const sql=await readFile('supabase/migrations/202609070009_document_exports_and_shares.sql','utf8'),shares=await readFile('api/v1/documents/shares.js','utf8'),shared=await readFile('api/v1/documents/shared.js','utf8'),page=await readFile('dist/share/index.html','utf8'),config=JSON.parse(await readFile('vercel.json','utf8')),shareHeaders=config.headers.find(item=>item.source==='/share')?.headers||[];
   assert.match(sql,/token_hash text not null unique/);assert.match(sql,/expires_at timestamptz not null/);assert.match(sql,/max_downloads integer/);assert.match(sql,/revoked_at timestamptz/);assert.match(shares,/sha256\(token\)/);assert.match(shares,/approved_version_required/);assert.match(shared,/download_count>=share\.max_downloads/);assert.match(page,/noindex,nofollow/);
+  assert.ok(shareHeaders.some(header=>header.key==='X-Robots-Tag'&&header.value==='noindex, nofollow'));assert.ok(shareHeaders.some(header=>header.key==='Referrer-Policy'&&header.value==='no-referrer'));assert.ok(shareHeaders.some(header=>header.key==='Cache-Control'&&header.value==='no-store'));
 });
 
 test('redirects preserve old routes and enforce canonical host',async()=>{
