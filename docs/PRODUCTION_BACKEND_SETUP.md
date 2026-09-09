@@ -2,7 +2,7 @@
 
 The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
-Current production implementation: commit `c5f7a42`, production deployment `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri`.
+Current production implementation: commit `4aa39c8`, production deployment `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz`.
 
 ## Activation status
 
@@ -43,6 +43,8 @@ Current production implementation: commit `c5f7a42`, production deployment `dpl_
 - Live secure-share lifecycle verification completed on 9 September 2026 with three isolated PDF share tokens for `QA-EXP-20260908` version 1. The `/share` page removed each fragment token from the visible URL before sending it by POST; two allowed downloads completed and a third returned unavailable at the limit; independently expired and revoked tokens were rejected. All three records ended revoked, the final externally-available count was zero, and the approved QA fixture was archived.
 - Migration `202609090013_phase3_core_planning.sql` was applied and verified on 9 September 2026. Its six planning tables, membership-scoped RLS and security-definer mutation functions are active. Save → scope-baseline approval → change-referenced revision passed in a rolled-back production transaction. The live `AKH-026` legacy planning content was migrated into a governed draft and survived reload; no production scope baseline was approved during verification.
 - Phase 3 deployment `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri` serves commit `c5f7a42` at `www.arkhimar.com`. The live authenticated Planning screen exposes 25 subsidiary plan editors, requirements/RTM, WBS dictionary and accessible move controls. The private PM route remains noindex and unauthenticated share administration returns `401`.
+- Migration `202609090014_phase4_schedule_cost.sql` was applied and verified on 9 September 2026. Its ten schedule/cost tables, membership-scoped RLS, security-definer save functions and owner/admin baseline controls are active. Schedule and cost save → baseline approval → change-referenced revision lifecycles passed inside a rolled-back production transaction.
+- Phase 4 deployment `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz` serves commit `4aa39c8` at `www.arkhimar.com`. The live `AKH-026` data was saved through both governed paths and survived reload; its four activities resolve to a 202-day critical path through three explicit FS dependencies. No production schedule or cost baseline was approved. The exact `/pm` route and its descendants return `X-Robots-Tag: noindex, nofollow`, and unauthenticated controlled-export requests return `401`.
 
 ## Architecture
 
@@ -70,6 +72,7 @@ Current production implementation: commit `c5f7a42`, production deployment `dpl_
    - `supabase/migrations/202609080011_service_workspace_read.sql`
    - `supabase/migrations/202609080012_phase2_initiation.sql`
    - `supabase/migrations/202609090013_phase3_core_planning.sql`
+   - `supabase/migrations/202609090014_phase4_schedule_cost.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -110,6 +113,8 @@ Current production implementation: commit `c5f7a42`, production deployment `dpl_
 - Resource import accepts only catalogued importable packs, requires explicit project-manager-or-higher access and creates a traceable controlled draft with audit events.
 - Business-case submission requires an executive summary and at least two structured options; fixed weighted scores are calculated on the server.
 - Project managers can save and submit business cases and charters; only owners/admins can approve or request changes; approved versions can only be superseded through an audited revision transition.
+- Project managers can save normalized schedule and cost drafts; only owners/admins can approve their immutable baselines; revisions require an approved change or explicit authorization reference.
+- Schedule calculations reject dependency cycles and support FS, SS, FF and SF relationships with lead/lag; earned-value metrics remain deterministic and explicitly report zero-denominator cases as not computable.
 
 ## Growth-release rollback
 

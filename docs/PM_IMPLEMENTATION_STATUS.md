@@ -2,13 +2,13 @@
 
 Updated: 2026-09-09
 
-Phase 3 deployed implementation commit: `c5f7a42`
+Phase 4 deployed implementation commit: `4aa39c8`
 
-Production deployment: `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri`
+Production deployment: `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz`
 
 ## Current master-prompt phase
 
-The formal production sequence has completed **Phase 3 of 8 — Core Planning** and is ready for Phase 4. Phase 1's secure foundation, Phase 2's initiation governance, and Phase 3's master/subsidiary plans, scope, requirements traceability, WBS dictionary and immutable scope baselines are production-governed. Later phases remain validation flows until normalized in turn.
+The formal production sequence has completed **Phase 4 of 8 — Schedule and Cost Management** and is ready for Phase 5. Phase 1's secure foundation, Phase 2's initiation governance, Phase 3's core planning controls, and Phase 4's schedule, dependency, baseline, cost, cash-flow and earned-value controls are production-governed. Later phases remain validation flows until normalized in turn.
 
 ## Delivered across the implementation
 
@@ -16,7 +16,7 @@ The formal production sequence has completed **Phase 3 of 8 — Core Planning** 
 - Phase 1 production foundation: branded responsive shell, six-step creation workflow, tenant-scoped persisted projects, project overview, readiness checklist, enforced roles and server audit history.
 - Phase 2 production initiation: normalized and versioned business cases and charters; structured options analysis with fixed weighted scoring; server-governed submission, change request, approval and revision decisions; immutable approved versions and tenant-scoped decision history.
 - Phase 3 production core planning: structured master plan and all 25 subsidiary plan editors; normalized requirements and RTM records; hierarchical WBS with keyboard-accessible movement and structured dictionary fields; atomic planning saves; owner/admin scope-baseline approval; immutable snapshots; and change-referenced baseline revisions.
-- Phase 4 validation flows: activity/dependency entry, cycle rejection, deterministic CPM, schedule baseline, budget, reserves and EVM metrics.
+- Phase 4 production schedule and cost management: normalized, versioned schedules and cost controls; activity codes, working calendars, milestones and FS/SS/FF/SF dependencies with lead/lag; deterministic CPM, cycle rejection, float and critical-path display; bounded Gantt presentation; budget, reserves, cost records and cash-flow/S-curve data; complete earned-value forecast variants; owner/admin immutable baseline approval; and change-referenced revisions.
 - Phase 5 validation flows: risk, issue, change and stakeholder registers; explicit change approval.
 - Phase 6 validation flows: project health, status-report snapshots and demonstration project.
 - Phase 7 validation flows: portable JSON backup, flat CSV controls, TXT project pack and print/PDF output.
@@ -46,11 +46,11 @@ The formal production sequence has completed **Phase 3 of 8 — Core Planning** 
 - Lead-resource delivery through a validated, honeypot-protected, database-rate-limited API with separate marketing consent and restricted lead access.
 - Allowlisted “Use in PM” workflow that requires explicit project selection, creates only a controlled draft, records source/version traceability and writes both import and audit events.
 
-Database migrations through `202609090013_phase3_core_planning.sql` were applied and verified in Supabase project `mbveqvzlrpsyhmsfpdfk` on 2026-09-09. The Phase 3 save, baseline approval and authorized revision lifecycle completed inside a rolled-back production transaction. The existing `AKH-026` planning content was then migrated through the live governed save path and verified after a full reload. No baseline was approved on the user's behalf.
+Database migrations through `202609090014_phase4_schedule_cost.sql` were applied and verified in Supabase project `mbveqvzlrpsyhmsfpdfk` on 2026-09-09. The Phase 4 schedule/cost save, baseline approval and authorized revision lifecycles completed inside a rolled-back production transaction. The existing `AKH-026` schedule and cost content was then migrated through the live governed save paths and verified after a full reload. Its predecessor chain became three explicit finish-to-start dependencies and CPM recalculated the 202-day critical path. No production baseline was approved on the user's behalf.
 
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 
-The Phase 3 production bundle, authenticated workspace loading, structured Planning screen, persisted normalized draft, API authentication boundaries and private-page noindex protection were verified after deployment. The Consult start-a-project form remains on its existing FormSubmit delivery path; the n8n payload is a separate synthetic testing reference and no n8n webhook was added to production.
+The Phase 4 production bundle, authenticated workspace loading, governed Schedule & Cost screen, persisted normalized drafts, API authentication boundaries and private-page meta/HTTP noindex protection were verified after deployment. The Consult start-a-project form remains on its existing FormSubmit delivery path; the n8n payload is a separate synthetic testing reference and no n8n webhook was added to production.
 
 Live secure-share lifecycle verification completed on 2026-09-09 using the approved `QA-EXP-20260908` fixture: the fragment token was removed from the visible URL before the POST request, two permitted PDF downloads succeeded, the third was rejected at the configured limit, separately expired and revoked tokens were rejected, and the final database check showed zero externally available test shares. All three temporary shares were revoked and the fixture was archived afterward.
 
@@ -62,7 +62,7 @@ This release is a coherent product-validation build, not the production multi-us
 - normalized relational storage for every advanced control register and full concurrent-edit conflict UI;
 - malware scanning/quarantine integration;
 - optional share passwords and recipient identity verification for highly restricted external distribution;
-- full FS/SS/FF/SF calendar scheduling and high-volume Gantt virtualization;
+- high-volume Gantt virtualization and enterprise resource leveling;
 - server-generated XLSX and PPTX project/register exports;
 - notification jobs, secure AI provider integration and organization knowledge retrieval;
 - automated tenant-isolation, authorization and full browser E2E suites.
