@@ -2,9 +2,9 @@
 
 Updated: 2026-09-09
 
-Current deployed implementation commit: `4aa39c8`
+Current deployed implementation commit: `fad350e`
 
-Production deployment: `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz`
+Production deployment: `dpl_8TRAtNXchJYhALecfENMkH2cFpV5`
 
 ## Delivered
 
@@ -29,9 +29,9 @@ Production deployment: `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz`
 
 ## Original PM build status
 
-The original production implementation sequence has completed **Phase 4 of 8 after the Phase 0 audit**. Phase 1 provides the secure tenant foundation, Phase 2 governs initiation, Phase 3 governs core planning, and Phase 4 now governs normalized schedules, dependencies, immutable delivery baselines, cost controls, cash flow and earned value. Later-phase workflows remain a browser-based validation layer until normalized in their respective phases.
+The original production implementation sequence has completed **Phase 5 of 8 after the Phase 0 audit**. Phases 1–4 provide the secure tenant, initiation, planning, schedule and cost foundation; Phase 5 now governs risks, issues, stakeholders, engagement actions and formal change decisions. Later-phase workflows remain a browser-based validation layer until normalized in their respective phases.
 
 Estimated completion:
 
-- Product-validation UI and deterministic workflow coverage: approximately **78%**.
-- Full production brief, including normalized controls, collaboration, complete exports, AI and enterprise hardening: approximately **58%**.
+- Product-validation UI and deterministic workflow coverage: approximately **84%**.
+- Full production brief, including normalized controls, collaboration, complete exports, AI and enterprise hardening: approximately **66%**.

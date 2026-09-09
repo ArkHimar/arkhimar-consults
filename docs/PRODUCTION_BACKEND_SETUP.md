@@ -2,7 +2,7 @@
 
 The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
-Current production implementation: commit `4aa39c8`, production deployment `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz`.
+Current production implementation: commit `fad350e`, production deployment `dpl_8TRAtNXchJYhALecfENMkH2cFpV5`.
 
 ## Activation status
 
@@ -45,6 +45,8 @@ Current production implementation: commit `4aa39c8`, production deployment `dpl_
 - Phase 3 deployment `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri` serves commit `c5f7a42` at `www.arkhimar.com`. The live authenticated Planning screen exposes 25 subsidiary plan editors, requirements/RTM, WBS dictionary and accessible move controls. The private PM route remains noindex and unauthenticated share administration returns `401`.
 - Migration `202609090014_phase4_schedule_cost.sql` was applied and verified on 9 September 2026. Its ten schedule/cost tables, membership-scoped RLS, security-definer save functions and owner/admin baseline controls are active. Schedule and cost save → baseline approval → change-referenced revision lifecycles passed inside a rolled-back production transaction.
 - Phase 4 deployment `dpl_Hm3DDY8K8ghd5Br7S68RZyrFicZz` serves commit `4aa39c8` at `www.arkhimar.com`. The live `AKH-026` data was saved through both governed paths and survived reload; its four activities resolve to a 202-day critical path through three explicit FS dependencies. No production schedule or cost baseline was approved. The exact `/pm` route and its descendants return `X-Robots-Tag: noindex, nofollow`, and unauthenticated controlled-export requests return `401`.
+- Migrations `202609090015_phase5_project_controls.sql` and `202609090016_phase5_snapshot_privacy.sql` were applied and verified on 9 September 2026. Nine normalized control/change tables, membership-scoped RLS, immutable snapshots/history, manager-only private stakeholder notes, atomic register saves and the formal change-transition RPC are active. The complete change lifecycle produced eight history entries inside a rolled-back transaction, followed by zero retained QA records.
+- Phase 5 deployment `dpl_8TRAtNXchJYhALecfENMkH2cFpV5` serves commit `fad350e` at `www.arkhimar.com`. The live `AKH-026` register migrated two risks and one stakeholder into governed version 1 and survived reload; its matrix reports top exposure 16. No synthetic production change or approval remains. `/pm` returns `X-Robots-Tag: noindex, nofollow`, and unauthenticated controlled-export requests return `401`.
 
 ## Architecture
 
@@ -73,6 +75,8 @@ Current production implementation: commit `4aa39c8`, production deployment `dpl_
    - `supabase/migrations/202609080012_phase2_initiation.sql`
    - `supabase/migrations/202609090013_phase3_core_planning.sql`
    - `supabase/migrations/202609090014_phase4_schedule_cost.sql`
+   - `supabase/migrations/202609090015_phase5_project_controls.sql`
+   - `supabase/migrations/202609090016_phase5_snapshot_privacy.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
@@ -115,6 +119,8 @@ Current production implementation: commit `4aa39c8`, production deployment `dpl_
 - Project managers can save and submit business cases and charters; only owners/admins can approve or request changes; approved versions can only be superseded through an audited revision transition.
 - Project managers can save normalized schedule and cost drafts; only owners/admins can approve their immutable baselines; revisions require an approved change or explicit authorization reference.
 - Schedule calculations reject dependency cycles and support FS, SS, FF and SF relationships with lead/lag; earned-value metrics remain deterministic and explicitly report zero-denominator cases as not computable.
+- Project managers can save versioned risks, issues, stakeholders and engagement actions; register history is immutable and PM-only stakeholder notes are hidden from ordinary members, including through historical snapshots.
+- Change requests follow the enforced draft-to-closure workflow; only owners/admins can approve, reject, defer or close, and approved requests can authorize new scope, schedule or cost drafts without deleting prior baselines.
 
 ## Growth-release rollback
 
