@@ -1,6 +1,6 @@
 # ArkHimar PM implementation status
 
-Updated: 2026-09-08
+Updated: 2026-09-09
 
 Phase 2 implementation commit: `8539e7cddc90862a74017dcaacecec66a0e3c8c7`
 
@@ -51,6 +51,8 @@ Database migrations through `202609080012_phase2_initiation.sql` were applied an
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 
 The Phase 2 production bundle, authenticated workspace loading, API authentication boundaries and private-page noindex headers were verified after deployment. The Consult start-a-project form remains on its existing FormSubmit delivery path; the n8n payload is a separate synthetic testing reference and no n8n webhook was added to production.
+
+Live secure-share lifecycle verification completed on 2026-09-09 using the approved `QA-EXP-20260908` fixture: the fragment token was removed from the visible URL before the POST request, two permitted PDF downloads succeeded, the third was rejected at the configured limit, separately expired and revoked tokens were rejected, and the final database check showed zero externally available test shares. All three temporary shares were revoked and the fixture was archived afterward.
 
 ## Remaining production boundary
 
