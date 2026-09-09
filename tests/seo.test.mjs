@@ -180,6 +180,17 @@ test('schedule and cost controls are normalized, versioned and baseline-governed
   assert.doesNotMatch(ui,/data-baseline="schedule"/);assert.doesNotMatch(ui,/data-baseline="cost"/);
 });
 
+test('risk issue stakeholder and change controls are normalized and server-governed',async()=>{
+  const sql=await readFile('supabase/migrations/202609090015_phase5_project_controls.sql','utf8'),privacy=await readFile('supabase/migrations/202609090016_phase5_snapshot_privacy.sql','utf8'),client=await readFile('pm/backend.js','utf8'),ui=await readFile('pm/pm.js','utf8');
+  for(const table of ['project_control_sets','control_register_versions','project_risks','project_issues','project_stakeholders','stakeholder_private_notes','stakeholder_engagement_actions','change_requests','change_request_history'])assert.match(sql,new RegExp(`create table public\\.${table}`));
+  assert.match(sql,/Threat','Opportunity/);assert.match(sql,/protect_control_register_versions/);assert.match(sql,/stakeholder_private_notes_manager_read/);
+  assert.match(privacy,/drop policy if exists control_register_versions_member_read/);assert.match(privacy,/control_register_versions_manager_read/);assert.match(privacy,/workspace_role_for\(workspace_id\) in \('owner','admin','project_manager'\)/);
+  assert.match(sql,/actor_role in \('owner','admin'\)/);assert.match(sql,/Change transition not permitted/);assert.match(sql,/revoke insert,update,delete on public\.project_control_sets/);
+  assert.match(client,/loadControlsForProjects/);assert.match(client,/saveProjectControls[\s\S]+save_project_controls/);assert.match(client,/transitionChangeRequest[\s\S]+transition_change_request/);
+  assert.match(ui,/Probability × impact matrix/);assert.match(ui,/data-change-transition/);assert.match(ui,/Private PM-only notes/);assert.match(ui,/immutable register snapshot/);
+  assert.doesNotMatch(ui,/data-approve-change/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });
