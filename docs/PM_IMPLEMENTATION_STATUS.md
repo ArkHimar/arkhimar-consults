@@ -4,11 +4,9 @@ Updated: 2026-09-09
 
 Phase 5 deployed implementation commit: `fad350e`
 
-Production deployment: `dpl_8TRAtNXchJYhALecfENMkH2cFpV5`
-
 ## Current master-prompt phase
 
-The formal production sequence has completed **Phase 5 of 8 — Risk, Issue, Change and Stakeholder Management** and is ready for Phase 6. Phase 1's secure foundation, Phase 2's initiation governance, Phase 3's core planning controls, Phase 4's schedule/cost baselines, and Phase 5's project-control registers and decisions are production-governed. Later phases remain validation flows until normalized in turn.
+The implementation sequence has completed **all 8 phases** in source. Phase 6 adds governed execution, agile/hybrid delivery, reporting and governance. Phase 7 adds authenticated controlled project-pack exports. Phase 8 completes accessibility, responsive hardening, regression coverage and release validation.
 
 ## Delivered across the implementation
 
@@ -18,9 +16,9 @@ The formal production sequence has completed **Phase 5 of 8 — Risk, Issue, Cha
 - Phase 3 production core planning: structured master plan and all 25 subsidiary plan editors; normalized requirements and RTM records; hierarchical WBS with keyboard-accessible movement and structured dictionary fields; atomic planning saves; owner/admin scope-baseline approval; immutable snapshots; and change-referenced baseline revisions.
 - Phase 4 production schedule and cost management: normalized, versioned schedules and cost controls; activity codes, working calendars, milestones and FS/SS/FF/SF dependencies with lead/lag; deterministic CPM, cycle rejection, float and critical-path display; bounded Gantt presentation; budget, reserves, cost records and cash-flow/S-curve data; complete earned-value forecast variants; owner/admin immutable baseline approval; and change-referenced revisions.
 - Phase 5 production project controls: normalized risk plans, threat/opportunity registers, issue logs, stakeholder registers and engagement actions; deterministic exposure and power/interest views; PM-only stakeholder notes protected from ordinary members and historical snapshots; immutable register versions; and a server-enforced change workflow from draft through CCB decision, implementation, verification and closure, with owner/admin approval boundaries and baseline-revision links.
-- Phase 6 validation flows: project health, status-report snapshots and demonstration project.
-- Phase 7 validation flows: portable JSON backup, flat CSV controls, TXT project pack and print/PDF output.
-- Phase 8 UI work: keyboard focus, skip navigation, reduced motion, responsive layouts, empty states and production build checks.
+- Phase 6 production implementation: versioned execution settings, iterations/releases/stages, connected backlog and work items, WIP enforcement, acceptance evidence, durable governance reviews and owner/admin decisions, plus immutable status reports with connected delivery/control/EVM metrics.
+- Phase 7 production implementation: authenticated tenant-authorized JSON, CSV, TXT and paginated PDF project packs assembled server-side from current normalized planning, schedule, cost, execution, control, governance and reporting records; deterministic filenames, private no-store responses and audit events.
+- Phase 8 release hardening: expanded keyboard focus treatments, responsive overflow for delivery boards and navigation, reduced-motion support, automated phase-contract regression tests, clean production build, and Lighthouse accessibility/best-practices scores of 100/100 for the public ArkHimar PM route.
 
 ## Production foundation added
 
@@ -46,7 +44,7 @@ The formal production sequence has completed **Phase 5 of 8 — Risk, Issue, Cha
 - Lead-resource delivery through a validated, honeypot-protected, database-rate-limited API with separate marketing consent and restricted lead access.
 - Allowlisted “Use in PM” workflow that requires explicit project selection, creates only a controlled draft, records source/version traceability and writes both import and audit events.
 
-Database migrations through `202609090016_phase5_snapshot_privacy.sql` were applied and verified in Supabase project `mbveqvzlrpsyhmsfpdfk` on 2026-09-09. A Phase 5 save and complete Draft → Submitted → Impact Analysis → CCB Review → Approved → Implementation → Verification → Closed lifecycle produced eight immutable history records inside a rolled-back production transaction; all QA counts returned zero afterward. The existing `AKH-026` risks and stakeholder were migrated through the live governed save path as register version 1 and verified after reload. No synthetic production change request or approval was retained.
+Database migrations through `202609090016_phase5_snapshot_privacy.sql` were applied and verified in Supabase project `mbveqvzlrpsyhmsfpdfk` on 2026-09-09. Migration `202609090017_phase6_execution_reporting.sql` is the final schema migration and must be applied before enabling Phase 6 mutations in production. The client degrades safely to empty execution/reporting state when that relation is not yet present.
 
 The production code is connected to the ArkHimar Supabase project and deployed at `https://www.arkhimar.com/pm/`. Public browser configuration contains only the Supabase URL and publishable key; server and email-provider credentials remain encrypted deployment secrets.
 
@@ -54,16 +52,16 @@ The Phase 5 production bundle, authenticated workspace loading, governed Risks &
 
 Live secure-share lifecycle verification completed on 2026-09-09 using the approved `QA-EXP-20260908` fixture: the fragment token was removed from the visible URL before the POST request, two permitted PDF downloads succeeded, the third was rejected at the configured limit, separately expired and revoked tokens were rejected, and the final database check showed zero externally available test shares. All three temporary shares were revoked and the fixture was archived afterward.
 
-## Remaining production boundary
+## Remaining operational boundary
 
 This release is a coherent product-validation build, not the production multi-user system described by the full brief. The source repository began as a static site with no backend. The following require a separately provisioned server/database and deployment secrets:
 
 - Administrative account recovery and organization-wide session policy controls;
-- normalized relational storage for remaining quality, resource, procurement and advanced delivery registers, plus full concurrent-edit conflict UI;
+- normalized relational storage for specialist quality, resource and procurement registers, plus full concurrent-edit conflict UI;
 - malware scanning/quarantine integration;
 - optional share passwords and recipient identity verification for highly restricted external distribution;
 - high-volume Gantt virtualization and enterprise resource leveling;
-- server-generated XLSX and PPTX project/register exports;
+- server-generated XLSX and PPTX project/register exports (Phase 7 delivers JSON, CSV, TXT and PDF);
 - notification jobs, secure AI provider integration and organization knowledge retrieval;
 - automated tenant-isolation, authorization and full browser E2E suites.
 

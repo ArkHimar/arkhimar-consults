@@ -7,6 +7,7 @@ import exportHandler from '../api/v1/documents/export.js';
 import sharesHandler from '../api/v1/documents/shares.js';
 import sharedHandler from '../api/v1/documents/shared.js';
 import resourceClaimHandler from '../api/v1/resources/claim.js';
+import projectExportHandler from '../api/v1/projects/export.js';
 
 function response(){return{statusCode:200,headers:{},body:null,setHeader(name,value){this.headers[name]=value},status(code){this.statusCode=code;return this},json(value){this.body=value;return this}}}
 
@@ -37,6 +38,10 @@ test('workspace invitation API requires an authenticated owner or admin session'
 
 test('controlled export and share administration require authentication',async()=>{
   for(const handler of [exportHandler,sharesHandler]){const result=response();await handler({method:'POST',headers:{},body:{}},result);assert.equal(result.statusCode,401);assert.equal(result.body.error,'authentication_required')}
+});
+
+test('project pack export requires authentication',async()=>{
+  const result=response();await projectExportHandler({method:'POST',headers:{},body:{}},result);assert.equal(result.statusCode,401);assert.equal(result.body.error,'authentication_required');
 });
 
 test('public shared download rejects malformed tokens before database access',async()=>{
