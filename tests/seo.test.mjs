@@ -158,6 +158,18 @@ test('initiation artifacts are tenant-scoped, versioned and decided on the serve
   assert.match(ui,/transitionBusinessCase/);assert.match(ui,/transitionProjectCharter/);assert.doesNotMatch(ui,/charterAction\(/);
 });
 
+test('core planning is normalized, traceable and protected by immutable scope baselines',async()=>{
+  const sql=await readFile('supabase/migrations/202609090013_phase3_core_planning.sql','utf8'),client=await readFile('pm/backend.js','utf8'),ui=await readFile('pm/pm.js','utf8');
+  for(const table of ['core_planning_sets','core_planning_versions','requirements','requirement_traces','wbs_nodes','scope_baselines'])assert.match(sql,new RegExp(`create table public\\.${table}`));
+  assert.match(sql,/protect_scope_baselines/);assert.match(sql,/Approved planning records are immutable/);
+  assert.match(sql,/Start an authorized baseline revision before editing/);assert.match(sql,/change_reference/);
+  assert.match(sql,/Project manager permission required/);assert.match(sql,/Owner or admin approval required/);
+  assert.match(sql,/create policy requirements_member_read/);assert.match(sql,/revoke insert,update,delete on public\.core_planning_sets/);
+  assert.match(client,/loadPlanningForProjects/);assert.match(client,/saveCorePlanning[\s\S]+save_core_planning/);assert.match(client,/approveScopeBaseline[\s\S]+approve_scope_baseline/);
+  assert.match(ui,/subsidiaryPlanTypes/);assert.match(ui,/data-move-wbs/);assert.match(ui,/data-revise-scope/);assert.match(ui,/traceStatus/);
+  assert.doesNotMatch(ui,/data-baseline="scope"/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });
