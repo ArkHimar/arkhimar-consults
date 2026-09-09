@@ -187,6 +187,7 @@ test('risk issue stakeholder and change controls are normalized and server-gover
   assert.match(privacy,/drop policy if exists control_register_versions_member_read/);assert.match(privacy,/control_register_versions_manager_read/);assert.match(privacy,/workspace_role_for\(workspace_id\) in \('owner','admin','project_manager'\)/);
   assert.match(sql,/actor_role in \('owner','admin'\)/);assert.match(sql,/Change transition not permitted/);assert.match(sql,/revoke insert,update,delete on public\.project_control_sets/);
   assert.match(client,/loadControlsForProjects/);assert.match(client,/saveProjectControls[\s\S]+save_project_controls/);assert.match(client,/transitionChangeRequest[\s\S]+transition_change_request/);
+  assert.match(client,/if\(!result\.has\(projectId\)&&!projectChanges\.length\)continue/);
   assert.match(ui,/Probability × impact matrix/);assert.match(ui,/data-change-transition/);assert.match(ui,/Private PM-only notes/);assert.match(ui,/immutable register snapshot/);
   assert.doesNotMatch(ui,/data-approve-change/);
 });
