@@ -2,7 +2,7 @@
 
 The application integration is active on `https://www.arkhimar.com`. Supabase project `mbveqvzlrpsyhmsfpdfk` was provisioned in West Europe (London) on 6 September 2026, the checked-in migrations were applied, and the hosted login detects the configured backend.
 
-Current production implementation: commit `8539e7cddc90862a74017dcaacecec66a0e3c8c7`, production deployment `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4`.
+Current production implementation: commit `c5f7a42`, production deployment `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri`.
 
 ## Activation status
 
@@ -41,6 +41,8 @@ Current production implementation: commit `8539e7cddc90862a74017dcaacecec66a0e3c
 - Migration `202609080012_phase2_initiation.sql` was applied and verified on 8 September 2026. Business cases, structured options, charters, immutable versions and decision histories are tenant-scoped; mutations are limited to security-definer RPCs with project-manager submission and owner/admin decision boundaries. A complete save → submit → approve → revise lifecycle passed inside a rolled-back production transaction.
 - Phase 2 deployment `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4` was aliased to `www.arkhimar.com` and verified with the authenticated owner workspace. The live bundle contains the governed initiation RPC contracts; `/pm` and `/share` remain noindex, unauthenticated export/share administration returns `401`, and malformed public share tokens fail before database access.
 - Live secure-share lifecycle verification completed on 9 September 2026 with three isolated PDF share tokens for `QA-EXP-20260908` version 1. The `/share` page removed each fragment token from the visible URL before sending it by POST; two allowed downloads completed and a third returned unavailable at the limit; independently expired and revoked tokens were rejected. All three records ended revoked, the final externally-available count was zero, and the approved QA fixture was archived.
+- Migration `202609090013_phase3_core_planning.sql` was applied and verified on 9 September 2026. Its six planning tables, membership-scoped RLS and security-definer mutation functions are active. Save → scope-baseline approval → change-referenced revision passed in a rolled-back production transaction. The live `AKH-026` legacy planning content was migrated into a governed draft and survived reload; no production scope baseline was approved during verification.
+- Phase 3 deployment `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri` serves commit `c5f7a42` at `www.arkhimar.com`. The live authenticated Planning screen exposes 25 subsidiary plan editors, requirements/RTM, WBS dictionary and accessible move controls. The private PM route remains noindex and unauthenticated share administration returns `401`.
 
 ## Architecture
 
@@ -67,6 +69,7 @@ Current production implementation: commit `8539e7cddc90862a74017dcaacecec66a0e3c
    - `supabase/migrations/202609080010_resource_growth_engine.sql`
    - `supabase/migrations/202609080011_service_workspace_read.sql`
    - `supabase/migrations/202609080012_phase2_initiation.sql`
+   - `supabase/migrations/202609090013_phase3_core_planning.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.

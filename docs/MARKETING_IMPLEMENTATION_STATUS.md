@@ -1,10 +1,10 @@
 # ArkHimar PM marketing implementation status
 
-Updated: 2026-09-08
+Updated: 2026-09-09
 
-Current implementation commit: `8539e7cddc90862a74017dcaacecec66a0e3c8c7`
+Current deployed implementation commit: `c5f7a42`
 
-Production deployment: `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4`
+Production deployment: `dpl_8eURgW3uxFJUa4mHwHggrSRDaYri`
 
 ## Delivered
 
@@ -29,9 +29,9 @@ Production deployment: `dpl_3caBuqbdr4qs5EFqmA94JWBNzRk4`
 
 ## Original PM build status
 
-The original production implementation sequence is formally at **Phase 2 of 8 after the completed Phase 0 audit**. Phase 1 is complete with authenticated tenancy, server-side permissions, private storage, governed controlled documents and append-only auditing. Phase 2 Initiation is active with normalized business cases, structured options analysis and server-governed charter decisions. Later-phase workflows remain a browser-based validation layer until normalized in their respective phases.
+The original production implementation sequence has completed **Phase 3 of 8 after the Phase 0 audit**. Phase 1 provides the secure tenant foundation, Phase 2 governs initiation, and Phase 3 now governs master/subsidiary plans, scope, requirements traceability, WBS dictionaries and immutable scope baselines. Later-phase workflows remain a browser-based validation layer until normalized in their respective phases.
 
 Estimated completion:
 
 - Product-validation UI and deterministic workflow coverage: approximately **72%**.
-- Full production brief, including normalized controls, collaboration, complete exports, AI and enterprise hardening: approximately **42%**.
+- Full production brief, including normalized controls, collaboration, complete exports, AI and enterprise hardening: approximately **50%**.
