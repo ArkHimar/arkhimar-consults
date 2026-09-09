@@ -4,6 +4,10 @@ Updated: 2026-09-09
 
 Phase 5 deployed implementation commit: `fad350e`
 
+Phases 6–8 implementation commit: `a0b458c`
+
+Production deployment: `dpl_DQc2oPzqtx2w3b559PXkCrg1kxhE`
+
 ## Current master-prompt phase
 
 The implementation sequence has completed **all 8 phases** in source. Phase 6 adds governed execution, agile/hybrid delivery, reporting and governance. Phase 7 adds authenticated controlled project-pack exports. Phase 8 completes accessibility, responsive hardening, regression coverage and release validation.
