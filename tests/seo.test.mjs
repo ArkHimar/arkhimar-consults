@@ -170,6 +170,16 @@ test('core planning is normalized, traceable and protected by immutable scope ba
   assert.doesNotMatch(ui,/data-baseline="scope"/);
 });
 
+test('schedule and cost controls are normalized, versioned and baseline-governed',async()=>{
+  const sql=await readFile('supabase/migrations/202609090014_phase4_schedule_cost.sql','utf8'),client=await readFile('pm/backend.js','utf8'),ui=await readFile('pm/pm.js','utf8');
+  for(const table of ['schedule_control_sets','schedule_versions','schedule_tasks','schedule_dependencies','schedule_baselines','cost_control_sets','cost_versions','cost_items','cash_flow_entries','cost_baselines'])assert.match(sql,new RegExp(`create table public\\.${table}`));
+  assert.match(sql,/dependency_type in \('FS','SS','FF','SF'\)/);assert.match(sql,/revision_reference/);assert.match(sql,/protect_schedule_baselines/);assert.match(sql,/protect_cost_baselines/);
+  assert.match(sql,/Owner or admin approval required/);assert.match(sql,/create policy schedule_tasks_member_read/);assert.match(sql,/revoke insert,update,delete on public\.schedule_control_sets/);
+  assert.match(client,/loadDeliveryForProjects/);assert.match(client,/saveScheduleControl[\s\S]+save_schedule_control/);assert.match(client,/saveCostControl[\s\S]+save_cost_control/);
+  assert.match(ui,/data-dependency-index/);assert.match(ui,/data-approve-delivery/);assert.match(ui,/cash-curve/);assert.match(ui,/Gantt/);
+  assert.doesNotMatch(ui,/data-baseline="schedule"/);assert.doesNotMatch(ui,/data-baseline="cost"/);
+});
+
 test('redirects preserve old routes and enforce canonical host',async()=>{
   const config=JSON.parse(await readFile('vercel.json','utf8'));assert.ok(config.redirects.some(item=>item.source==='/work'&&item.destination==='/projects'));assert.ok(config.redirects.some(item=>item.has?.some(rule=>rule.type==='host'&&rule.value==='arkhimar.com')&&item.destination.startsWith(SITE_ORIGIN)));
 });
