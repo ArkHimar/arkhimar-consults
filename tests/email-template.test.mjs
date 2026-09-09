@@ -15,3 +15,9 @@ test('plain text renderer preserves readable calls to action',()=>{
   assert.match(text,/Friendly copy/);
   assert.match(text,/Review: https:\/\/arkhimar\.com\/review/);
 });
+
+test('email call-to-action opens outside an embedded preview safely',()=>{
+  const html=renderEmailHtml({blocks:[{type:'button',label:'Review project',url:'https://www.arkhimar.com/pm'}]});
+  assert.match(html,/target="_blank"/);
+  assert.match(html,/rel="noopener noreferrer"/);
+});
