@@ -9,7 +9,7 @@ if(invitationFromHash){localStorage.setItem(invitationStorageKey,invitationFromH
 let mode=location.hash.includes('type=recovery')?'recovery':requestedMode==='signup'?'signup':'signin';
 let mfaFactorId=null;
 
-async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);return data}
+async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);localStorage.setItem('arkhimar.pm.active-workspace',data);return data}
 
 function setMode(next){
   mode=next;

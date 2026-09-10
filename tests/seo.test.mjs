@@ -106,6 +106,16 @@ test('workspace invitations are expiring, email-bound and owner-safe',async()=>{
   assert.match(sql,/grant execute on function public\.accept_workspace_invitation\(text\) to authenticated/i);
 });
 
+test('workspace invitation acceptance supports established users and selects the joined workspace',async()=>{
+  const sql=await readFile('supabase/migrations/202609100018_workspace_invitation_join_reliability.sql','utf8');
+  const auth=await readFile('pm/auth.js','utf8');
+  const backend=await readFile('pm/backend.js','utf8');
+  assert.doesNotMatch(sql,/already belongs to another workspace/i);
+  assert.match(sql,/on conflict\(workspace_id,user_id\) do update/i);
+  assert.match(auth,/arkhimar\.pm\.active-workspace/);
+  assert.match(backend,/find\(item=>item\.workspace_id===preferred\)/);
+});
+
 test('account creation requires password confirmation',async()=>{
   const login=await readFile('dist/pm/login/index.html','utf8');
   const auth=await readFile('pm/auth.js','utf8');
