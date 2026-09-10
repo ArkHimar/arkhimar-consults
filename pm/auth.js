@@ -64,7 +64,7 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
     }else if(mode==='signup'){
       const {data,error}=await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{display_name:values.display_name},emailRedirectTo:`${location.origin}/pm/login/`}});
       if(error)throw error;
-      status.textContent=data.session?'Account created. Redirecting…':'Check your email to verify your account before signing in.';
+      status.textContent=data.session?'Account created. Redirecting…':'Check your email to verify your account. Then return to this browser, or reopen the original invitation link, and sign in.';
       if(data.session){await acceptPendingInvitation();location.replace('/pm/')}
     }else if(mode==='reset'){
       const {error}=await supabase.auth.resetPasswordForEmail(values.email,{redirectTo:`${location.origin}/pm/login/`});

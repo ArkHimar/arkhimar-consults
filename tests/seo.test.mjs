@@ -52,6 +52,15 @@ test('built private workspace remains noindex and out of sitemap',async()=>{
   const pm=await readFile('dist/pm/index.html','utf8');const sitemap=await readFile('dist/sitemap.xml','utf8');assert.match(pm,/noindex,nofollow/);assert.match(pm,/Loading your secure workspace/);assert.doesNotMatch(sitemap,/\/pm/);
 });
 
+test('project brief delivery is permitted by the production content security policy',async()=>{
+  const form=await readFile('start-a-project/form.js','utf8');
+  const config=JSON.parse(await readFile('vercel.json','utf8'));
+  const policy=config.headers.flatMap(rule=>rule.headers).find(header=>header.key==='Content-Security-Policy')?.value||'';
+  const endpoint=form.match(/fetch\('([^']+)'/)?.[1];
+  assert.equal(endpoint,'https://formsubmit.co/ajax/projects@arkhimar.com');
+  assert.match(policy,/connect-src[^;]*https:\/\/formsubmit\.co(?:\s|;)/);
+});
+
 test('authenticated database migration grants only the application operations required by the client',async()=>{
   const sql=await readFile('supabase/migrations/202609070003_authenticated_privileges.sql','utf8');
   assert.match(sql,/grant select on table[\s\S]+to authenticated/i);
