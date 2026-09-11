@@ -5,6 +5,17 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/api/v1/ai/chat", "destination": "/api/v1/ai?action=chat" },
+    { "source": "/api/v1/ai/context", "destination": "/api/v1/ai?action=context" },
+    { "source": "/api/v1/ai/actions/preview", "destination": "/api/v1/ai?action=preview" },
+    { "source": "/api/v1/ai/actions/execute", "destination": "/api/v1/ai?action=execute" },
+    { "source": "/api/v1/ai/feedback", "destination": "/api/v1/ai?action=feedback" },
+    { "source": "/api/v1/ai/automations", "destination": "/api/v1/ai?action=automations" },
+    { "source": "/api/v1/ai/voice/catalog", "destination": "/api/v1/ai?action=catalog" },
+    { "source": "/api/v1/ai/voice/session", "destination": "/api/v1/ai?action=voice" },
+    { "source": "/api/v1/ai/voice/webhook/vapi", "destination": "/api/v1/ai?action=vapi" }
+  ],
   "redirects": [
     { "source": "/work", "destination": "/projects", "permanent": true },
     { "source": "/works", "destination": "/projects", "permanent": true },
@@ -17,7 +28,7 @@
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(self), geolocation=()" },
         { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' https://formsubmit.co https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'" }
       ]
     },

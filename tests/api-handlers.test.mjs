@@ -8,6 +8,8 @@ import sharesHandler from '../api/v1/documents/shares.js';
 import sharedHandler from '../api/v1/documents/shared.js';
 import resourceClaimHandler from '../api/v1/resources/claim.js';
 import projectExportHandler from '../api/v1/projects/export.js';
+import authEmailHandler from '../api/v1/auth/email.js';
+import aiHandler from '../api/v1/ai.js';
 
 function response(){return{statusCode:200,headers:{},body:null,setHeader(name,value){this.headers[name]=value},status(code){this.statusCode=code;return this},json(value){this.body=value;return this}}}
 
@@ -52,4 +54,14 @@ test('resource delivery validates requests and catalog access before database us
   const invalid=response();await resourceClaimHandler({method:'POST',headers:{},body:{}},invalid);assert.equal(invalid.statusCode,400);
   const unavailable=response();await resourceClaimHandler({method:'POST',headers:{},body:{resourceSlug:'not-a-resource',name:'Ada Example',email:'ada@example.com',marketingConsent:false,attribution:{}}},unavailable);assert.equal(unavailable.statusCode,404);
   const honeypot=response();await resourceClaimHandler({method:'POST',headers:{},body:{resourceSlug:'project-brief-starter-kit',name:'Ada Example',email:'ada@example.com',company:'bot value',marketingConsent:false,attribution:{}}},honeypot);assert.equal(honeypot.statusCode,202);
+});
+
+test('custom auth email endpoint validates payloads before privileged link generation',async()=>{
+  const result=response();await authEmailHandler({method:'POST',headers:{},body:{action:'signup',email:'not-an-email',password:'short',redirectTo:'https://www.arkhimar.com/pm/login/'}},result);assert.equal(result.statusCode,400);assert.equal(result.body.error,'invalid_request');
+});
+
+test('ArkHimar Intelligence validates authentication, action and voice consent boundaries',async()=>{
+  let result=response();await aiHandler({method:'POST',query:{action:'chat'},headers:{},body:{workspaceId:'00000000-0000-4000-8000-000000000001',projectId:'00000000-0000-4000-8000-000000000002',message:'Summarize this project'}},result);assert.equal(result.statusCode,401);
+  result=response();await aiHandler({method:'POST',query:{action:'preview'},headers:{},body:{}},result);assert.equal(result.statusCode,400);
+  result=response();await aiHandler({method:'POST',query:{action:'voice'},headers:{},body:{workspaceId:'00000000-0000-4000-8000-000000000001',projectId:'00000000-0000-4000-8000-000000000002',voiceId:'site-coordinator',consentToAudio:false,recordingDisclosureAccepted:false}},result);assert.equal(result.statusCode,400);
 });

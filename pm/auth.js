@@ -27,6 +27,12 @@ function showAuthError(error){
   $('[data-switch-invite-account]').hidden=!/invitation email does not match/i.test(message);
 }
 
+async function requestAuthEmail(payload){
+  const response=await fetch('/api/v1/auth/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),result=await response.json();
+  if(!response.ok){const error=new Error(result.message||({account_exists:'An account already exists for this email address. Choose Sign in or Reset password.',too_many_requests:'Please wait 15 minutes before requesting another email.'}[result.error])||'The secure email could not be sent.');error.status=response.status;throw error}
+  return result;
+}
+
 async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);localStorage.setItem('arkhimar.pm.active-workspace',data);return data}
 
 function setMode(next){
@@ -97,14 +103,10 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
       sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Signed in successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Welcome back to your secure workspace.'}));
       location.replace('/pm/');
     }else if(mode==='signup'){
-      const {data,error}=await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{display_name:values.display_name},emailRedirectTo:`${location.origin}/pm/login/`}});
-      if(error)throw error;
-      if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){setMode('signin');status.textContent='An account already exists for this email address. Sign in to continue, or use Reset password if needed.';return}
-      status.textContent=data.session?'Account created. Redirecting…':'Check your email to verify your account. Then return to this browser, or reopen the original invitation link, and sign in.';
-      if(data.session){const joined=await acceptPendingInvitation();sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Account created successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Your secure workspace is ready.'}));location.replace('/pm/')}
+      await requestAuthEmail({action:'signup',email:values.email,password:values.password,displayName:values.display_name||'',redirectTo:`${location.origin}/pm/login/`});
+      setMode('signin');form.elements.email.value=values.email;status.textContent='Verification email sent through ArkHimar. Open it within 24 hours, then sign in. Your invitation remains saved in this browser.';
     }else if(mode==='reset'){
-      const {error}=await supabase.auth.resetPasswordForEmail(values.email,{redirectTo:`${location.origin}/pm/login/?mode=recovery`});
-      if(error)throw error;
+      await requestAuthEmail({action:'recovery',email:values.email,redirectTo:`${location.origin}/pm/login/?mode=recovery`});
       status.textContent='If that address is registered, a reset email has been sent. Open it to choose a new password, then return to Sign in.';
     }else if(mode==='mfa'){
       if(!mfaFactorId)throw new Error('Authenticator challenge expired. Sign in again.');
