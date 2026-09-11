@@ -137,6 +137,15 @@ test('account creation requires password confirmation',async()=>{
   assert.match(auth,/Passwords do not match/);
 });
 
+test('password recovery preserves the existing account and returns to sign in',async()=>{
+  const auth=await readFile('pm/auth.js','utf8');
+  assert.match(auth,/requestedMode==='recovery'&&authParams\.has\('code'\)/);
+  assert.match(auth,/redirectTo:`\$\{location\.origin\}\/pm\/login\/\?mode=recovery`/);
+  assert.match(auth,/history\.replaceState\(null,'',`\$\{location\.pathname\}\?mode=signin`\)/);
+  assert.match(auth,/Password updated\. Sign in with your new password\./);
+  assert.match(auth,/you do not need to create a new account/);
+});
+
 test('account security supports enforced TOTP and selective session revocation',async()=>{
   const login=await readFile('dist/pm/login/index.html','utf8');
   const auth=await readFile('pm/auth.js','utf8');
