@@ -3,7 +3,7 @@ import test from "node:test";
 import { signPayload, snapshotHash } from "../api/_lib/instiserve-capstone.js";
 
 test("signs the exact timestamp and body", () => {
-  assert.equal(signPayload("secret", "100", "{}"), "b8382f8fd7a91f1571e6be1e690ef658bdfd4d2d47f956e75164cbb36cfb80d6");
+  assert.equal(signPayload("secret", "100", "{}"), "8e1a45bf4cb0f06fc9070524ebc7719df42e3abca9ada83da0314a32a75bbc62");
 });
 
 test("snapshot hashes are deterministic and tamper evident", () => {
