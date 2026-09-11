@@ -4,6 +4,7 @@ const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
 const requestedMode=new URLSearchParams(location.search).get('mode');
 const invitationStorageKey='arkhimar.pm.pending-invitation';
+const authFlashKey='arkhimar.pm.auth-flash';
 const invitationFromHash=new URLSearchParams(location.hash.slice(1)).get('invite');
 if(invitationFromHash){localStorage.setItem(invitationStorageKey,invitationFromHash);history.replaceState(null,'',`${location.pathname}${location.search}`)}
 const hasPendingInvitation=Boolean(localStorage.getItem(invitationStorageKey));
@@ -70,14 +71,15 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
       if(error)throw error;
       const requirement=await mfaRequirement();
       if(requirement.required){mfaFactorId=requirement.factor.id;setMode('mfa');status.textContent='Password accepted. Complete authenticator verification.';return}
-      await acceptPendingInvitation();
+      const joined=await acceptPendingInvitation();
+      sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Signed in successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Welcome back to your secure workspace.'}));
       location.replace('/pm/');
     }else if(mode==='signup'){
       const {data,error}=await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{display_name:values.display_name},emailRedirectTo:`${location.origin}/pm/login/`}});
       if(error)throw error;
       if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){setMode('signin');status.textContent='An account already exists for this email address. Sign in to continue, or use Reset password if needed.';return}
       status.textContent=data.session?'Account created. Redirecting…':'Check your email to verify your account. Then return to this browser, or reopen the original invitation link, and sign in.';
-      if(data.session){await acceptPendingInvitation();location.replace('/pm/')}
+      if(data.session){const joined=await acceptPendingInvitation();sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Account created successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Your secure workspace is ready.'}));location.replace('/pm/')}
     }else if(mode==='reset'){
       const {error}=await supabase.auth.resetPasswordForEmail(values.email,{redirectTo:`${location.origin}/pm/login/`});
       if(error)throw error;
@@ -85,7 +87,8 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
     }else if(mode==='mfa'){
       if(!mfaFactorId)throw new Error('Authenticator challenge expired. Sign in again.');
       await verifyMfaCode(mfaFactorId,values.mfa_code);
-      await acceptPendingInvitation();
+      const joined=await acceptPendingInvitation();
+      sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Signed in successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Identity verification completed.'}));
       location.replace('/pm/');
     }else{
       const {error}=await supabase.auth.updateUser({password:values.password});
