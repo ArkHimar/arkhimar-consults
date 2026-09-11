@@ -15,8 +15,16 @@ let mfaFactorId=null;
 function friendlyAuthError(error){
   const message=String(error?.message||'');
   if(error?.status===429||/email rate limit|rate limit.*email|over_email_send_rate_limit/i.test(message))return hasPendingInvitation?'Verification email delivery is temporarily at capacity. Do not keep retrying. If you already have an ArkHimar PM account, choose Sign in. If you are new, your invitation is saved in this browser; try New user again later.':'Verification email delivery is temporarily at capacity. Do not keep retrying; try again later.';
+  if(/invitation email does not match/i.test(message))return 'This invitation was sent to a different email address. Sign out below, then sign in with the exact address that received the invitation.';
+  if(/already belongs to another workspace/i.test(message))return 'Your account could not yet be added to this additional project workspace. Please try the invitation again; if this continues, ask the project manager to resend it.';
   if(/already registered|already exists/i.test(message))return 'An account already exists for this email address. Choose Sign in, or use Reset password if needed.';
   return message||'Authentication failed. Please try again.';
+}
+
+function showAuthError(error){
+  const message=String(error?.message||'');
+  $('[data-auth-status]').textContent=friendlyAuthError(error);
+  $('[data-switch-invite-account]').hidden=!/invitation email does not match/i.test(message);
 }
 
 async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);localStorage.setItem('arkhimar.pm.active-workspace',data);return data}
@@ -40,6 +48,7 @@ function setMode(next){
   $('[data-auth-intro]').textContent=mode==='recovery'?'Choose a strong new password for your existing account. After it is saved, you will return to Sign in.':mode==='reset'?'Enter your existing account email. We will send a secure reset link; you do not need to create a new account.':mode==='mfa'?'Enter the six-digit code from your authenticator app.':hasPendingInvitation&&mode==='signup'?'Create one account using the exact email address that received the invitation. We will then return you to the invited workspace.':hasPendingInvitation?'Sign in to accept the invitation immediately. No new verification email is needed for an existing account.':'Sign in with your verified account to continue.';
   $('[data-auth-submit]').textContent=mode==='signin'?'Sign in securely':mode==='signup'?'Create secure account':mode==='reset'?'Send reset link':mode==='mfa'?'Verify and continue':'Set new password';
   $('[data-auth-status]').textContent=backendConfigured?'':'Authentication is not configured on this deployment. Add the Supabase public environment variables and redeploy.';
+  $('[data-switch-invite-account]').hidden=true;
 }
 
 setMode(mode);
@@ -52,11 +61,23 @@ if(!backendConfigured){
   });
   const session=await currentSession();
   if(session&&mode!=='recovery'){
-    try{const requirement=await mfaRequirement();if(requirement.required){mfaFactorId=requirement.factor.id;setMode('mfa')}else{await acceptPendingInvitation();location.replace('/pm/')}}catch(error){$('[data-auth-status]').textContent=error.message||'This invitation could not be accepted with the signed-in account.'}
+    try{const requirement=await mfaRequirement();if(requirement.required){mfaFactorId=requirement.factor.id;setMode('mfa')}else{await acceptPendingInvitation();location.replace('/pm/')}}catch(error){showAuthError(error)}
   }
 }
 
 $$('[data-auth-mode]').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.authMode)));
+$('[data-switch-invite-account]').addEventListener('click',async()=>{
+  const status=$('[data-auth-status]'),button=$('[data-switch-invite-account]');
+  button.disabled=true;
+  status.textContent='Signing out…';
+  const {error}=await supabase.auth.signOut({scope:'local'});
+  button.disabled=false;
+  if(error){showAuthError(error);return}
+  $('[data-auth-form]').reset();
+  setMode('signin');
+  status.textContent='Signed out. Enter the exact email address that received this project invitation.';
+  $('[name=email]').focus();
+});
 $('[data-auth-form]').addEventListener('submit',async event=>{
   event.preventDefault();
   const form=event.currentTarget,button=$('[data-auth-submit]'),status=$('[data-auth-status]'),values=Object.fromEntries(new FormData(form));
@@ -101,7 +122,7 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
       status.textContent='Password updated. Sign in with your new password.';
     }
   }catch(error){
-    status.textContent=friendlyAuthError(error);
+    showAuthError(error);
   }finally{
     button.disabled=!backendConfigured;
   }

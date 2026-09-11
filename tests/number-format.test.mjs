@@ -21,3 +21,16 @@ test('cost controls format monetary inputs and sign-in produces a one-time succe
   assert.match(pm,/sessionStorage\.removeItem\(AUTH_FLASH_KEY\)/);
   assert.match(page,/data-toast role="status" aria-live="polite"/);
 });
+
+test('invited users can recover from a signed-in email mismatch without losing the invitation',async()=>{
+  const [auth,login,migration]=await Promise.all([
+    readFile('pm/auth.js','utf8'),
+    readFile('pm/login/index.html','utf8'),
+    readFile('supabase/migrations/202609100018_workspace_invitation_join_reliability.sql','utf8')
+  ]);
+  assert.match(auth,/Sign out below, then sign in with the exact address/);
+  assert.match(auth,/signOut\(\{scope:'local'\}\)/);
+  assert.match(login,/data-switch-invite-account hidden/);
+  assert.doesNotMatch(migration,/account already belongs to another workspace/i);
+  assert.match(migration,/on conflict\(workspace_id,user_id\) do update/);
+});
