@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { deliverCapstone, snapshotHash } from "../../../../_lib/instiserve-capstone.js";
+import { deliverCapstone, snapshotHash } from "../../../_lib/instiserve-capstone.js";
 
 const json = (res, status, body) => res.status(status).json(body);
 
