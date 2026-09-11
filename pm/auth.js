@@ -6,14 +6,25 @@ const requestedMode=new URLSearchParams(location.search).get('mode');
 const invitationStorageKey='arkhimar.pm.pending-invitation';
 const invitationFromHash=new URLSearchParams(location.hash.slice(1)).get('invite');
 if(invitationFromHash){localStorage.setItem(invitationStorageKey,invitationFromHash);history.replaceState(null,'',`${location.pathname}${location.search}`)}
-let mode=location.hash.includes('type=recovery')?'recovery':requestedMode==='signup'?'signup':'signin';
+const hasPendingInvitation=Boolean(localStorage.getItem(invitationStorageKey));
+let mode=location.hash.includes('type=recovery')?'recovery':requestedMode==='signup'&&!hasPendingInvitation?'signup':'signin';
 let mfaFactorId=null;
+
+function friendlyAuthError(error){
+  const message=String(error?.message||'');
+  if(error?.status===429||/email rate limit|rate limit.*email|over_email_send_rate_limit/i.test(message))return hasPendingInvitation?'Verification email delivery is temporarily at capacity. Do not keep retrying. If you already have an ArkHimar PM account, choose Sign in. If you are new, your invitation is saved in this browser; try New user again later.':'Verification email delivery is temporarily at capacity. Do not keep retrying; try again later.';
+  if(/already registered|already exists/i.test(message))return 'An account already exists for this email address. Choose Sign in, or use Reset password if needed.';
+  return message||'Authentication failed. Please try again.';
+}
 
 async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);localStorage.setItem('arkhimar.pm.active-workspace',data);return data}
 
 function setMode(next){
   mode=next;
   $$('[data-auth-mode]').forEach(button=>button.classList.toggle('active',button.dataset.authMode===mode));
+  $('[data-auth-title]').textContent=hasPendingInvitation?'Join your project workspace.':'Welcome to ArkHimar PM.';
+  $('[data-invitation-notice]').hidden=!hasPendingInvitation;
+  $('[data-auth-mode="signup"]').textContent=hasPendingInvitation?'New user':'Create account';
   $('[data-email]').hidden=['recovery','mfa'].includes(mode);
   $('[data-password]').hidden=['reset','mfa'].includes(mode);
   $('[data-confirm-password]').hidden=!['signup','recovery'].includes(mode);
@@ -24,7 +35,7 @@ function setMode(next){
   $('[name=confirm_password]').required=['signup','recovery'].includes(mode);
   $('[name=mfa_code]').required=mode==='mfa';
   $('[name=password]').autocomplete=['signup','recovery'].includes(mode)?'new-password':'current-password';
-  $('[data-auth-intro]').textContent=mode==='recovery'?'Choose a strong new password for your account.':mode==='mfa'?'Enter the six-digit code from your authenticator app.':'Sign in with your verified account to continue.';
+  $('[data-auth-intro]').textContent=mode==='recovery'?'Choose a strong new password for your account.':mode==='mfa'?'Enter the six-digit code from your authenticator app.':hasPendingInvitation&&mode==='signup'?'Create one account using the exact email address that received the invitation. We will then return you to the invited workspace.':hasPendingInvitation?'Sign in to accept the invitation immediately. No new verification email is needed for an existing account.':'Sign in with your verified account to continue.';
   $('[data-auth-submit]').textContent=mode==='signin'?'Sign in securely':mode==='signup'?'Create secure account':mode==='reset'?'Send reset link':mode==='mfa'?'Verify and continue':'Set new password';
   $('[data-auth-status]').textContent=backendConfigured?'':'Authentication is not configured on this deployment. Add the Supabase public environment variables and redeploy.';
 }
@@ -64,6 +75,7 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
     }else if(mode==='signup'){
       const {data,error}=await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{display_name:values.display_name},emailRedirectTo:`${location.origin}/pm/login/`}});
       if(error)throw error;
+      if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){setMode('signin');status.textContent='An account already exists for this email address. Sign in to continue, or use Reset password if needed.';return}
       status.textContent=data.session?'Account created. Redirecting…':'Check your email to verify your account. Then return to this browser, or reopen the original invitation link, and sign in.';
       if(data.session){await acceptPendingInvitation();location.replace('/pm/')}
     }else if(mode==='reset'){
@@ -85,7 +97,7 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
       status.textContent='Password updated. Sign in with your new password.';
     }
   }catch(error){
-    status.textContent=error.message||'Authentication failed. Please try again.';
+    status.textContent=friendlyAuthError(error);
   }finally{
     button.disabled=!backendConfigured;
   }

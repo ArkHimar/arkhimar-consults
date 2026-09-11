@@ -77,10 +77,12 @@ Current production implementation: commit `fad350e`, production deployment `dpl_
    - `supabase/migrations/202609090014_phase4_schedule_cost.sql`
    - `supabase/migrations/202609090015_phase5_project_controls.sql`
    - `supabase/migrations/202609090016_phase5_snapshot_privacy.sql`
+   - `supabase/migrations/202609090017_phase6_execution_reporting.sql`
+   - `supabase/migrations/202609100018_workspace_invitation_join_reliability.sql`
 3. In Authentication → URL Configuration, set the Site URL to the intended host and add:
    - `https://arkhimar-consults-demo.vercel.app/pm/login/`
    - `https://www.arkhimar.com/pm/login/` only when production cutover is approved.
-4. Enable email confirmation. Configure a production SMTP provider before public launch so authentication mail does not depend on development limits.
+4. Keep email confirmation enabled and configure production SMTP by following `docs/AUTH_EMAIL_DELIVERY_SETUP.md`; the Supabase demonstration mail service is not suitable for invited users.
 5. Add these Vercel environment variables to the intended deployment environments:
    - `PUBLIC_SUPABASE_URL`
    - `PUBLIC_SUPABASE_ANON_KEY`

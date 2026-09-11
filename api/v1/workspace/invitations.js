@@ -44,7 +44,7 @@ export default async function handler(req,res){
     if(insertError)throw insertError;
     invitationId=invite.id;
     const site=(process.env.PUBLIC_SITE_URL||'https://www.arkhimar.com').replace(/\/$/,'');
-    const inviteUrl=`${site}/pm/login/?mode=signup#invite=${encodeURIComponent(token)}`;
+    const inviteUrl=`${site}/pm/login/?mode=invite#invite=${encodeURIComponent(token)}`;
     const subject=`You are invited to ${workspace?.name||'ArkHimar PM'}`;
     const blocks=[{type:'heading',text:`Join ${workspace?.name||'ArkHimar PM'}`},{type:'text',text:`You have been invited as ${value.role.replace('_',' ')}. Use the invited email address when you create an account or sign in. If email verification opens in another browser, reopen this invitation afterward. Already have an account? Choose Sign in on the invitation page. This invitation expires in ${value.expiresInDays} day${value.expiresInDays===1?'':'s'}.`},{type:'button',label:'Accept invitation',url:inviteUrl},{type:'divider'},{type:'signature',text:'Sent securely by ArkHimar PM'}];
     const senderName=(brand?.sender_name||'ArkHimar PM').replace(/[<>\r\n]/g,'').slice(0,120);

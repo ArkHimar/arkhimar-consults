@@ -119,10 +119,14 @@ test('workspace invitation acceptance supports established users and selects the
   const sql=await readFile('supabase/migrations/202609100018_workspace_invitation_join_reliability.sql','utf8');
   const auth=await readFile('pm/auth.js','utf8');
   const backend=await readFile('pm/backend.js','utf8');
+  const invitationApi=await readFile('api/v1/workspace/invitations.js','utf8');
   assert.doesNotMatch(sql,/already belongs to another workspace/i);
   assert.match(sql,/on conflict\(workspace_id,user_id\) do update/i);
   assert.match(auth,/arkhimar\.pm\.active-workspace/);
   assert.match(backend,/find\(item=>item\.workspace_id===preferred\)/);
+  assert.match(invitationApi,/\?mode=invite#invite=/);
+  assert.match(auth,/requestedMode==='signup'&&!hasPendingInvitation/);
+  assert.match(auth,/Verification email delivery is temporarily at capacity/);
 });
 
 test('account creation requires password confirmation',async()=>{
