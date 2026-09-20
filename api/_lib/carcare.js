@@ -45,8 +45,13 @@ export async function forwardCarCare(kind,payload){
   if(endpoint.protocol!=='https:'&&!local)return{ok:false,status:503,message:'CarCare automation requires a secure webhook URL.'};
   try{
     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','X-Workflow-Secret':secret},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)});
-    return response.ok?{ok:true}:{ok:false,status:502,message:'The automation could not accept this request. Please try again.'};
-  }catch{return{ok:false,status:502,message:'The automation is temporarily unavailable. Please try again.'}}
+    if(response.ok)return{ok:true};
+    console.error('carcare_webhook_rejected',JSON.stringify({kind,upstreamHost:endpoint.host,upstreamStatus:response.status}));
+    return{ok:false,status:502,message:'The automation could not accept this request. Please try again.'};
+  }catch(error){
+    console.error('carcare_webhook_unavailable',JSON.stringify({kind,upstreamHost:endpoint.host,error:error?.name||'Error'}));
+    return{ok:false,status:502,message:'The automation is temporarily unavailable. Please try again.'};
+  }
 }
 
 export function rejectCommon(req,res,scope,limit){
