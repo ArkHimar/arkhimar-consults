@@ -26,6 +26,7 @@ The production-ready static artifact is written to `dist/` and can be served by 
 
 - `/` — ArkHimar Consult public website
 - `/start-a-project/` — complete project enquiry workflow
+- `/carcare/` — customer feedback and protected job-completion front door for the CarCare n8n workflow
 - `/project-management/` — ArkHimar PM public product page
 - `/project-management/pricing/` — private-beta pricing and exact-seat calculator
 - `/project-management/demo/` — guided nine-step product demo

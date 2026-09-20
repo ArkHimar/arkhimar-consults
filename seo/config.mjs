@@ -27,6 +27,7 @@ const architecturePages={
   '/how-it-works': ['How Our Architecture Process Works | ArkHimar Consult','Understand ArkHimar Consult’s process from project brief and consultation through proposal and architectural design.'],
   '/start-a-project': ['Start an Architecture Project | ArkHimar Consult','Submit your architectural project brief to ArkHimar Consult for professional review and a tailored project proposal.'],
   '/contact': ['Contact ArkHimar Consult | Architecture Consultancy','Contact ArkHimar Consult about architectural design, project documentation and built-environment consultancy services.'],
+  '/carcare': ['ArkHimar CarCare | Customer Feedback Intelligence','Share feedback about a car-care visit. Positive feedback is prepared for human review, while complaints are privately routed and urgent issues are escalated.'],
   '/resources': ['Architecture and Project Management Resources | ArkHimar','Explore practical ArkHimar Consult client-preparation resources and ArkHimar PM tools and workflow packs.'],
   '/resources/architecture': ['Architecture Client Resources | ArkHimar Consult','Use practical project brief, design readiness, site information, decision and handover resources before and during an architectural project.'],
   '/tools/design-readiness': ['Free Architectural Design Readiness Tool | ArkHimar','Use an eight-question interactive check to identify missing client, site, budget, decision, survey and statutory preparation before architectural design.'],

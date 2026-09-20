@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d2622">
+  <meta name="description" content="Share feedback about your car-care visit or send a completed job into the ArkHimar CarCare feedback workflow.">
+  <link rel="canonical" href="https://www.arkhimar.com/carcare">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Inter:wght@400;500;600;700&amp;family=Syne:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/carcare/carcare.css">
+  <title>ArkHimar CarCare | Every Visit Heard Clearly</title>
+</head>
+<body>
+  <a class="cc-skip" href="#main">Skip to content</a>
+  <header class="cc-header">
+    <a class="cc-brand" href="/" aria-label="ArkHimar home">Arkhimar<span>.</span><small>CarCare</small></a>
+    <nav aria-label="CarCare navigation">
+      <a href="#feedback">Leave feedback</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#staff">Staff</a>
+    </nav>
+    <a class="cc-header-action" href="#feedback">Share your visit <span aria-hidden="true">↘</span></a>
+  </header>
+
+  <main id="main">
+    <section class="cc-hero">
+      <div class="cc-hero-copy">
+        <p class="cc-kicker"><span></span> Reputation &amp; feedback intelligence</p>
+        <h1>Every visit.<br><em>Heard clearly.</em></h1>
+        <p class="cc-hero-lede">A simple way for customers to be heard and for car-care teams to act before a small concern becomes a public problem.</p>
+        <div class="cc-hero-actions">
+          <a class="cc-button cc-button-primary" href="#feedback">Rate your visit <span aria-hidden="true">↘</span></a>
+          <a class="cc-text-link" href="#how-it-works">See what happens next</a>
+        </div>
+        <ul class="cc-trust-list" aria-label="Service promises">
+          <li><span aria-hidden="true">✓</span> Private by default</li>
+          <li><span aria-hidden="true">✓</span> Read by a human</li>
+          <li><span aria-hidden="true">✓</span> Urgent issues escalated</li>
+        </ul>
+      </div>
+
+      <div class="cc-hero-visual" aria-hidden="true">
+        <div class="cc-orbit cc-orbit-one"></div><div class="cc-orbit cc-orbit-two"></div>
+        <svg class="cc-car" viewBox="0 0 620 280" role="img">
+          <path d="M102 177c18-56 50-91 94-103 58-16 161-18 230 1 37 10 65 42 86 96l40 18c15 7 23 18 23 34v12H47v-17c0-14 8-25 23-31l32-10Z" fill="none" stroke="currentColor" stroke-width="5"/>
+          <path d="M170 163c17-42 41-65 71-72 49-11 131-10 172 2 25 7 47 30 64 70H170Z" fill="none" stroke="currentColor" stroke-width="4"/>
+          <path d="M307 90v73M122 178h87m198 0h92" fill="none" stroke="currentColor" stroke-width="3"/>
+          <circle cx="161" cy="223" r="37" fill="#0d2622" stroke="currentColor" stroke-width="5"/><circle cx="463" cy="223" r="37" fill="#0d2622" stroke="currentColor" stroke-width="5"/>
+          <circle cx="161" cy="223" r="13" fill="currentColor"/><circle cx="463" cy="223" r="13" fill="currentColor"/>
+        </svg>
+        <div class="cc-score-card">
+          <span>LIVE ROUTING</span><strong>8.4</strong><small>severity score</small>
+          <div><i></i><b>Manager alerted</b></div>
+        </div>
+        <div class="cc-message-card"><span>NEW FEEDBACK</span><p>“The team listened and fixed the issue quickly.”</p><small>Ready for human review</small></div>
+      </div>
+    </section>
+
+    <section class="cc-feedback-section" id="feedback">
+      <div class="cc-section-intro">
+        <p class="cc-kicker"><span></span> Your visit</p>
+        <h2>Tell us how it <em>really</em> went.</h2>
+        <p>Good, bad, or somewhere in between—your words help the right person understand what happened.</p>
+        <div class="cc-visit-chip" data-visit-summary hidden><span>Visit loaded</span><strong data-visit-location></strong><small data-visit-job></small></div>
+      </div>
+
+      <form class="cc-form" id="feedback-form" novalidate>
+        <div class="cc-form-step"><span>01</span><p>Visit details</p></div>
+        <div class="cc-grid">
+          <label>Job ID <input name="job_id" required maxlength="80" autocomplete="off" placeholder="e.g. JOB-1001"></label>
+          <label>Service location <input name="location" required maxlength="120" autocomplete="organization" placeholder="e.g. Lekki"></label>
+          <label>Your name <input name="customer_name" required maxlength="120" autocomplete="name" placeholder="Your full name"></label>
+          <label>Email address <input name="customer_email" type="email" required maxlength="254" autocomplete="email" placeholder="you@example.com"></label>
+          <input name="customer_id" type="hidden">
+          <label class="cc-honeypot" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <div class="cc-form-step"><span>02</span><p>Your experience</p></div>
+        <fieldset class="cc-rating">
+          <legend>How would you rate this visit?</legend>
+          <div class="cc-rating-options">
+            <input id="rate-1" type="radio" name="rating" value="1" required><label for="rate-1"><strong>1</strong><span>Poor</span></label>
+            <input id="rate-2" type="radio" name="rating" value="2"><label for="rate-2"><strong>2</strong><span>Fair</span></label>
+            <input id="rate-3" type="radio" name="rating" value="3"><label for="rate-3"><strong>3</strong><span>Okay</span></label>
+            <input id="rate-4" type="radio" name="rating" value="4"><label for="rate-4"><strong>4</strong><span>Good</span></label>
+            <input id="rate-5" type="radio" name="rating" value="5"><label for="rate-5"><strong>5</strong><span>Great</span></label>
+          </div>
+        </fieldset>
+        <label class="cc-message-label">What stood out about your visit?
+          <textarea name="feedback" required minlength="8" maxlength="4000" rows="6" placeholder="Tell us what happened, what went well, or what we should fix..."></textarea>
+          <small><span data-character-count>0</span> / 4,000 characters</small>
+        </label>
+        <label class="cc-consent"><input type="checkbox" required><span>I confirm this feedback relates to my visit and may be reviewed by the service team.</span></label>
+        <button class="cc-button cc-button-dark" type="submit">Send feedback <span aria-hidden="true">↗</span></button>
+        <p class="cc-form-status" data-feedback-status role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="cc-process" id="how-it-works">
+      <div class="cc-process-heading"><p class="cc-kicker light"><span></span> What happens next</p><h2>Your words go to the <em>right place.</em></h2></div>
+      <ol>
+        <li><span>01</span><div class="cc-process-icon">◎</div><h3>We listen</h3><p>Your message is read for meaning, tone, urgency, and context—not just “good” or “bad.”</p></li>
+        <li><span>02</span><div class="cc-process-icon">◇</div><h3>We route</h3><p>Positive notes are saved for review. Concerns enter a private service-recovery queue.</p></li>
+        <li><span>03</span><div class="cc-process-icon">!</div><h3>We escalate</h3><p>Severe issues and repeat concerns alert a manager immediately.</p></li>
+        <li><span>04</span><div class="cc-process-icon">✓</div><h3>A human acts</h3><p>Every drafted response is reviewed and sent by a real team member.</p></li>
+      </ol>
+    </section>
+
+    <section class="cc-staff" id="staff">
+      <div class="cc-staff-copy"><p class="cc-kicker"><span></span> Staff tool</p><h2>Close the job.<br><em>Start the conversation.</em></h2><p>When a visit is complete, submit the customer details once. The automation sends the feedback request and tracks what happens next.</p><div class="cc-secure-note"><b>Server-protected</b><span>The staff key and n8n secret never appear in the browser bundle.</span></div></div>
+      <form class="cc-form cc-staff-form" id="job-form" novalidate>
+        <div class="cc-form-step"><span>STAFF</span><p>Mark a job complete</p></div>
+        <div class="cc-grid">
+          <label>Job ID <input name="job_id" required maxlength="80" placeholder="JOB-1001"></label>
+          <label>Customer ID <input name="customer_id" maxlength="80" placeholder="CUS-44 (optional)"></label>
+          <label>Customer name <input name="customer_name" required maxlength="120" autocomplete="name"></label>
+          <label>Customer email <input name="customer_email" type="email" required maxlength="254" autocomplete="email"></label>
+          <label>Service location <input name="location" required maxlength="120" placeholder="Lekki"></label>
+          <label>Staff access key <input name="access_key" type="password" required autocomplete="current-password"></label>
+          <label class="cc-honeypot" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <button class="cc-button cc-button-dark" type="submit">Send feedback request <span aria-hidden="true">↗</span></button>
+        <p class="cc-form-status" data-job-status role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="cc-footer"><div><a class="cc-brand" href="/">Arkhimar<span>.</span><small>CarCare</small></a><p>Feedback intelligence for better service recovery.</p></div><div><small>HUMAN-CONTROLLED AUTOMATION</small><p>No review is published and no drafted response is sent without human approval.</p></div><a href="mailto:projects@arkhimar.com">projects@arkhimar.com ↗</a></footer>
+  <script type="module" src="/carcare/carcare.js"></script>
+</body>
+</html>
