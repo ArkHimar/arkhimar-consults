@@ -1,53 +1,36 @@
-# ArkHimar Consult
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Production reconstruction of the ArkHimar public site, plus a connected browser-based validation release of ArkHimar PM, in the original repository.
+## Getting Started
 
-## Run locally
+First, run the development server:
 
-Requires Node.js 24. Copy `.env.example` to `.env.local` and supply a Supabase public URL and publishable anonymous key for the authenticated PM application.
-
-```sh
+```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open `http://localhost:4173`.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Verify
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```sh
-npm run check
-npm test
-npm run build
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-The production-ready static artifact is written to `dist/` and can be served by any static host with directory-index support.
+## Learn More
 
-## Routes
+To learn more about Next.js, take a look at the following resources:
 
-- `/` — ArkHimar Consult public website
-- `/start-a-project/` — complete project enquiry workflow
-- `/project-management/` — ArkHimar PM public product page
-- `/project-management/pricing/` — private-beta pricing and exact-seat calculator
-- `/project-management/demo/` — guided nine-step product demo
-- `/project-management/early-access/` — waitlist, design-partner and enterprise interest
-- `/project-management/features/` — current capability registry
-- `/project-management/templates/` — project artifact template library
-- `/project-management/tools/` — free ROI/NPV, EVM, PERT, risk and readiness tools
-- `/project-management/solutions/` — role and industry use cases
-- `/project-management/compare/` — comparison publishing policy
-- `/project-management/security/` — current trust and production boundary
-- `/project-management/resources/` and `/project-management/changelog/`
-- `/resources/` and `/resources/architecture/` — Consult resources and lead magnets
-- `/tools/design-readiness/` and `/tools/project-brief-builder/` — privacy-conscious client preparation tools
-- `/project-management/workflow-packs/` — initiation, planning, controls, closeout and built-environment packs
-- `/pm/` — ArkHimar PM validation workspace
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Product status
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-The public site and enquiry UI are complete static routes. The PM workspace now includes a six-step project setup, readiness scoring, business-case calculations, versioned charter approval, scope/requirements/WBS planning, schedule critical path, cost/EVM controls, RAID/change registers, versioned predictive/agile/hybrid execution, governance gates, immutable connected status reports, audit events and authenticated JSON/CSV/TXT/PDF project packs. It includes tested deterministic financial, EVM, risk, weighted-scoring, critical-path and delivery-metric engines.
+## Deploy on Vercel
 
-The PM workspace now uses Supabase Auth, PostgreSQL tenancy with row-level security, role-restricted mutations, append-only server audit events and private object storage with expiring signed links. It also includes a scoped API-key Integration Hub and a branded email/letter Communications Studio with server-side Resend delivery. The integration requires backend provisioning and environment variables before it becomes operational on a deployment. See [docs/PRODUCTION_BACKEND_SETUP.md](docs/PRODUCTION_BACKEND_SETUP.md), [docs/INTEGRATIONS_COMMUNICATIONS_IMPLEMENTATION_PROMPTS.md](docs/INTEGRATIONS_COMMUNICATIONS_IMPLEMENTATION_PROMPTS.md) and [docs/PM_IMPLEMENTATION_STATUS.md](docs/PM_IMPLEMENTATION_STATUS.md).
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-The public PM marketing system is configured for `private_beta`. Its pricing is explicitly labelled as a hypothesis, its claim registry hides planned capabilities, and its provider-neutral analytics layer rejects project content. Lead forms use the already configured `projects@arkhimar.com` FormSubmit route. See [docs/MARKETING_IMPLEMENTATION_STATUS.md](docs/MARKETING_IMPLEMENTATION_STATUS.md).
-
-See [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md) for the baseline audit and production risks.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
