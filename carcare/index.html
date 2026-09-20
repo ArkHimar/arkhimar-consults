@@ -70,7 +70,7 @@
         <div class="cc-form-step"><span>01</span><p>Visit details</p></div>
         <div class="cc-grid">
           <label>Job ID <input name="job_id" required maxlength="80" autocomplete="off" placeholder="e.g. JOB-1001"></label>
-          <label>Service location <input name="location" required maxlength="120" autocomplete="organization" placeholder="e.g. Lekki"></label>
+          <label>Service location <select name="location" required autocomplete="organization"><option value="" selected disabled>Select a location</option><option>Abuja</option><option>Lagos</option><option>Enugu</option><option>Ogun State</option><option>Port Harcourt</option></select></label>
           <label>Your name <input name="customer_name" required maxlength="120" autocomplete="name" placeholder="Your full name"></label>
           <label>Email address <input name="customer_email" type="email" required maxlength="254" autocomplete="email" placeholder="you@example.com"></label>
           <input name="customer_id" type="hidden">
@@ -117,7 +117,7 @@
           <label>Customer ID <input name="customer_id" maxlength="80" placeholder="CUS-44 (optional)"></label>
           <label>Customer name <input name="customer_name" required maxlength="120" autocomplete="name"></label>
           <label>Customer email <input name="customer_email" type="email" required maxlength="254" autocomplete="email"></label>
-          <label>Service location <input name="location" required maxlength="120" placeholder="Lekki"></label>
+          <label>Service location <select name="location" required><option value="" selected disabled>Select a location</option><option>Abuja</option><option>Lagos</option><option>Enugu</option><option>Ogun State</option><option>Port Harcourt</option></select></label>
           <label>Staff access key <input name="access_key" type="password" required autocomplete="current-password"></label>
           <label class="cc-honeypot" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
         </div>

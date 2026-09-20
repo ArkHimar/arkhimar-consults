@@ -3,12 +3,13 @@ import {z} from 'zod';
 import {requestIpHash,sendJson} from './server.js';
 
 const clean=z.string().trim().min(1).max(120);
+export const carCareLocations=['Abuja','Lagos','Enugu','Ogun State','Port Harcourt'];
 const jobSchema=z.object({
   job_id:z.string().trim().min(1).max(80),
   customer_id:z.string().trim().max(80).optional().default(''),
   customer_name:clean,
   customer_email:z.string().trim().email().max(254).transform(value=>value.toLowerCase()),
-  location:clean,
+  location:z.enum(carCareLocations),
   website:z.string().max(200).optional().default('')
 }).passthrough();
 

@@ -14,7 +14,7 @@ test('CarCare endpoints reject invalid public and staff submissions',async()=>{
 
   result=response();
   process.env.CARCARE_STAFF_ACCESS_KEY='a-long-private-staff-key';
-  await jobHandler({method:'POST',headers:{...baseHeaders,'x-forwarded-for':'203.0.113.45'},body:{job_id:'JOB-1',customer_name:'Ada',customer_email:'ada@example.com',location:'Lekki',access_key:'wrong'}},result);
+  await jobHandler({method:'POST',headers:{...baseHeaders,'x-forwarded-for':'203.0.113.45'},body:{job_id:'JOB-1',customer_name:'Ada',customer_email:'ada@example.com',location:'Lagos',access_key:'wrong'}},result);
   assert.equal(result.statusCode,401);
   assert.equal(result.body.error,'invalid_access_key');
 });
@@ -28,7 +28,7 @@ test('CarCare feedback forwards normalized content without exposing the workflow
   globalThis.fetch=async(url,options)=>{request={url:String(url),options};return{ok:true}};
   try{
     const result=response();
-    await feedbackHandler({method:'POST',headers:{...baseHeaders,'x-forwarded-for':'203.0.113.46'},body:{job_id:'JOB-1001',customer_id:'CUS-44',customer_name:'Ada Okafor',customer_email:'ADA@example.com',location:'Lekki',rating:2,feedback:'The visit took much longer than promised.'}},result);
+    await feedbackHandler({method:'POST',headers:{...baseHeaders,'x-forwarded-for':'203.0.113.46'},body:{job_id:'JOB-1001',customer_id:'CUS-44',customer_name:'Ada Okafor',customer_email:'ADA@example.com',location:'Lagos',rating:2,feedback:'The visit took much longer than promised.'}},result);
     assert.equal(result.statusCode,200);
     assert.equal(result.body.ok,true);
     assert.equal(request.url,'https://automation.example/webhook/feedback');
