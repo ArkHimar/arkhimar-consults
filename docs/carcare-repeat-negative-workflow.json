@@ -1,0 +1,426 @@
+{
+  "name": "CarCare - No-Code Repeat Negative Escalation",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1UJoWjgu7M05-euV2mfAl5aNegJpmYIVtWNxo-szMv34",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "customer_email",
+              "lookupValue": "={{ $('Feedback webhook').first().json.body.customer_email }}"
+            },
+            {
+              "lookupColumn": "route",
+              "lookupValue": "needs_follow_up"
+            }
+          ]
+        },
+        "combineFilters": "AND",
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000010",
+      "name": "Find previous negative",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -220,
+        80
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "30000000-0000-4000-8000-000000000002",
+              "leftValue": "={{ $json.route }}",
+              "rightValue": "needs_follow_up",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000011",
+      "name": "Repeat negative?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        40,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "carcare/job-completed-repeat",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000001",
+      "name": "Job completed webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        -260
+      ],
+      "webhookId": "20000000-0000-4000-8000-000000000001"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.body.customer_email }}",
+        "subject": "How did your CarCare visit go?",
+        "emailType": "html",
+        "message": "=<div style=\"margin:0;padding:0;background:#f3efe6;color:#0d2622;font-family:Inter,Arial,sans-serif;\"><div style=\"display:none;max-height:0;overflow:hidden;opacity:0;\">Your CarCare visit is complete. Tell us how it went.</div><table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f3efe6;padding:32px 14px;\"><tr><td align=\"center\"><table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:620px;background:#fffdf8;border:1px solid #d7d9cf;\"><tr><td style=\"background:#071a17;padding:24px 32px;color:#ffffff;\"><div style=\"font-size:24px;font-weight:700;letter-spacing:-1px;\">ArkHimar<span style=\"color:#d7f06a;\">.</span> CarCare</div><div style=\"margin-top:8px;color:#18a995;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;\">Every visit heard clearly</div></td></tr><tr><td style=\"padding:40px 32px 18px;\"><div style=\"color:#18a995;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;\">Your visit is complete</div><h1 style=\"margin:14px 0 18px;color:#071a17;font-family:Georgia,serif;font-size:38px;line-height:1.08;font-weight:400;\">How did it really go?</h1><p style=\"margin:0 0 16px;color:#0d2622;font-size:16px;line-height:1.7;\">Hi {{ $json.body.customer_name }},</p><p style=\"margin:0 0 26px;color:#62716d;font-size:15px;line-height:1.7;\">Your visit at <strong style=\"color:#0d2622;\">{{ $json.body.location }}</strong> is complete. Your feedback helps the right person understand what happened and improve the next visit.</p><table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr><td style=\"background:#d7f06a;\"><a href=\"https://www.arkhimar.com/carcare?job_id={{ encodeURIComponent($json.body.job_id) }}&customer_id={{ encodeURIComponent($json.body.customer_id || '') }}&customer_name={{ encodeURIComponent($json.body.customer_name) }}&customer_email={{ encodeURIComponent($json.body.customer_email) }}&location={{ encodeURIComponent($json.body.location) }}\" style=\"display:inline-block;padding:17px 26px;color:#071a17;font-size:12px;font-weight:800;letter-spacing:1.6px;text-decoration:none;text-transform:uppercase;\">Share your feedback&nbsp;&nbsp;&#8599;</a></td></tr></table></td></tr><tr><td style=\"padding:22px 32px 36px;\"><div style=\"border-left:4px solid #18a995;background:#e5f5ee;padding:16px 18px;\"><div style=\"color:#62716d;font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;\">Visit reference</div><div style=\"margin-top:6px;color:#0d2622;font-size:14px;font-weight:700;\">{{ $json.body.job_id }}</div></div><p style=\"margin:24px 0 0;color:#62716d;font-size:12px;line-height:1.6;\">Good, bad or somewhere in between—your words go directly to the service team. We never publish feedback automatically.</p></td></tr><tr><td style=\"background:#071512;padding:22px 32px;color:#ffffff;\"><div style=\"font-size:12px;font-weight:700;\">ArkHimar CarCare</div><div style=\"margin-top:7px;color:#9aaaa6;font-size:11px;line-height:1.5;\">A secure feedback experience by ArkHimar Consult.</div></td></tr></table><div style=\"max-width:620px;padding:16px 8px;color:#62716d;font-size:10px;line-height:1.5;text-align:center;\">If the button does not work, copy this address into your browser:<br><span style=\"word-break:break-all;\">https://www.arkhimar.com/carcare</span></div></td></tr></table></div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "10000000-0000-4000-8000-000000000002",
+      "name": "Email feedback link",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -500,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\":true,\"message\":\"Feedback request sent.\"}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "10000000-0000-4000-8000-000000000003",
+      "name": "Confirm request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "carcare/feedback-repeat",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000004",
+      "name": "Feedback webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        180
+      ],
+      "webhookId": "20000000-0000-4000-8000-000000000002"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "30000000-0000-4000-8000-000000000001",
+              "leftValue": "={{ $json.body.rating }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000005",
+      "name": "Rating 3 or lower?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -500,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UJoWjgu7M05-euV2mfAl5aNegJpmYIVtWNxo-szMv34",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "received_at": "={{ $now.toISO() }}",
+            "job_id": "={{ $('Feedback webhook').first().json.body.job_id }}",
+            "customer_id": "={{ $('Feedback webhook').first().json.body.customer_id }}",
+            "customer_name": "={{ $('Feedback webhook').first().json.body.customer_name }}",
+            "customer_email": "={{ $('Feedback webhook').first().json.body.customer_email }}",
+            "location": "={{ $('Feedback webhook').first().json.body.location }}",
+            "rating": "={{ $('Feedback webhook').first().json.body.rating }}",
+            "feedback": "={{ $('Feedback webhook').first().json.body.feedback }}",
+            "route": "needs_follow_up"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000006",
+      "name": "Save low rating",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "emavericks22@gmail.com",
+        "subject": "=CarCare follow-up needed - {{ $('Feedback webhook').first().json.body.location }}",
+        "emailType": "text",
+        "message": "=A customer submitted a rating of {{ $('Feedback webhook').first().json.body.rating }}/5.\n\nCustomer: {{ $('Feedback webhook').first().json.body.customer_name }}\nEmail: {{ $('Feedback webhook').first().json.body.customer_email }}\nJob: {{ $('Feedback webhook').first().json.body.job_id }}\nLocation: {{ $('Feedback webhook').first().json.body.location }}\n\nFeedback:\n{{ $('Feedback webhook').first().json.body.feedback }}\n\nPlease follow up privately.",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "10000000-0000-4000-8000-000000000007",
+      "name": "Alert manager",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        320,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UJoWjgu7M05-euV2mfAl5aNegJpmYIVtWNxo-szMv34",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "received_at": "={{ $now.toISO() }}",
+            "job_id": "={{ $('Feedback webhook').first().json.body.job_id }}",
+            "customer_id": "={{ $('Feedback webhook').first().json.body.customer_id }}",
+            "customer_name": "={{ $('Feedback webhook').first().json.body.customer_name }}",
+            "customer_email": "={{ $('Feedback webhook').first().json.body.customer_email }}",
+            "location": "={{ $('Feedback webhook').first().json.body.location }}",
+            "rating": "={{ $('Feedback webhook').first().json.body.rating }}",
+            "feedback": "={{ $('Feedback webhook').first().json.body.feedback }}",
+            "route": "ready_to_post"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000008",
+      "name": "Save positive rating",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\":true,\"message\":\"Feedback saved.\"}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "10000000-0000-4000-8000-000000000009",
+      "name": "Confirm feedback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        600,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Job completed webhook": {
+      "main": [
+        [
+          {
+            "node": "Email feedback link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email feedback link": {
+      "main": [
+        [
+          {
+            "node": "Confirm request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback webhook": {
+      "main": [
+        [
+          {
+            "node": "Rating 3 or lower?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rating 3 or lower?": {
+      "main": [
+        [
+          {
+            "node": "Find previous negative",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save positive rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find previous negative": {
+      "main": [
+        [
+          {
+            "node": "Repeat negative?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Repeat negative?": {
+      "main": [
+        [
+          {
+            "node": "Alert manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save low rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert manager": {
+      "main": [
+        [
+          {
+            "node": "Save low rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save low rating": {
+      "main": [
+        [
+          {
+            "node": "Confirm feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save positive rating": {
+      "main": [
+        [
+          {
+            "node": "Confirm feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "40000000-0000-4000-8000-000000000001",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
