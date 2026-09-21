@@ -109,12 +109,10 @@
     </section>
 
     <section class="cc-staff" id="staff">
-      <div class="cc-staff-copy"><p class="cc-kicker"><span></span> Staff tool</p><h2>Close the job.<br><em>Start the conversation.</em></h2><p>When a visit is complete, submit the customer details once. The automation sends the feedback request and tracks what happens next.</p><div class="cc-secure-note"><b>Server-protected</b><span>The staff key and n8n secret never appear in the browser bundle.</span></div></div>
+      <div class="cc-staff-copy"><p class="cc-kicker"><span></span> Staff tool</p><h2>Close the job.<br><em>Start the conversation.</em></h2><p>When a visit is complete, submit the customer details once. The system assigns a unique Job ID, recognizes returning customers by email, sends the feedback request, and tracks what happens next.</p><div class="cc-secure-note"><b>Server-protected</b><span>Job and Customer IDs are generated securely; the staff key and n8n secret never appear in the browser bundle.</span></div></div>
       <form class="cc-form cc-staff-form" id="job-form" novalidate>
         <div class="cc-form-step"><span>STAFF</span><p>Mark a job complete</p></div>
         <div class="cc-grid">
-          <label>Job ID <input name="job_id" required maxlength="80" placeholder="JOB-1001"></label>
-          <label>Customer ID <input name="customer_id" maxlength="80" placeholder="CUS-44 (optional)"></label>
           <label>Customer name <input name="customer_name" required maxlength="120" autocomplete="name"></label>
           <label>Customer email <input name="customer_email" type="email" required maxlength="254" autocomplete="email"></label>
           <label>Service location <select name="location" required><option value="" selected disabled>Select a location</option><option>Abuja</option><option>Lagos</option><option>Enugu</option><option>Ogun State</option><option>Port Harcourt</option></select></label>

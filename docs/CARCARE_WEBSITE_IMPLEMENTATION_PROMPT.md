@@ -189,7 +189,7 @@ Both endpoints must:
 - Forward only to a configured HTTPS URL, except localhost during development.
 - Abort the upstream request after 15 seconds.
 
-The staff endpoint must additionally validate `CARCARE_STAFF_ACCESS_KEY` with constant-time comparison.
+The staff endpoint must additionally validate `CARCARE_STAFF_ACCESS_KEY` with constant-time comparison. After authentication, it generates a new cryptographically random `job_id` for every submission and a stable, non-reversible `customer_id` from the normalized customer email. Staff must not enter either ID manually. Keep `CARCARE_ID_SECRET` stable so returning customers continue to receive the same Customer ID.
 
 Forward to n8n with:
 
@@ -205,6 +205,7 @@ CARCARE_JOB_WEBHOOK_URL=https://your-n8n.example/webhook/reputation/job-complete
 CARCARE_FEEDBACK_WEBHOOK_URL=https://your-n8n.example/webhook/reputation/feedback
 CARCARE_WEBHOOK_SECRET=<same value as WORKFLOW_WEBHOOK_SECRET in n8n>
 CARCARE_STAFF_ACCESS_KEY=<separate long random staff key>
+CARCARE_ID_SECRET=<stable random server-only customer identity secret>
 ```
 
 Set the n8n workflow's customer-form variable to:

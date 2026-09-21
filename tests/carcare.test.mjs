@@ -53,3 +53,34 @@ test('CarCare honeypot accepts bot-looking submissions without forwarding',async
     assert.equal(called,false);
   }finally{globalThis.fetch=oldFetch}
 });
+
+test('CarCare assigns unique job IDs and a stable returning-customer ID',async()=>{
+  const oldFetch=globalThis.fetch;
+  const previous={jobUrl:process.env.CARCARE_JOB_WEBHOOK_URL,webhookSecret:process.env.CARCARE_WEBHOOK_SECRET,staffKey:process.env.CARCARE_STAFF_ACCESS_KEY,idSecret:process.env.CARCARE_ID_SECRET};
+  process.env.CARCARE_JOB_WEBHOOK_URL='https://automation.example/webhook/job';
+  process.env.CARCARE_WEBHOOK_SECRET='workflow-secret-value';
+  process.env.CARCARE_STAFF_ACCESS_KEY='a-long-private-staff-key';
+  process.env.CARCARE_ID_SECRET='stable-customer-identity-secret';
+  const payloads=[];
+  globalThis.fetch=async(_url,options)=>{payloads.push(JSON.parse(options.body));return{ok:true}};
+  try{
+    const first=response(),second=response();
+    const body={customer_name:'Ada Okafor',customer_email:' ADA@Example.com ',location:'Lagos',access_key:'a-long-private-staff-key'};
+    await jobHandler({method:'POST',headers:{...baseHeaders,'x-forwarded-for':'203.0.113.48'},body},first);
+    await jobHandler({method:'POST',headers:{...baseHeaders,'x-forwarded-for':'203.0.113.49'},body},second);
+    assert.equal(first.statusCode,200);
+    assert.match(first.body.job_id,/^JOB-\d{8}-[0-9A-F-]{36}$/);
+    assert.match(first.body.customer_id,/^CUS-[A-Z0-9_-]{20}$/);
+    assert.notEqual(first.body.job_id,second.body.job_id);
+    assert.equal(first.body.customer_id,second.body.customer_id);
+    assert.equal(payloads[0].job_id,first.body.job_id);
+    assert.equal(payloads[0].customer_id,first.body.customer_id);
+    assert.equal(payloads[0].customer_email,'ada@example.com');
+    assert.doesNotMatch(first.body.customer_id,/ADA|EXAMPLE/);
+  }finally{
+    globalThis.fetch=oldFetch;
+    for(const [key,name] of Object.entries({jobUrl:'CARCARE_JOB_WEBHOOK_URL',webhookSecret:'CARCARE_WEBHOOK_SECRET',staffKey:'CARCARE_STAFF_ACCESS_KEY',idSecret:'CARCARE_ID_SECRET'})){
+      if(previous[key]===undefined)delete process.env[name];else process.env[name]=previous[key];
+    }
+  }
+});

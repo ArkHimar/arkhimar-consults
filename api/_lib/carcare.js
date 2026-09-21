@@ -1,4 +1,4 @@
-import {timingSafeEqual} from 'node:crypto';
+import {createHmac,randomUUID,timingSafeEqual} from 'node:crypto';
 import {z} from 'zod';
 import {requestIpHash,sendJson} from './server.js';
 
@@ -14,8 +14,24 @@ const jobSchema=z.object({
 }).passthrough();
 
 export const feedbackSchema=jobSchema.extend({feedback:z.string().trim().min(8).max(4000),rating:z.coerce.number().int().min(1).max(5)});
-export const staffJobSchema=jobSchema.extend({access_key:z.string().min(1).max(300)});
+export const staffJobSchema=z.object({
+  customer_name:clean,
+  customer_email:z.string().trim().email().max(254).transform(value=>value.toLowerCase()),
+  location:z.enum(carCareLocations),
+  access_key:z.string().min(1).max(300),
+  website:z.string().max(200).optional().default('')
+}).passthrough();
 const buckets=new Map();
+
+export function createCarCareIds(customerEmail,now=new Date()){
+  const identitySecret=process.env.CARCARE_ID_SECRET||process.env.CARCARE_WEBHOOK_SECRET||process.env.CARCARE_STAFF_ACCESS_KEY;
+  if(!identitySecret)throw new Error('CarCare ID generation is not configured.');
+  const normalizedEmail=String(customerEmail).trim().toLowerCase();
+  const date=now.toISOString().slice(0,10).replaceAll('-','');
+  const jobId=`JOB-${date}-${randomUUID().toUpperCase()}`;
+  const customerToken=createHmac('sha256',identitySecret).update(`carcare-customer:${normalizedEmail}`).digest('base64url').slice(0,20).toUpperCase();
+  return{job_id:jobId,customer_id:`CUS-${customerToken}`};
+}
 
 export function sameOrigin(req){
   const origin=String(req.headers.origin||'');
