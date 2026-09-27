@@ -1,6 +1,6 @@
 import '../../success-toast.js';
 import '../experience.js';
-import {currentSession} from '../../pm/backend.js';
+import {supabase} from '../../pm/backend.js';
 
 const $=(selector,root=document)=>root.querySelector(selector);
 let records=[],currentPage=1,targetRecordId=new URLSearchParams(location.search).get('record')||'',accessToken='';
@@ -8,6 +8,17 @@ const pageSize=5;
 const queue=$('#queue'),template=$('#card-template');
 const confirmationDialog=$('#record-confirm'),confirmationTitle=$('#record-confirm-title'),confirmationMessage=$('#record-confirm-message'),confirmationSubmit=$('#record-confirm-submit');
 let toastTimer;
+
+const wait=milliseconds=>new Promise(resolve=>setTimeout(()=>resolve(null),milliseconds));
+async function managementSession(){
+  if(!supabase)return null;
+  const {data:{session},error}=await supabase.auth.getSession();
+  if(error||!session?.access_token)return null;
+  // The API validates this token again. Do not strand the live operations desk
+  // behind a slow profile validation request in the browser.
+  await Promise.race([supabase.auth.getUser().catch(()=>null),wait(5000)]);
+  return session;
+}
 
 const label=value=>String(value||'').replaceAll('_',' ');
 const date=value=>new Intl.DateTimeFormat('en-NG',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));
@@ -32,7 +43,7 @@ async function api(method='GET',body){
   const separator=query?'&':'?';
   const response=await fetch(`/api/carcare/feedback${query}${separator}action=admin`,{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:body?JSON.stringify(body):undefined});
   const result=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(result.message||'The management desk could not complete that request.');
+  if(!response.ok){const error=new Error(result.message||'The management desk could not complete that request.');error.status=response.status;throw error}
   return result;
 }
 
@@ -54,7 +65,7 @@ function communicationLabel(fields){
   return`Email ${bookingLabel(fields.email_delivery_status||'queued')}`;
 }
 async function loadBookings(){
-  const response=await fetch('/api/carcare/bookings?mode=admin',{headers:{Authorization:`Bearer ${accessToken}`}}),result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.message||'Bookings could not be loaded.');
+  const response=await fetch('/api/carcare/bookings?mode=admin',{headers:{Authorization:`Bearer ${accessToken}`}}),result=await response.json().catch(()=>({}));if(!response.ok){const error=new Error(result.message||'Bookings could not be loaded.');error.status=response.status;throw error}
   const summary=result.summary||{};$('#booking-metrics').innerHTML=[['All bookings',summary.total||0],['New requests',summary.newRequests||0],['Delivered · no reply',summary.awaitingReply||0],['Customer replied',summary.replied||0]].map(([name,value])=>`<div><strong>${value}</strong><span>${name}</span></div>`).join('');bookingQueue.replaceChildren();
   if(!result.records?.length){bookingQueue.innerHTML='<div class="empty">No session bookings yet.</div>';return}
   for(const record of result.records){const f=record.fields||{},node=bookingTemplate.content.cloneNode(true),card=$('.booking-card',node);card.dataset.urgency=f.urgency;card.dataset.recordId=record.id;card.id=`booking-${record.id}`;$('.booking-urgency',node).textContent=bookingLabel(f.urgency);$('h3',node).textContent=`${record.submitter_name} · ${f.booking_id}`;$('.booking-meta',node).textContent=`${record.submitter_email} · ${f.location} · ${f.preferred_date} · ${f.preferred_time}`;$('.booking-status',node).textContent=bookingLabel(f.booking_status);$('.booking-vehicle',node).textContent=`${f.vehicle_year||''} ${f.vehicle_make||''} ${f.vehicle_model||''} · ${f.registration||''}`;$('.booking-services',node).replaceChildren(...(f.services||[]).map(service=>{const item=document.createElement('li');item.textContent=service;return item}));$('.booking-problem',node).textContent=record.message||f.problem_description||'';const comm=$('.communication-state',node);comm.textContent=communicationLabel(f);comm.classList.toggle('is-replied',f.customer_reply_status==='replied');comm.classList.toggle('is-failed',['failed','bounced','complained'].includes(f.email_delivery_status));$('.communication-time',node).textContent=f.customer_replied_at?`Replied ${date(f.customer_replied_at)}`:f.email_delivered_at?`Delivered ${date(f.email_delivered_at)}`:f.email_sent_at?`Sent ${date(f.email_sent_at)}`:'';const email=$('.booking-email',node);email.href=`mailto:${encodeURIComponent(record.submitter_email)}?subject=${encodeURIComponent(`Your CarCare booking ${f.booking_id}`)}`;
@@ -62,6 +73,20 @@ async function loadBookings(){
     $('.save-booking',node).addEventListener('click',async event=>{const button=event.currentTarget,payload={id:record.id};for(const control of card.querySelectorAll('[data-booking-field]'))payload[control.dataset.bookingField]=control.value;button.disabled=true;button.textContent='Saving…';try{const update=await fetch('/api/carcare/bookings?mode=admin',{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:JSON.stringify(payload)}),saved=await update.json().catch(()=>({}));if(!update.ok)throw new Error(saved.message||'Booking changes were not saved.');globalThis.showSuccessToast?.(`Booking ${f.booking_id} was updated.`,'Booking saved');await loadBookings()}catch(error){showToast('error',error.message)}finally{button.disabled=false;button.textContent='Save booking changes'}});bookingQueue.append(node);
   }
   if(targetRecordId){const target=document.querySelector(`.booking-card[data-record-id="${CSS.escape(targetRecordId)}"]`);if(target){target.classList.add('is-linked-case');requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'center'}));setTimeout(()=>target.classList.remove('is-linked-case'),7000);targetRecordId=''}}
+}
+
+function renderFeedbackFailure(error){
+  const message=error?.status===401?'Your management session has expired. Sign in again to load protected cases.':'The feedback queue could not be loaded. Please retry.';
+  queue.innerHTML=`<div class="empty"><strong>Feedback queue unavailable</strong><br>${message}<br><button type="button" id="retry-feedback">Retry feedback queue</button></div>`;
+  $('#retry-feedback')?.addEventListener('click',()=>load().catch(renderFeedbackFailure));
+  $('#sync').textContent=message;
+  if(error?.status===401)setTimeout(()=>location.replace(`/pm/login/?return=${encodeURIComponent(`${location.pathname}${location.search}`)}`),800);
+}
+
+function renderBookingsFailure(error){
+  const message=error?.status===401?'Your management session has expired. Sign in again to load bookings.':'Bookings are temporarily unavailable. Feedback cases remain available below.';
+  bookingQueue.innerHTML=`<div class="empty"><strong>Booking queue unavailable</strong><br>${message}<br><button type="button" id="retry-bookings">Retry bookings</button></div>`;
+  $('#retry-bookings')?.addEventListener('click',()=>loadBookings().catch(renderBookingsFailure));
 }
 
 function render(){
@@ -122,5 +147,9 @@ function preparePrint(){document.querySelectorAll('.draft textarea').forEach(are
 function cleanupPrint(){document.body.classList.remove('print-single');document.querySelectorAll('.is-print-target').forEach(node=>node.classList.remove('is-print-target'));document.querySelectorAll('.draft textarea').forEach(area=>area.style.height='')}
 $('#print-dashboard').addEventListener('click',()=>{preparePrint();window.print()});
 addEventListener('afterprint',cleanupPrint);
-const session=await currentSession();
-if(!session?.access_token){location.replace(`/pm/login/?return=${encodeURIComponent(`${location.pathname}${location.search}`)}`)}else{accessToken=session.access_token;Promise.all([load(),loadBookings()]).catch(error=>$('#sync').textContent=error.message)}
+const session=await managementSession();
+if(!session?.access_token){location.replace(`/pm/login/?return=${encodeURIComponent(`${location.pathname}${location.search}`)}`)}else{
+  accessToken=session.access_token;
+  load().catch(renderFeedbackFailure);
+  loadBookings().catch(renderBookingsFailure);
+}
