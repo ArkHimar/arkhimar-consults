@@ -21,3 +21,18 @@ test('execution-control browser contract is backed by an idempotent production m
   assert.match(migration,/grant execute on function public\.save_execution_control\(uuid,integer,jsonb,jsonb,jsonb,jsonb\)[\s\S]+to authenticated/i);
   assert.match(migration,/notify pgrst,\s*'reload schema'/i,'migration must refresh the PostgREST schema cache');
 });
+
+test('initiation transitions are serialized in the browser and retry-safe in the database',async()=>{
+  const [ui,migration]=await Promise.all([
+    readFile(new URL('../pm/pm.js',import.meta.url),'utf8'),
+    readFile(new URL('../supabase/migrations/202609270023_repair_initiation_draft_workflow.sql',import.meta.url),'utf8')
+  ]);
+  assert.match(ui,/if\(initiationBusy\)return/,'duplicate initiation actions must be ignored');
+  assert.match(ui,/while\(autosaveInFlight\)/,'a transition must wait for an active draft save');
+  assert.match(ui,/clearProgressState\(\)/,'pending autosave must be cleared before a transition');
+  assert.match(migration,/if artifact\.status=next_status then/i,'same-state transition retries must succeed safely');
+  assert.match(migration,/workspace_has_permission\(artifact\.workspace_id,'edit'\)/i);
+  assert.match(migration,/workspace_has_permission\(artifact\.workspace_id,'approve'\)/i);
+  assert.match(migration,/grant execute on function public\.transition_business_case\(uuid,integer,text,text\)[\s\S]+to authenticated/i);
+  assert.match(migration,/notify pgrst,\s*'reload schema'/i);
+});
