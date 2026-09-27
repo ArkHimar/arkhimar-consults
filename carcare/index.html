@@ -10,18 +10,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Inter:wght@400;500;600;700&amp;family=Syne:wght@500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/carcare/carcare.css">
+  <style>.cc-role-home .cc-feedback-section,.cc-role-home .cc-staff{display:none}.cc-role-gateway{display:none}.cc-access{padding:90px clamp(20px,6vw,90px);background:#f3efe6}.cc-access-heading{max-width:720px;margin-bottom:35px}.cc-access-heading h2{font:600 clamp(42px,6vw,72px)/.98 Syne,sans-serif;letter-spacing:-.055em;margin:14px 0}.cc-access-heading h2 em{font-family:Georgia,serif;font-weight:400;color:#18a995}.cc-access-heading>p{color:#62716d}.cc-access-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.cc-access-card{display:flex;min-height:260px;flex-direction:column;border:1px solid #d7d9cf;background:#fffdf8;padding:30px;color:#0d2622;text-decoration:none;transition:.2s transform,.2s border-color,.2s background}.cc-access-card:hover,.cc-access-card:focus-visible{transform:translateY(-5px);border-color:#18a995;background:#eaf7f3}.cc-access-card>span{font:600 10px DM Mono,monospace;color:#18a995;letter-spacing:.14em}.cc-access-card h3{font:600 27px Syne,sans-serif;margin:35px 0 12px}.cc-access-card p{margin:0;color:#62716d}.cc-access-card b{margin-top:auto;font:600 10px DM Mono,monospace;letter-spacing:.1em}@media(max-width:1100px){.cc-access-grid{grid-template-columns:1fr 1fr}}@media(max-width:760px){.cc-access-grid{grid-template-columns:1fr}.cc-access-card{min-height:200px}}</style>
   <title>ArkHimar CarCare | Every Visit Heard Clearly</title>
 </head>
-<body>
+<body class="cc-role-home">
   <a class="cc-skip" href="#main">Skip to content</a>
+  <section class="cc-role-gateway" data-role-gateway hidden aria-modal="true" role="dialog" aria-labelledby="role-title"><div class="cc-role-panel"><p class="cc-kicker"><span></span> Choose your access</p><h2 id="role-title">How are you using <em>CarCare?</em></h2><p>No password is required. Choose the area you need.</p><div class="cc-role-options"><button class="cc-role-option" type="button" data-role="customer"><span>01</span><strong>Customer</strong><small>Rate a completed visit and share private feedback.</small></button><button class="cc-role-option" type="button" data-role="staff"><span>02</span><strong>Staff</strong><small>Mark a customer’s job as complete and send their feedback request.</small></button><button class="cc-role-option" type="button" data-role="admin"><span>03</span><strong>Admin</strong><small>Review feedback, manage cases and email customers.</small></button></div></div></section>
   <header class="cc-header">
     <a class="cc-brand" href="/" aria-label="ArkHimar home">Arkhimar<span>.</span><small>CarCare</small></a>
     <nav aria-label="CarCare navigation">
-      <a href="#feedback">Leave feedback</a>
+      <a href="/carcare/feedback">Share feedback</a>
       <a href="#how-it-works">How it works</a>
-      <a href="#staff">Staff</a>
+      <a href="/carcare/complete">Mark job complete</a><a href="/carcare/book">Book a session</a><a href="/carcare/testimonials">What customers say</a>
+      <a href="/carcare/admin">Management</a>
     </nav>
-    <a class="cc-header-action" href="#feedback">Share your visit <span aria-hidden="true">↘</span></a>
+    <a class="cc-header-action" href="/carcare/feedback">Share your visit <span aria-hidden="true">↘</span></a>
   </header>
 
   <main id="main">
@@ -31,7 +34,7 @@
         <h1>Every visit.<br><em>Heard clearly.</em></h1>
         <p class="cc-hero-lede">A simple way for customers to be heard and for car-care teams to act before a small concern becomes a public problem.</p>
         <div class="cc-hero-actions">
-          <a class="cc-button cc-button-primary" href="#feedback">Rate your visit <span aria-hidden="true">↘</span></a>
+          <a class="cc-button cc-button-primary" href="/carcare/feedback">Rate your visit <span aria-hidden="true">↘</span></a>
           <a class="cc-text-link" href="#how-it-works">See what happens next</a>
         </div>
         <ul class="cc-trust-list" aria-label="Service promises">
@@ -58,6 +61,10 @@
       </div>
     </section>
 
+    <section class="cc-project-summary" data-reveal><div><p class="cc-kicker"><span></span> What we are building</p><h2>A connected customer-care and reputation system.</h2></div><div><p>ArkHimar CarCare begins when staff mark a vehicle job complete. The system creates the Job ID, recognizes returning customers through a stable Customer ID and emails a prefilled feedback link.</p><p>Customer feedback then enters an AI-assisted review workflow. Positive responses move to a public-ready queue. Complaints receive a private draft response, while severe or repeat complaints receive management priority. Human staff remain responsible for every message sent.</p><a class="cc-text-link" href="#how-it-works">See the workflow</a></div></section>
+
+    <section class="cc-access" id="access"><div class="cc-access-heading"><p class="cc-kicker"><span></span> Choose your workspace</p><h2>Four clear paths.<br><em>One connected workflow.</em></h2><p>Staff close visits, customers share feedback or request service, and administrators act on every signal.</p></div><div class="cc-access-grid"><a class="cc-access-card" href="/carcare/complete"><span>01 · STAFF</span><h3>Mark a Job as Complete</h3><p>Enter the customer and visit details, assign the attending staff member, and send the feedback request.</p><b>OPEN STAFF FORM ↗</b></a><a class="cc-access-card" href="/carcare/feedback"><span>02 · CUSTOMER</span><h3>Share Your Feedback</h3><p>Rate a completed visit and privately tell the CarCare team what happened.</p><b>OPEN FEEDBACK FORM ↗</b></a><a class="cc-access-card" href="/carcare/book"><span>03 · BOOKING</span><h3>Book a Session</h3><p>Choose the services your vehicle needs and request a convenient appointment.</p><b>BOOK A CARCARE SESSION ↗</b></a><a class="cc-access-card" href="/carcare/admin"><span>04 · ADMIN</span><h3>Admin Dashboard</h3><p>Review bookings, feedback, communication status, alerts, and follow-up.</p><b>OPEN DASHBOARD ↗</b></a></div></section>
+
     <section class="cc-feedback-section" id="feedback">
       <div class="cc-section-intro">
         <p class="cc-kicker"><span></span> Your visit</p>
@@ -81,8 +88,8 @@
         <fieldset class="cc-rating">
           <legend>How would you rate this visit?</legend>
           <div class="cc-rating-options">
-            <input id="rate-1" type="radio" name="rating" value="1" required><label for="rate-1"><strong>1</strong><span>Poor</span></label>
-            <input id="rate-2" type="radio" name="rating" value="2"><label for="rate-2"><strong>2</strong><span>Fair</span></label>
+            <input id="rate-1" type="radio" name="rating" value="1" required><label for="rate-1"><strong>1</strong><span>Very bad/poor</span></label>
+            <input id="rate-2" type="radio" name="rating" value="2"><label for="rate-2"><strong>2</strong><span>Bad</span></label>
             <input id="rate-3" type="radio" name="rating" value="3"><label for="rate-3"><strong>3</strong><span>Okay</span></label>
             <input id="rate-4" type="radio" name="rating" value="4"><label for="rate-4"><strong>4</strong><span>Good</span></label>
             <input id="rate-5" type="radio" name="rating" value="5"><label for="rate-5"><strong>5</strong><span>Great</span></label>
@@ -98,6 +105,8 @@
       </form>
     </section>
 
+    <section class="cc-testimonial-home" data-reveal><div><p class="cc-kicker"><span></span> Public feedback wall</p><h2>What customers<br><em>say about us.</em></h2></div><div><p>Positive comments tagged “Ready to post” appear on a dedicated customer-stories page. Private contact details, Customer IDs and Job IDs remain inside the management workflow.</p><a class="cc-button cc-button-dark" href="/carcare/testimonials">Read customer stories <span aria-hidden="true">↗</span></a></div></section>
+
     <section class="cc-process" id="how-it-works">
       <div class="cc-process-heading"><p class="cc-kicker light"><span></span> What happens next</p><h2>Your words go to the <em>right place.</em></h2></div>
       <ol>
@@ -109,14 +118,14 @@
     </section>
 
     <section class="cc-staff" id="staff">
-      <div class="cc-staff-copy"><p class="cc-kicker"><span></span> Staff tool</p><h2>Close the job.<br><em>Start the conversation.</em></h2><p>When a visit is complete, submit the customer details once. The system assigns a unique Job ID, recognizes returning customers by email, sends the feedback request, and tracks what happens next.</p><div class="cc-secure-note"><b>Server-protected</b><span>Job and Customer IDs are generated securely; the staff key and n8n secret never appear in the browser bundle.</span></div></div>
+      <div class="cc-staff-copy"><p class="cc-kicker"><span></span> Staff tool</p><h2>Close the job.<br><em>Start the conversation.</em></h2><p>When a visit is complete, submit the customer details once. The system assigns a unique Job ID, recognizes returning customers by email, records the attending staff member, sends the feedback request, and tracks what happens next.</p><div class="cc-secure-note"><b>Automatic access</b><span>The workflow credential is applied securely by the server, so staff can submit this form without entering an access key.</span></div></div>
       <form class="cc-form cc-staff-form" id="job-form" novalidate>
         <div class="cc-form-step"><span>STAFF</span><p>Mark a job complete</p></div>
         <div class="cc-grid">
           <label>Customer name <input name="customer_name" required maxlength="120" autocomplete="name"></label>
           <label>Customer email <input name="customer_email" type="email" required maxlength="254" autocomplete="email"></label>
           <label>Service location <select name="location" required><option value="" selected disabled>Select a location</option><option>Abuja</option><option>Lagos</option><option>Enugu</option><option>Ogun State</option><option>Port Harcourt</option></select></label>
-          <label>Staff access key <input name="access_key" type="password" required autocomplete="current-password"></label>
+          <label>Attending staff member <input name="staff_name" required maxlength="120" autocomplete="name" placeholder="Staff full name"></label>
           <label class="cc-honeypot" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
         </div>
         <button class="cc-button cc-button-dark" type="submit">Send feedback request <span aria-hidden="true">↗</span></button>
@@ -125,7 +134,7 @@
     </section>
   </main>
 
-  <footer class="cc-footer"><div><a class="cc-brand" href="/">Arkhimar<span>.</span><small>CarCare</small></a><p>Feedback intelligence for better service recovery.</p></div><div><small>HUMAN-CONTROLLED AUTOMATION</small><p>No review is published and no drafted response is sent without human approval.</p></div><a href="mailto:projects@arkhimar.com">projects@arkhimar.com ↗</a></footer>
+  <footer class="cc-footer"><div><a class="cc-brand" href="/carcare">Arkhimar<span>.</span><small>CarCare</small></a><p>Feedback intelligence for better service recovery.</p></div><div><small>CARCARE WORKSPACES</small><p><a href="/carcare/complete">Mark job complete</a> · <a href="/carcare/feedback">Share feedback</a> · <a href="/carcare/book">Book a session</a> · <a href="/carcare/testimonials">What customers say</a> · <a href="/carcare/admin">Admin dashboard</a></p></div><a href="mailto:projects@arkhimar.com">projects@arkhimar.com ↗</a></footer>
   <script type="module" src="/carcare/carcare.js"></script>
 </body>
 </html>

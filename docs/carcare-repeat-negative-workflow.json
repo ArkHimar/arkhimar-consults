@@ -74,6 +74,139 @@
     },
     {
       "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1UJoWjgu7M05-euV2mfAl5aNegJpmYIVtWNxo-szMv34",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet2",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "customer_id",
+              "lookupValue": "={{ $('Job completed webhook').first().json.body.customer_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000012",
+      "name": "Find completed visits",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -500,
+        -260
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50000000-0000-4000-8000-000000000001",
+              "name": "completed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000002",
+              "name": "customer_id",
+              "value": "={{ $('Job completed webhook').first().json.body.customer_id }}",
+              "type": "string"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000003",
+              "name": "visit_count",
+              "value": "={{ $items('Find completed visits').filter(item => item.json.job_id).length + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000004",
+              "name": "job_id",
+              "value": "={{ 'JOB-' + $('Job completed webhook').first().json.body.customer_id.replace('CUS-','') + '-' + String($items('Find completed visits').filter(item => item.json.job_id).length + 1).padStart(4,'0') + '-' + $now.toFormat('yyyyLLdd') }}",
+              "type": "string"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000005",
+              "name": "customer_name",
+              "value": "={{ $('Job completed webhook').first().json.body.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000006",
+              "name": "customer_email",
+              "value": "={{ $('Job completed webhook').first().json.body.customer_email }}",
+              "type": "string"
+            },
+            {
+              "id": "50000000-0000-4000-8000-000000000007",
+              "name": "location",
+              "value": "={{ $('Job completed webhook').first().json.body.location }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000013",
+      "name": "Build visit reference",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -260
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UJoWjgu7M05-euV2mfAl5aNegJpmYIVtWNxo-szMv34",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet2",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "completed_at": "={{ $json.completed_at }}",
+            "job_id": "={{ $json.job_id }}",
+            "customer_id": "={{ $json.customer_id }}",
+            "visit_count": "={{ $json.visit_count }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_email": "={{ $json.customer_email }}",
+            "location": "={{ $json.location }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000014",
+      "name": "Save completed job",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        20,
+        -260
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "carcare/job-completed-repeat",
         "authentication": "headerAuth",
@@ -92,6 +225,29 @@
     },
     {
       "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50000000-0000-4000-8000-000000000008",
+              "name": "body",
+              "value": "={{ $('Build visit reference').first().json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "10000000-0000-4000-8000-000000000015",
+      "name": "Prepare email data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        -260
+      ]
+    },
+    {
+      "parameters": {
         "sendTo": "={{ $json.body.customer_email }}",
         "subject": "How did your CarCare visit go?",
         "emailType": "html",
@@ -105,14 +261,14 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        -500,
+        540,
         -260
       ]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\"ok\":true,\"message\":\"Feedback request sent.\"}",
+        "responseBody": "={{ { ok: true, message: 'Feedback request sent.', job_id: $('Build visit reference').first().json.job_id, customer_id: $('Build visit reference').first().json.customer_id, visit_count: $('Build visit reference').first().json.visit_count } }}",
         "options": {
           "responseCode": 200
         }
@@ -122,7 +278,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        -240,
+        800,
         -260
       ]
     },
@@ -221,11 +377,12 @@
     },
     {
       "parameters": {
-        "sendTo": "emavericks22@gmail.com",
-        "subject": "=CarCare follow-up needed - {{ $('Feedback webhook').first().json.body.location }}",
+        "sendTo": "projects@arkhimar.com",
+        "subject": "=URGENT CarCare review - {{ $('Feedback webhook').first().json.body.rating }}/5 - {{ $('Feedback webhook').first().json.body.location }}",
         "emailType": "text",
         "message": "=A customer submitted a rating of {{ $('Feedback webhook').first().json.body.rating }}/5.\n\nCustomer: {{ $('Feedback webhook').first().json.body.customer_name }}\nEmail: {{ $('Feedback webhook').first().json.body.customer_email }}\nJob: {{ $('Feedback webhook').first().json.body.job_id }}\nLocation: {{ $('Feedback webhook').first().json.body.location }}\n\nFeedback:\n{{ $('Feedback webhook').first().json.body.feedback }}\n\nPlease follow up privately.",
         "options": {
+          "ccList": "emavericks22@gmail.com",
           "appendAttribution": false
         }
       },
@@ -300,6 +457,50 @@
   ],
   "connections": {
     "Job completed webhook": {
+      "main": [
+        [
+          {
+            "node": "Find completed visits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find completed visits": {
+      "main": [
+        [
+          {
+            "node": "Build visit reference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build visit reference": {
+      "main": [
+        [
+          {
+            "node": "Save completed job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save completed job": {
+      "main": [
+        [
+          {
+            "node": "Prepare email data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare email data": {
       "main": [
         [
           {

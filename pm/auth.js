@@ -3,6 +3,7 @@ import {backendConfigured,currentSession,mfaRequirement,supabase,verifyMfaCode} 
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
 const authParams=new URLSearchParams(location.search),requestedMode=authParams.get('mode');
+const requestedReturn=authParams.get('return'),safeReturn=requestedReturn?.startsWith('/')&&!requestedReturn.startsWith('//')?requestedReturn:'/pm/';
 const invitationStorageKey='arkhimar.pm.pending-invitation';
 const authFlashKey='arkhimar.pm.auth-flash';
 const invitationFromHash=new URLSearchParams(location.hash.slice(1)).get('invite');
@@ -67,7 +68,7 @@ if(!backendConfigured){
   });
   const session=await currentSession();
   if(session&&mode!=='recovery'){
-    try{const requirement=await mfaRequirement();if(requirement.required){mfaFactorId=requirement.factor.id;setMode('mfa')}else{await acceptPendingInvitation();location.replace('/pm/')}}catch(error){showAuthError(error)}
+    try{const requirement=await mfaRequirement();if(requirement.required){mfaFactorId=requirement.factor.id;setMode('mfa')}else{await acceptPendingInvitation();location.replace(safeReturn)}}catch(error){showAuthError(error)}
   }
 }
 
@@ -101,7 +102,7 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
       if(requirement.required){mfaFactorId=requirement.factor.id;setMode('mfa');status.textContent='Password accepted. Complete authenticator verification.';return}
       const joined=await acceptPendingInvitation();
       sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Signed in successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Welcome back to your secure workspace.'}));
-      location.replace('/pm/');
+      location.replace(safeReturn);
     }else if(mode==='signup'){
       await requestAuthEmail({action:'signup',email:values.email,password:values.password,displayName:values.display_name||'',redirectTo:`${location.origin}/pm/login/`});
       setMode('signin');form.elements.email.value=values.email;status.textContent='Verification email sent through ArkHimar. Open it within 24 hours, then sign in. Your invitation remains saved in this browser.';
@@ -113,7 +114,7 @@ $('[data-auth-form]').addEventListener('submit',async event=>{
       await verifyMfaCode(mfaFactorId,values.mfa_code);
       const joined=await acceptPendingInvitation();
       sessionStorage.setItem(authFlashKey,JSON.stringify({title:'Signed in successfully',copy:joined?'Your invitation was accepted and the project workspace is ready.':'Identity verification completed.'}));
-      location.replace('/pm/');
+      location.replace(safeReturn);
     }else{
       const {error}=await supabase.auth.updateUser({password:values.password});
       if(error)throw error;

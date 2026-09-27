@@ -189,7 +189,7 @@ Both endpoints must:
 - Forward only to a configured HTTPS URL, except localhost during development.
 - Abort the upstream request after 15 seconds.
 
-The staff endpoint must additionally validate `CARCARE_STAFF_ACCESS_KEY` with constant-time comparison. After authentication, it generates a new cryptographically random `job_id` for every submission and a stable, non-reversible `customer_id` from the normalized customer email. Staff must not enter either ID manually. Keep `CARCARE_ID_SECRET` stable so returning customers continue to receive the same Customer ID.
+The staff endpoint must additionally validate `CARCARE_STAFF_ACCESS_KEY` with constant-time comparison. After authentication, it generates a short, stable, non-reversible `customer_id` from the normalized customer email. n8n counts completed visits in the `Jobs` sheet and returns `job_id` in the format `JOB-{7-character customer token}-{4-digit visit count}-{YYYYMMDD}`. For example, the first visit for `CUS-OYAX2IX` on 21 September 2026 is `JOB-OYAX2IX-0001-20260921`. Staff must not enter either ID manually. Keep `CARCARE_ID_SECRET` stable so returning customers continue to receive the same Customer ID.
 
 Forward to n8n with:
 
