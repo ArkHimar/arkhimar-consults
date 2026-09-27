@@ -45,6 +45,9 @@ test('CarCare customer, staff and booking forms live on separate public routes',
   assert.match(bookingPage,/General vehicle inspection/);
   assert.match(bookingPage,/Roadside assistance or towing/);
   for(const route of ['/carcare/complete','/carcare/feedback','/carcare/book','/carcare/admin'])assert.match(landingPage,new RegExp(`href="${route}"`));
+  const accessGrid=landingPage.match(/<div class="cc-access-grid">([\s\S]*?)<\/div><\/section>/)?.[1]||'';
+  assert.ok(accessGrid.indexOf('href="/carcare/book"')<accessGrid.indexOf('href="/carcare/complete"'),'booking must be the first CarCare workspace');
+  assert.match(accessGrid,/href="\/carcare\/book"><span>01 · BOOKING<\/span>/);
   assert.match(buildScript,/carcare\/feedback/);
   assert.match(buildScript,/carcare\/complete/);
   assert.match(jobApi,/\/carcare\/feedback\?\$\{query\}/);
