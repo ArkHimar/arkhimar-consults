@@ -321,6 +321,7 @@ test('CarCare dashboard only displays a red priority badge for repeat-negative f
 
 test('CarCare management desk keeps the priority feedback queue independent from bookings',async()=>{
   const admin=await readFile('carcare/admin/admin.js','utf8');
+  const buildScript=await readFile('scripts/build.mjs','utf8');
   assert.match(admin,/async function managementSession\(\)/);
   assert.match(admin,/Promise\.race\(\[supabase\.auth\.getUser\(\)\.catch\(\(\)=>null\),wait\(5000\)\]\)/);
   assert.doesNotMatch(admin,/Promise\.all\(\[load\(\),loadBookings\(\)\]\)/);
@@ -328,6 +329,7 @@ test('CarCare management desk keeps the priority feedback queue independent from
   assert.match(admin,/loadBookings\(\)\.catch\(renderBookingsFailure\)/);
   assert.match(admin,/Feedback cases remain available below/);
   assert.match(admin,/Your management session has expired/);
+  assert.match(buildScript,/entryPoints:\['carcare\/admin\/admin\.js'\]/);
 });
 
 test('CarCare admin sends a structured response only to the customer on the selected record',async()=>{
