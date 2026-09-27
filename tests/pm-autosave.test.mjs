@@ -9,8 +9,19 @@ test('project managers can save progress manually and edits autosave through gov
   ]);
 
   assert.match(ui,/data-save-progress>Save progress<\/button>/);
-  assert.match(ui,/const AUTOSAVE_DELAY=1800/);
+  assert.match(ui,/const DRAFT_CACHE_PREFIX='arkhimar\.pm\.recovery\.v1'/);
+  assert.match(ui,/const AUTOSAVE_DELAY=800/);
   assert.match(ui,/control\.addEventListener\('input',scheduleProgressSave\)/);
+  assert.match(ui,/localStorage\.setItem\(draftCacheKey/);
+  assert.match(ui,/localStorage\.removeItem\(draftCacheKey/);
+  assert.match(ui,/restoreCachedProgress\(active\(\),state\.view\)/);
+  assert.match(ui,/addEventListener\('pagehide'/);
+  assert.match(ui,/document\.addEventListener\('visibilitychange'/);
+  assert.match(ui,/AUTOSAVE_RETRY_MIN/);
+  assert.match(ui,/AUTOSAVE_RETRY_MAX/);
+  assert.match(ui,/Saved on device · retrying/);
+  assert.match(ui,/if\(!progressDirty\)clearCachedProgress/);
+  assert.match(ui,/queueMicrotask\(scheduleProgressSave\)/);
   assert.match(ui,/if\(view==='business'\)saved=await saveBusinessDraft\([^;]+false,true\)/);
   assert.match(ui,/else if\(view==='planning'\)saved=await savePlanningDraft\([^;]+false,true\)/);
   assert.match(ui,/else if\(view==='controls'\)saved=await saveControlsDraft\(false,true\)/);
