@@ -34,7 +34,7 @@ async function requestAuthEmail(payload){
   return result;
 }
 
-async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data,error}=await supabase.rpc('accept_workspace_invitation',{invite_token:token});if(error)throw error;localStorage.removeItem(invitationStorageKey);localStorage.setItem('arkhimar.pm.active-workspace',data);return data}
+async function acceptPendingInvitation(){const token=localStorage.getItem(invitationStorageKey);if(!token)return null;const {data:{session}}=await supabase.auth.getSession();if(!session)throw new Error('Sign in before accepting this invitation.');const response=await fetch('/api/v1/workspace/invitations?action=accept',{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({token})}),result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.message||result.error||'The invitation could not be accepted.');localStorage.removeItem(invitationStorageKey);localStorage.setItem('arkhimar.pm.active-workspace',result.workspaceId);return result.workspaceId}
 
 function setMode(next){
   mode=next;

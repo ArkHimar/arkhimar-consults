@@ -1,6 +1,6 @@
 import {createHash} from 'node:crypto';
 import {z} from 'zod';
-import {carCareLocations,carCareSalutation,feedbackSchema,forwardCarCare,rateLimit,rejectCommon,requireCarCareManager} from '../_lib/carcare.js';
+import {carCareLocations,carCareSalutation,feedbackSchema,forwardCarCare,rateLimit,rejectCommon,sameOrigin} from '../_lib/carcare.js';
 import {analyzeCarCareFeedback,backfillCarCareCustomerIds,loadCarCareHistory,resolveCarCareCustomerId,resolveCarCareResetAt,storeCarCareFeedback,syncCarCareSheetHistory} from '../_lib/carcare-intelligence.js';
 import {carCarePdfAttachment,createCarCarePdf} from '../_lib/carcare-pdf.js';
 import bookingHandler from '../_lib/carcare-bookings.js';
@@ -20,7 +20,7 @@ const urgentAdminEmail='projects@arkhimar.com';
 const urgentAlertCc='emavericks22@gmail.com';
 const updateSchema=z.object({id:z.string().uuid(),human_review_status:z.enum(['pending','needs_clarification','approved','closed']).optional(),response_status:z.enum(['not_sent','sent']).optional(),alert_status:z.enum(['not_required','pending','acknowledged','resolved']).optional(),positive_status:z.enum(['not_applicable','ready_to_post','approved','posted','rejected']).optional()}).strict();
 const emailSchema=z.object({id:z.string().uuid(),subject:z.string().trim().min(3).max(200),body:z.string().trim().min(8).max(5000)}).strict();
-const bulkSchema=z.object({mode:z.enum(['archive','clear'])}).strict();
+const bulkSchema=z.object({mode:z.literal('archive')}).strict();
 const escapeHtml=value=>String(value||'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 const printEmailNote='<div style="max-width:620px;margin:0 auto 24px;background:#fffdf8;border:1px solid #d7d9cf;padding:14px 18px;font-family:Arial,sans-serif;color:#42534f;font-size:12px"><strong>PRINT OR SAVE AS PDF</strong><br>A print-ready PDF is attached. Open the attachment and choose Print to select an installed printer or Save as PDF.</div>';
 
@@ -57,17 +57,14 @@ async function publicTestimonials(req,res){
 async function manageFeedback(req,res){
   if(!['GET','PATCH','POST','DELETE'].includes(req.method)){res.setHeader('Allow','GET, PATCH, POST, DELETE');return sendJson(res,405,{error:'method_not_allowed'})}
   if(!rateLimit(req,'carcare-admin',60,60000))return sendJson(res,429,{error:'rate_limited'});
+  if(req.method!=='GET'&&!sameOrigin(req))return sendJson(res,403,{error:'origin_not_allowed',message:'Open the CarCare dashboard before changing records.'});
   try{
-    const {db,workspaceId}=await requireCarCareManager(req);
+    const db=adminClient(),workspaceId=process.env.ARKHIMAR_WORKSPACE_ID;
+    if(!workspaceId)throw new Error('CarCare workspace is not configured.');
     if(req.method==='DELETE'){
       const parsed=bulkSchema.safeParse(req.body);
-      if(!parsed.success)return sendJson(res,400,{error:'invalid_request',message:'Choose whether to archive or clear the dashboard records.'});
+      if(!parsed.success)return sendJson(res,400,{error:'invalid_request',message:'Only archiving is available from the dashboard.'});
       const now=new Date().toISOString();
-      if(parsed.data.mode==='clear'){
-        const {error}=await db.from('form_submissions').insert({workspace_id:workspaceId,form_id:'carcare-control',submitter_name:'CarCare Admin',submitter_email:null,message:'Dashboard cleared by administrator',fields:{action:'clear_dashboard',reset_at:now},source:'carcare-admin'});
-        if(error)throw error;
-        return sendJson(res,200,{ok:true,mode:'clear',count:0,message:'The active dashboard has been cleared. The underlying audit data remains recoverable.'});
-      }
       const resetAt=await resolveCarCareResetAt(db,workspaceId);
       let query=db.from('form_submissions').select('id,submitter_name,submitter_email,fields,received_at').eq('workspace_id',workspaceId).eq('form_id','carcare-feedback');
       if(resetAt)query=query.gte('received_at',resetAt);
@@ -82,17 +79,25 @@ async function manageFeedback(req,res){
       const hasResetBoundary=Boolean(resetAt);
       if(!hasResetBoundary){try{await syncCarCareSheetHistory(db,workspaceId)}catch(error){console.error('carcare_sheet_sync_failed',error?.message)}}
       let feedbackQuery=db.from('form_submissions').select('id,submitter_name,submitter_email,message,fields,received_at').eq('workspace_id',workspaceId).eq('form_id','carcare-feedback');
-      const [{data,error},{data:stateEvents,error:stateError}]=await Promise.all([
+      const [{data,error},{data:stateEvents,error:stateError},{data:bookings,error:bookingError},{data:jobs,error:jobError}]=await Promise.all([
         feedbackQuery.order('received_at',{ascending:false}).limit(500),
-        db.from('form_submissions').select('fields,received_at').eq('workspace_id',workspaceId).eq('form_id','carcare-status').order('received_at',{ascending:false}).limit(2000)
+        db.from('form_submissions').select('fields,received_at').eq('workspace_id',workspaceId).eq('form_id','carcare-status').order('received_at',{ascending:false}).limit(2000),
+        db.from('form_submissions').select('submitter_email,fields,received_at').eq('workspace_id',workspaceId).eq('form_id','carcare-booking').order('received_at',{ascending:false}).limit(1000),
+        db.from('form_submissions').select('fields,received_at').eq('workspace_id',workspaceId).eq('form_id','carcare-job').order('received_at',{ascending:false}).limit(1000)
       ]);
       if(error)throw error;
-      if(stateError)throw stateError;
+      if(stateError||bookingError||jobError)throw stateError||bookingError||jobError;
       const registry=await backfillCarCareCustomerIds(db,workspaceId);
       const stateByRecord=new Map();
       for(const event of stateEvents||[]){const target=event.fields?.target_id;if(target&&!stateByRecord.has(target))stateByRecord.set(target,event.fields?.state||{})}
+      const bookingDatesByEmail=new Map();
+      for(const booking of bookings||[]){const email=String(booking.submitter_email||'').trim().toLowerCase();if(!email)continue;if(!bookingDatesByEmail.has(email))bookingDatesByEmail.set(email,[]);bookingDatesByEmail.get(email).push(booking.received_at)}
+      const jobById=new Map();
+      for(const job of jobs||[]){const jobId=String(job.fields?.job_id||'');if(jobId&&!jobById.has(jobId))jobById.set(jobId,job.received_at)}
       const normalizedRecords=(data||[]).map(item=>{
-        const fields={...(item.fields||{}),...(stateByRecord.get(item.id)||{}),customer_id:registry.byEmail.get(String(item.submitter_email||'').trim().toLowerCase())||item.fields?.customer_id||''};
+        const email=String(item.submitter_email||'').trim().toLowerCase(),state=stateByRecord.get(item.id)||{},base=item.fields||{};
+        const relatedBookings=bookingDatesByEmail.get(email)||[],bookingDate=relatedBookings.find(value=>Date.parse(value)<=Date.parse(item.received_at))||relatedBookings[0]||'';
+        const fields={...base,...state,customer_id:registry.byEmail.get(email)||base.customer_id||'',booking_date:state.booking_date||base.booking_date||bookingDate||jobById.get(String(base.job_id||''))||'',last_updated_at:state.last_updated_at||state.updated_at||base.last_updated_at||base.updated_at||item.received_at};
         if(fields.route==='ready_to_post'||fields.sentiment==='positive')fields.repeat_concern=false;
         return{...item,fields};
       });

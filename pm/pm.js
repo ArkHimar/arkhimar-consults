@@ -1,5 +1,5 @@
 import {addWorkingDays,roi,npv,payback,evm,riskScore,weightedScore,calculateCpm,pert,scheduleVariance} from '../lib/calculators.mjs';
-import {approveDeliveryBaseline,approveScopeBaseline,backendConfigured,beginDeliveryRevision,beginScopeRevision,bootstrapWorkspace,createControlledDocument,createDocumentShare,createProject,downloadControlledDocument,downloadProjectPack,importResourceDraft,listControlledDocuments,listDocuments,loadProjectControls,loadProjectDelivery,loadProjectExecution,loadProjectInitiation,loadProjectPlanning,loadWorkspaceContext,publishStatusReport,reviseControlledDocument,revokeDocumentShare,saveBusinessCase,saveCorePlanning,saveCostControl,saveExecutionControl,saveProjectCharter,saveProjectControls,saveScheduleControl,selectWorkspace,signOut,signedDocumentUrl,transitionBusinessCase,transitionChangeRequest,transitionControlledDocument,transitionGovernanceReview,transitionProjectCharter,updateProject,uploadDocument} from './backend.js';
+import {approveDeliveryBaseline,approveScopeBaseline,backendConfigured,beginDeliveryRevision,beginScopeRevision,bootstrapWorkspace,createControlledDocument,createDocumentShare,createProject,downloadControlledDocument,downloadProjectPack,importResourceDraft,initializeSubscription,listControlledDocuments,listDocuments,loadProjectControls,loadProjectDelivery,loadProjectExecution,loadProjectInitiation,loadProjectPlanning,loadWorkspaceContext,publishStatusReport,reviseControlledDocument,revokeDocumentShare,saveBusinessCase,saveCorePlanning,saveCostControl,saveExecutionControl,saveProjectCharter,saveProjectControls,saveScheduleControl,selectWorkspace,signOut,signedDocumentUrl,transitionBusinessCase,transitionChangeRequest,transitionControlledDocument,transitionGovernanceReview,transitionProjectCharter,updateProject,uploadDocument,verifySubscription} from './backend.js';
 import {deliveryMetrics,executionFromForm,executionModel,renderExecution,renderReporting,statusMetrics} from './execution.js';
 import {bindStudio,loadStudio,renderCommunications,renderIntegrations} from './studio.js';
 import {bindTeam,loadTeam,renderTeam} from './team.js';
@@ -345,8 +345,27 @@ $('[data-notifications]').addEventListener('click',()=>notify('Notifications','N
 addEventListener('keydown',event=>{if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();openCommand()}if(event.key==='Escape')rail.classList.remove('open')});
 addEventListener('pagehide',()=>{if(progressDirty)cacheProgressDraft()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&progressDirty){cacheProgressDraft();saveCurrentProgress()}});
+async function handleBillingReturnOrIntent(){
+  const params=new URLSearchParams(location.search),reference=params.get('reference'),plan=params.get('subscribe');
+  if(params.get('billing')==='return'&&reference){
+    try{const result=await verifySubscription(reference);showToast('Payment confirmed',`Your ${result.plan} subscription is active.`)}catch(error){notify('Payment not confirmed',error.message)}
+    params.delete('billing');params.delete('reference');history.replaceState({},'',`${location.pathname}${params.size?`?${params}`:''}${location.hash}`);return;
+  }
+  if(params.get('billing')==='free'){showToast('Free plan active','Your workspace is ready on the Free plan.');params.delete('billing');history.replaceState({},'',`${location.pathname}${params.size?`?${params}`:''}${location.hash}`);return}
+  if(params.get('billing')==='existing'){showToast('Subscription already active','This workspace already has the selected paid subscription.');params.delete('billing');history.replaceState({},'',`${location.pathname}${params.size?`?${params}`:''}${location.hash}`);return}
+  if(!plan)return;
+  if(!cloud.workspace){showToast('Create your workspace','Once the workspace is created, secure checkout will open automatically.');return}
+  if(!['free','growth','professional','enterprise'].includes(plan)){params.delete('subscribe');history.replaceState({},'',`${location.pathname}${params.size?`?${params}`:''}${location.hash}`);return}
+  const billingPeriod=params.get('period')==='annual'?'annual':'monthly',seats=Math.max(1,Math.min(500,Number(params.get('seats'))||1));
+  try{
+    showToast('Preparing secure checkout','Please wait while your plan and seat count are confirmed.');
+    const result=await initializeSubscription({workspaceId:cloud.workspace.id,plan,billingPeriod,seats});
+    location.assign(result.authorizationUrl||result.redirectUrl||'/pm/');
+  }catch(error){notify('Checkout could not start',error.message)}
+}
 restoreCachedProgress(active(),state.view);
 render();
 scheduleRecoveredProgressSave();
+await handleBillingReturnOrIntent();
 try{const flash=JSON.parse(sessionStorage.getItem(AUTH_FLASH_KEY)||'null');sessionStorage.removeItem(AUTH_FLASH_KEY);if(flash?.title)showToast(flash.title,flash.copy||'')}catch{sessionStorage.removeItem(AUTH_FLASH_KEY)}
 if(state.view==='documents'&&active()&&(active()._documents===null||active()._controlledDocuments===null))setView('documents');

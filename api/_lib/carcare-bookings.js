@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {z} from 'zod';
 import {adminClient,sendJson} from './server.js';
-import {carCareGenders,carCareLocations,carCareSalutation,carCareTitles,rateLimit,rejectCommon,requireCarCareManager} from './carcare.js';
+import {carCareGenders,carCareLocations,carCareSalutation,carCareTitles,rateLimit,rejectCommon,sameOrigin} from './carcare.js';
 import {resolveCarCareCustomerId} from './carcare-intelligence.js';
 import {carCarePdfAttachment,createCarCarePdf} from './carcare-pdf.js';
 
@@ -25,8 +25,9 @@ async function sendConfirmation(payload,recordId){
 async function adminBookings(req,res){
   if(!['GET','PATCH'].includes(req.method)){res.setHeader('Allow','GET, PATCH');return sendJson(res,405,{error:'method_not_allowed'})}
   if(!rateLimit(req,'carcare-booking-admin',80,60000))return sendJson(res,429,{error:'rate_limited'});
+  if(req.method!=='GET'&&!sameOrigin(req))return sendJson(res,403,{error:'origin_not_allowed',message:'Open the CarCare dashboard before changing a booking.'});
   try{
-    const {db,workspaceId}=await requireCarCareManager(req);
+    const db=adminClient(),workspaceId=process.env.ARKHIMAR_WORKSPACE_ID;if(!workspaceId)throw new Error('CarCare workspace is not configured.');
     if(req.method==='PATCH'){
       const parsed=updateSchema.safeParse(req.body);if(!parsed.success)return sendJson(res,400,{error:'invalid_update'});
       const {data:record,error}=await db.from('form_submissions').select('id,fields').eq('workspace_id',workspaceId).eq('form_id','carcare-booking').eq('id',parsed.data.id).single();if(error||!record)return sendJson(res,404,{error:'not_found'});

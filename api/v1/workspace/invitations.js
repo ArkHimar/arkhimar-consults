@@ -5,6 +5,8 @@ import {renderEmailHtml,renderEmailText} from '../../../lib/email-template.mjs';
 
 const createSchema=z.object({workspaceId:z.string().uuid(),email:z.string().trim().toLowerCase().email().max(254),role:z.enum(['admin','project_manager','member','viewer']),expiresInDays:z.number().int().min(1).max(30).default(7)}).strict();
 const revokeSchema=z.object({workspaceId:z.string().uuid(),invitationId:z.string().uuid()}).strict();
+const acceptSchema=z.object({token:z.string().min(40).max(200)}).strict();
+const unlimitedInviteEmails=new Set(['emavericks22@gmail.com','projects@arkhimar.com']);
 
 async function authenticatedContext(req,res,workspaceId){
   const token=bearerToken(req);
@@ -20,9 +22,25 @@ export default async function handler(req,res){
   if(!['POST','DELETE'].includes(req.method)){res.setHeader('Allow','POST, DELETE');return sendJson(res,405,{error:'method_not_allowed'})}
   if(Number(req.headers['content-length']||0)>32768)return sendJson(res,413,{error:'payload_too_large'});
   if(!bearerToken(req))return sendJson(res,401,{error:'authentication_required'});
-  const parsed=(req.method==='POST'?createSchema:revokeSchema).safeParse(req.body);
+  const accepting=req.method==='POST'&&req.query?.action==='accept';
+  const parsed=(accepting?acceptSchema:req.method==='POST'?createSchema:revokeSchema).safeParse(req.body);
   if(!parsed.success)return sendJson(res,400,{error:'invalid_request',issues:parsed.error.issues.map(({path,message})=>({field:path.join('.'),message}))});
-  const value=parsed.data,context=await authenticatedContext(req,res,value.workspaceId);
+  const value=parsed.data;
+  if(accepting){
+    try{
+    const db=adminClient(),{data:{user},error:userError}=await db.auth.getUser(bearerToken(req));if(userError||!user)return sendJson(res,401,{error:'invalid_session'});
+    const email=String(user.email||'').toLowerCase(),tokenHash=sha256(value.token),now=new Date().toISOString();
+    const {data:invite,error:inviteError}=await db.from('workspace_invitations').select('*').eq('token_hash',tokenHash).is('accepted_at',null).is('revoked_at',null).gt('expires_at',now).maybeSingle();if(inviteError)throw inviteError;
+    if(!invite)return sendJson(res,404,{error:'invitation_invalid',message:'This invitation is invalid or has expired.'});
+    if(!email||email!==invite.email)return sendJson(res,403,{error:'invitation_email_mismatch',message:'Sign in with the email address that received this invitation.'});
+    if(!unlimitedInviteEmails.has(email)){const {count,error:countError}=await db.from('workspace_members').select('workspace_id',{count:'exact',head:true}).eq('user_id',user.id);if(countError)throw countError;if((count||0)>=2){const {data:existing}=await db.from('workspace_members').select('workspace_id').eq('workspace_id',invite.workspace_id).eq('user_id',user.id).maybeSingle();if(!existing)return sendJson(res,409,{error:'workspace_limit_reached',message:'This account has reached the two-workspace invitation limit.'})}}
+    const {error:memberError}=await db.from('workspace_members').upsert({workspace_id:invite.workspace_id,user_id:user.id,role:invite.role},{onConflict:'workspace_id,user_id'});if(memberError)throw memberError;
+    const {error:acceptedError}=await db.from('workspace_invitations').update({accepted_at:now,accepted_by:user.id}).eq('id',invite.id);if(acceptedError)throw acceptedError;
+    await db.from('audit_events').insert({workspace_id:invite.workspace_id,actor_user_id:user.id,action:'accepted',entity_type:'workspace_invitation',entity_id:invite.id,metadata:{role:invite.role,unlimited_invites:unlimitedInviteEmails.has(email)}});
+      return sendJson(res,200,{ok:true,workspaceId:invite.workspace_id});
+    }catch(error){console.error('workspace_invitation_accept_failed',error?.message);return sendJson(res,500,{error:'workspace_invitation_accept_failed',message:'The invitation could not be accepted.'})}
+  }
+  const context=await authenticatedContext(req,res,value.workspaceId);
   if(!context)return;
   const {db,user,role:actorRole}=context;
   let invitationId=null;

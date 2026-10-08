@@ -59,6 +59,10 @@ async function loadExecutionForProjects(projectIds){
 }
 export async function loadProjectExecution(projectId){return(await loadExecutionForProjects([projectId])).get(projectId)||{execution:{},reports:[]}}
 export async function currentSession(){if(!supabase)return null;const {data:{session},error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;if(!session)return null;const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)return null;return{...session,user}}
+async function billingRequest(action,{method='GET',body,query}={}){const session=await currentSession();if(!session)throw new Error('Your session has expired. Sign in again.');const params=new URLSearchParams({action,...query}),response=await fetch(`/api/v1/billing?${params}`,{method,headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}),result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.message||result.error||'Billing could not complete that request.');return result}
+export async function initializeSubscription(payload){return billingRequest('checkout',{method:'POST',body:payload})}
+export async function verifySubscription(reference){return billingRequest('verify',{query:{reference}})}
+export async function loadSubscription(workspaceId){return billingRequest('status',{query:{workspaceId}})}
 export async function loadWorkspaceContext(){
   if(!backendConfigured)return{configured:false,session:null,workspace:null,role:null,projects:[]};
   const session=await currentSession();if(!session)return{configured:true,session:null,workspace:null,role:null,projects:[]};

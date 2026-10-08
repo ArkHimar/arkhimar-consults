@@ -52,33 +52,38 @@ test('CarCare customer, staff and booking forms live on separate public routes',
   assert.match(buildScript,/carcare\/complete/);
   assert.match(jobApi,/\/carcare\/feedback\?\$\{query\}/);
   assert.match(adminPage,/id="archive-records"/);
-  assert.match(adminPage,/id="clear-records"/);
+  assert.doesNotMatch(adminPage,/id="clear-records"/);
   assert.match(adminPage,/id="view"/);
+  assert.match(adminPage,/id="sort-by"/);
+  assert.match(adminPage,/id="sort-direction"/);
+  assert.match(adminPage,/id="page-count"/);
+  for(const field of ['job_id','name','location','booking_date','modified_date','feedback_received'])assert.match(adminPage,new RegExp(`value="${field}"`));
   assert.match(adminPage,/id="record-confirm"/);
   assert.match(adminPage,/id="record-toast"/);
   assert.match(adminScript,/mode:'archive'/);
-  assert.match(adminScript,/mode:'clear'/);
+  assert.doesNotMatch(adminScript,/mode:'clear'/);
   assert.match(adminScript,/showToast\('success'/);
   assert.match(adminScript,/showToast\('error'/);
   assert.match(adminScript,/new URLSearchParams\(location\.search\)\.get\('record'\)/);
   assert.match(adminScript,/scrollIntoView\(\{behavior:'smooth',block:'center'\}\)/);
   assert.match(adminScript,/Email delivered — awaiting customer reply/);
-  assert.match(adminScript,/managementSession/);
-  assert.match(adminScript,/Authorization:`Bearer \$\{accessToken\}`/);
+  assert.doesNotMatch(adminScript,/managementSession/);
+  assert.doesNotMatch(adminScript,/\/pm\/login/);
   assert.match(adminPage,/\/runtime-config\.js/);
   assert.match(adminPage,/id="booking-queue"/);
   assert.match(buildScript,/installSuccessToasts/);
 });
 
-test('CarCare management APIs require an authenticated manager session',async()=>{
-  const feedbackResult=response();
-  await feedbackHandler({method:'GET',query:{action:'admin'},headers:baseHeaders},feedbackResult);
-  assert.equal(feedbackResult.statusCode,401);
-  assert.equal(feedbackResult.body.error,'authentication_required');
-  const bookingResult=response();
-  await bookingHandler({method:'GET',query:{mode:'admin'},headers:baseHeaders},bookingResult);
-  assert.equal(bookingResult.statusCode,401);
-  assert.equal(bookingResult.body.error,'authentication_required');
+test('CarCare management APIs are independent from ArkHimar PM authentication',async()=>{
+  const oldFetch=globalThis.fetch;configureTestBackend();globalThis.fetch=fakeCarCareFetch([]);
+  try{
+    const feedbackResult=response();
+    await feedbackHandler({method:'GET',query:{action:'admin'},headers:baseHeaders},feedbackResult);
+    assert.equal(feedbackResult.statusCode,200);
+    const bookingResult=response();
+    await bookingHandler({method:'GET',query:{mode:'admin'},headers:baseHeaders},bookingResult);
+    assert.equal(bookingResult.statusCode,200);
+  }finally{globalThis.fetch=oldFetch}
 });
 
 test('CarCare booking creates tracked IDs and sends a structured confirmation',async()=>{
@@ -322,13 +327,13 @@ test('CarCare dashboard only displays a red priority badge for repeat-negative f
 test('CarCare management desk keeps the priority feedback queue independent from bookings',async()=>{
   const admin=await readFile('carcare/admin/admin.js','utf8');
   const buildScript=await readFile('scripts/build.mjs','utf8');
-  assert.match(admin,/async function managementSession\(\)/);
-  assert.match(admin,/Promise\.race\(\[supabase\.auth\.getUser\(\)\.catch\(\(\)=>null\),wait\(5000\)\]\)/);
+  assert.doesNotMatch(admin,/managementSession/);
+  assert.doesNotMatch(admin,/pm\/login/);
   assert.doesNotMatch(admin,/Promise\.all\(\[load\(\),loadBookings\(\)\]\)/);
   assert.match(admin,/load\(\)\.catch\(renderFeedbackFailure\)/);
   assert.match(admin,/loadBookings\(\)\.catch\(renderBookingsFailure\)/);
   assert.match(admin,/Feedback cases remain available below/);
-  assert.match(admin,/Your management session has expired/);
+  assert.match(admin,/sortedRecords/);
   assert.match(buildScript,/entryPoints:\['carcare\/admin\/admin\.js'\]/);
 });
 

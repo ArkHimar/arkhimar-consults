@@ -1,6 +1,6 @@
 # ArkHimar PM marketing implementation status
 
-Updated: 2026-09-09
+Updated: 2026-10-07
 
 Current deployed implementation commit: `fad350e`
 
@@ -17,12 +17,14 @@ Production deployment: `dpl_8TRAtNXchJYhALecfENMkH2cFpV5`
 - M6 growth foundation: stage-aware CTAs, UTM/referral attribution capture and a marketing/product event abstraction. No spam lifecycle email or monetary referral programme was created.
 - M7 hardening: responsive layouts, keyboard focus, reduced motion, unique metadata, canonical URLs, robots policy, sitemap, private-app noindex and automated marketing configuration checks.
 - Digital-product growth release: a unified resource hub, six Consult resources, five connected PM workflow packs, interactive design-readiness and project-brief tools, substantive lead-magnet delivery, safe source attribution and a controlled-draft PM import path.
+- Billing implementation: server-priced Free, Growth, Professional and custom Enterprise flows; Paystack hosted recurring checkout; signed webhooks; payment verification; exact-seat plan variants; and duplicate-subscription protection.
+- Google Analytics 4 delivery: consent-gated gtag.js loading on public pages, sanitized page URLs/referrers, privacy-safe custom event forwarding, and explicit exclusion of private PM, shared-document, staff, customer-feedback and CarCare admin routes.
 
 ## Intentionally not represented as complete
 
-- Paid checkout and subscriptions: no billing provider exists.
+- Production payment activation still requires the Paystack secret and the billing database migration described in `PM_BILLING_SETUP.md`.
 - Automated marketing lifecycle campaigns are intentionally absent; resource delivery sends only the requested transactional copy unless separate consent is given.
-- Third-party analytics delivery: the adapter is ready, but no provider or consent manager is configured.
+- Production Google Analytics activation requires `PUBLIC_GOOGLE_ANALYTICS_ID` to contain the GA4 web stream Measurement ID.
 - Individual competitor pages: require current official-source re-verification and owner editorial approval before publishing.
 - AI Copilot, SSO, SCIM, private cloud, on-premise, SLA, compliance certifications and Office exports: planned claims remain non-publishable.
 - Testimonials, logos, adoption metrics and case studies: none were fabricated.

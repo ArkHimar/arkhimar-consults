@@ -1,27 +1,16 @@
 import '../../success-toast.js';
 import '../experience.js';
-import {supabase} from '../../pm/backend.js';
 
 const $=(selector,root=document)=>root.querySelector(selector);
-let records=[],currentPage=1,targetRecordId=new URLSearchParams(location.search).get('record')||'',accessToken='';
+let records=[],currentPage=1,targetRecordId=new URLSearchParams(location.search).get('record')||'';
 const pageSize=5;
 const queue=$('#queue'),template=$('#card-template');
 const confirmationDialog=$('#record-confirm'),confirmationTitle=$('#record-confirm-title'),confirmationMessage=$('#record-confirm-message'),confirmationSubmit=$('#record-confirm-submit');
 let toastTimer;
 
-const wait=milliseconds=>new Promise(resolve=>setTimeout(()=>resolve(null),milliseconds));
-async function managementSession(){
-  if(!supabase)return null;
-  const {data:{session},error}=await supabase.auth.getSession();
-  if(error||!session?.access_token)return null;
-  // The API validates this token again. Do not strand the live operations desk
-  // behind a slow profile validation request in the browser.
-  await Promise.race([supabase.auth.getUser().catch(()=>null),wait(5000)]);
-  return session;
-}
-
 const label=value=>String(value||'').replaceAll('_',' ');
 const date=value=>new Intl.DateTimeFormat('en-NG',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));
+const safeDate=value=>value&&Number.isFinite(Date.parse(value))?date(value):'Not recorded';
 
 function confirmRecordAction({title,message,confirmLabel,danger=false}){
   confirmationTitle.textContent=title;confirmationMessage.textContent=message;confirmationSubmit.textContent=confirmLabel;confirmationDialog.classList.toggle('is-danger',danger);
@@ -41,7 +30,7 @@ async function api(method='GET',body){
   const location=$('#location').value,route=$('#route').value,view=$('#view').value;
   const query=method==='GET'?`?location=${encodeURIComponent(location)}&route=${encodeURIComponent(route)}&view=${encodeURIComponent(view)}`:'';
   const separator=query?'&':'?';
-  const response=await fetch(`/api/carcare/feedback${query}${separator}action=admin`,{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:body?JSON.stringify(body):undefined});
+  const response=await fetch(`/api/carcare/feedback${query}${separator}action=admin`,{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
   const result=await response.json().catch(()=>({}));
   if(!response.ok){const error=new Error(result.message||'The management desk could not complete that request.');error.status=response.status;throw error}
   return result;
@@ -65,38 +54,67 @@ function communicationLabel(fields){
   return`Email ${bookingLabel(fields.email_delivery_status||'queued')}`;
 }
 async function loadBookings(){
-  const response=await fetch('/api/carcare/bookings?mode=admin',{headers:{Authorization:`Bearer ${accessToken}`}}),result=await response.json().catch(()=>({}));if(!response.ok){const error=new Error(result.message||'Bookings could not be loaded.');error.status=response.status;throw error}
+  const response=await fetch('/api/carcare/bookings?mode=admin'),result=await response.json().catch(()=>({}));if(!response.ok){const error=new Error(result.message||'Bookings could not be loaded.');error.status=response.status;throw error}
   const summary=result.summary||{};$('#booking-metrics').innerHTML=[['All bookings',summary.total||0],['New requests',summary.newRequests||0],['Delivered · no reply',summary.awaitingReply||0],['Customer replied',summary.replied||0]].map(([name,value])=>`<div><strong>${value}</strong><span>${name}</span></div>`).join('');bookingQueue.replaceChildren();
   if(!result.records?.length){bookingQueue.innerHTML='<div class="empty">No session bookings yet.</div>';return}
   for(const record of result.records){const f=record.fields||{},node=bookingTemplate.content.cloneNode(true),card=$('.booking-card',node);card.dataset.urgency=f.urgency;card.dataset.recordId=record.id;card.id=`booking-${record.id}`;$('.booking-urgency',node).textContent=bookingLabel(f.urgency);$('h3',node).textContent=`${record.submitter_name} · ${f.booking_id}`;$('.booking-meta',node).textContent=`${record.submitter_email} · ${f.location} · ${f.preferred_date} · ${f.preferred_time}`;$('.booking-status',node).textContent=bookingLabel(f.booking_status);$('.booking-vehicle',node).textContent=`${f.vehicle_year||''} ${f.vehicle_make||''} ${f.vehicle_model||''} · ${f.registration||''}`;$('.booking-services',node).replaceChildren(...(f.services||[]).map(service=>{const item=document.createElement('li');item.textContent=service;return item}));$('.booking-problem',node).textContent=record.message||f.problem_description||'';const comm=$('.communication-state',node);comm.textContent=communicationLabel(f);comm.classList.toggle('is-replied',f.customer_reply_status==='replied');comm.classList.toggle('is-failed',['failed','bounced','complained'].includes(f.email_delivery_status));$('.communication-time',node).textContent=f.customer_replied_at?`Replied ${date(f.customer_replied_at)}`:f.email_delivered_at?`Delivered ${date(f.email_delivered_at)}`:f.email_sent_at?`Sent ${date(f.email_sent_at)}`:'';const email=$('.booking-email',node);email.href=`mailto:${encodeURIComponent(record.submitter_email)}?subject=${encodeURIComponent(`Your CarCare booking ${f.booking_id}`)}`;
     for(const control of node.querySelectorAll('[data-booking-field]'))control.value=f[control.dataset.bookingField]||control.value;
-    $('.save-booking',node).addEventListener('click',async event=>{const button=event.currentTarget,payload={id:record.id};for(const control of card.querySelectorAll('[data-booking-field]'))payload[control.dataset.bookingField]=control.value;button.disabled=true;button.textContent='Saving…';try{const update=await fetch('/api/carcare/bookings?mode=admin',{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:JSON.stringify(payload)}),saved=await update.json().catch(()=>({}));if(!update.ok)throw new Error(saved.message||'Booking changes were not saved.');globalThis.showSuccessToast?.(`Booking ${f.booking_id} was updated.`,'Booking saved');await loadBookings()}catch(error){showToast('error',error.message)}finally{button.disabled=false;button.textContent='Save booking changes'}});bookingQueue.append(node);
+    $('.save-booking',node).addEventListener('click',async event=>{const button=event.currentTarget,payload={id:record.id};for(const control of card.querySelectorAll('[data-booking-field]'))payload[control.dataset.bookingField]=control.value;button.disabled=true;button.textContent='Saving…';try{const update=await fetch('/api/carcare/bookings?mode=admin',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),saved=await update.json().catch(()=>({}));if(!update.ok)throw new Error(saved.message||'Booking changes were not saved.');globalThis.showSuccessToast?.(`Booking ${f.booking_id} was updated.`,'Booking saved');await loadBookings()}catch(error){showToast('error',error.message)}finally{button.disabled=false;button.textContent='Save booking changes'}});bookingQueue.append(node);
   }
   if(targetRecordId){const target=document.querySelector(`.booking-card[data-record-id="${CSS.escape(targetRecordId)}"]`);if(target){target.classList.add('is-linked-case');requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'center'}));setTimeout(()=>target.classList.remove('is-linked-case'),7000);targetRecordId=''}}
 }
 
-function renderFeedbackFailure(error){
-  const message=error?.status===401?'Your management session has expired. Sign in again to load protected cases.':'The feedback queue could not be loaded. Please retry.';
+function renderFeedbackFailure(){
+  const message='The feedback queue could not be loaded. Please retry.';
   queue.innerHTML=`<div class="empty"><strong>Feedback queue unavailable</strong><br>${message}<br><button type="button" id="retry-feedback">Retry feedback queue</button></div>`;
   $('#retry-feedback')?.addEventListener('click',()=>load().catch(renderFeedbackFailure));
   $('#sync').textContent=message;
-  if(error?.status===401)setTimeout(()=>location.replace(`/pm/login/?return=${encodeURIComponent(`${location.pathname}${location.search}`)}`),800);
 }
 
-function renderBookingsFailure(error){
-  const message=error?.status===401?'Your management session has expired. Sign in again to load bookings.':'Bookings are temporarily unavailable. Feedback cases remain available below.';
+function renderBookingsFailure(){
+  const message='Bookings are temporarily unavailable. Feedback cases remain available below.';
   bookingQueue.innerHTML=`<div class="empty"><strong>Booking queue unavailable</strong><br>${message}<br><button type="button" id="retry-bookings">Retry bookings</button></div>`;
   $('#retry-bookings')?.addEventListener('click',()=>loadBookings().catch(renderBookingsFailure));
 }
 
+const sortValue=(record,key)=>{
+  const fields=record.fields||{};
+  if(key==='job_id')return String(fields.job_id||'').toLocaleLowerCase();
+  if(key==='name')return String(record.submitter_name||'').toLocaleLowerCase();
+  if(key==='location')return String(fields.location||'').toLocaleLowerCase();
+  if(key==='booking_date')return Date.parse(fields.booking_date||'')||Number.NEGATIVE_INFINITY;
+  if(key==='modified_date')return Date.parse(fields.last_updated_at||fields.updated_at||record.received_at||'')||Number.NEGATIVE_INFINITY;
+  return Date.parse(record.received_at||'')||Number.NEGATIVE_INFINITY;
+};
+
+function sortedRecords(){
+  const key=$('#sort-by').value,direction=$('#sort-direction').value==='asc'?1:-1;
+  return records.map((record,index)=>({record,index})).sort((left,right)=>{
+    const a=sortValue(left.record,key),b=sortValue(right.record,key);
+    if(a===b)return left.index-right.index;
+    if(typeof a==='number'&&typeof b==='number')return(a-b)*direction;
+    return String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:'base'})*direction;
+  }).map(item=>item.record);
+}
+
+function renderPageNumbers(totalPages){
+  const holder=$('#page-numbers');holder.replaceChildren();
+  for(let page=1;page<=totalPages;page+=1){
+    const button=document.createElement('button');button.type='button';button.textContent=String(page);button.className='page-number';button.disabled=page===currentPage;button.setAttribute('aria-label',`Go to page ${page}`);
+    button.addEventListener('click',()=>{currentPage=page;render();scrollTo({top:queue.offsetTop-30,behavior:'smooth'})});holder.append(button);
+  }
+}
+
 function render(){
   queue.replaceChildren();
-  const totalPages=Math.max(1,Math.ceil(records.length/pageSize));
+  const ordered=sortedRecords(),totalPages=Math.max(1,Math.ceil(ordered.length/pageSize));
   currentPage=Math.min(currentPage,totalPages);
-  $('#page-count').textContent=`Page ${currentPage} of ${totalPages} · ${records.length} record${records.length===1?'':'s'}`;
+  const start=ordered.length?(currentPage-1)*pageSize+1:0,end=Math.min(currentPage*pageSize,ordered.length);
+  $('#page-count').textContent=`Showing ${start}–${end} of ${ordered.length} · Page ${currentPage} of ${totalPages}`;
+  renderPageNumbers(totalPages);
   $('#previous').disabled=currentPage<=1;$('#next').disabled=currentPage>=totalPages;
-  if(!records.length){queue.innerHTML='<div class="empty">No feedback matches these filters.</div>';return}
-  const pageRecords=records.slice((currentPage-1)*pageSize,currentPage*pageSize);
+  if(!ordered.length){queue.innerHTML='<div class="empty">No feedback matches these filters.</div>';return}
+  const pageRecords=ordered.slice((currentPage-1)*pageSize,currentPage*pageSize);
   for(const record of pageRecords){
     const node=template.content.cloneNode(true),card=$('.case',node),f=record.fields||{};
     const rating=Math.max(1,Math.min(5,Number(f.rating)||3));
@@ -104,7 +122,7 @@ function render(){
     const repeatConcern=Boolean(f.repeat_concern)&&f.route==='manager_escalation'&&f.sentiment!=='positive';
     card.dataset.recordId=record.id;card.id=`feedback-${record.id}`;card.dataset.route=f.route;card.dataset.rating=String(rating);card.dataset.severity=String(severity);card.dataset.repeat=String(repeatConcern);
     $('.route',node).textContent=label(f.route);$('.repeat-badge',node).hidden=!repeatConcern;$('h2',node).textContent=`${record.submitter_name||'Customer'} · ${f.job_id||'No job ID'}`;
-    $('.meta',node).textContent=`${record.submitter_email||''} · ${f.location||''} · ${f.rating||'–'}/5 · ${date(record.received_at)}`;
+    $('.meta',node).textContent=`${record.submitter_email||''} · ${f.location||''} · ${f.rating||'–'}/5 · Booked ${safeDate(f.booking_date)} · Feedback ${safeDate(record.received_at)} · Modified ${safeDate(f.last_updated_at||f.updated_at||record.received_at)}`;
     const communication=document.createElement('div');communication.className='feedback-communication';communication.textContent=communicationLabel(f);communication.classList.toggle('is-replied',f.customer_reply_status==='replied');communication.classList.toggle('is-failed',['failed','bounced','complained'].includes(f.email_delivery_status));$('.meta',node).after(communication);
     $('.score strong',node).textContent=`${rating}/5`;$('.score-label',node).textContent=`customer rating · severity ${severity}/5`;$('blockquote',node).textContent=record.message||'';$('.summary',node).textContent=f.summary||'No summary available.';$('.note',node).textContent=f.manager_note||'';
     $('.tags',node).replaceChildren(...(f.themes||[]).map(value=>{const span=document.createElement('span');span.textContent=value;return span}));
@@ -126,9 +144,8 @@ function render(){
 async function load(showSync=true){
   if(showSync)$('#sync').textContent='Syncing…';
   const result=await api();records=result.records;renderMetrics(result.summary);
-  if(targetRecordId){const targetIndex=records.findIndex(record=>record.id===targetRecordId);if(targetIndex>=0)currentPage=Math.floor(targetIndex/pageSize)+1}
+  if(targetRecordId){const targetIndex=sortedRecords().findIndex(record=>record.id===targetRecordId);if(targetIndex>=0)currentPage=Math.floor(targetIndex/pageSize)+1}
   $('#archive-records').disabled=$('#view').value==='archived'||records.length===0;
-  $('#clear-records').disabled=$('#view').value==='archived'||records.length===0;
   if($('#location').options.length===1)for(const value of result.locations){const option=document.createElement('option');option.value=option.textContent=value;$('#location').append(option)}
   render();$('#sync').textContent=`Updated ${new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'})}`;
   if(targetRecordId){const target=document.querySelector(`.case[data-record-id="${CSS.escape(targetRecordId)}"]`);if(target){target.classList.add('is-linked-case');requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'center'}));setTimeout(()=>target.classList.remove('is-linked-case'),7000);targetRecordId=''}}
@@ -138,8 +155,9 @@ $('#refresh').addEventListener('click',()=>load().catch(error=>$('#sync').textCo
 $('#location').addEventListener('change',()=>{currentPage=1;load().catch(error=>$('#sync').textContent=error.message)});
 $('#route').addEventListener('change',()=>{currentPage=1;load().catch(error=>$('#sync').textContent=error.message)});
 $('#view').addEventListener('change',()=>{currentPage=1;load().catch(error=>$('#sync').textContent=error.message)});
+$('#sort-by').addEventListener('change',()=>{currentPage=1;render()});
+$('#sort-direction').addEventListener('change',()=>{currentPage=1;render()});
 $('#archive-records').addEventListener('click',async event=>{if(!records.length)return;const confirmed=await confirmRecordAction({title:'Archive active records?',message:'The records will leave the active queue but remain available from the Archived records view.',confirmLabel:'Yes, archive records'});if(!confirmed)return;const button=event.currentTarget,status=$('#record-action-status');button.disabled=true;status.textContent='Archiving records…';try{const result=await api('DELETE',{mode:'archive'});status.textContent='';showToast('success',result.message);currentPage=1;await load(false)}catch(error){status.textContent='';showToast('error',error.message)}finally{button.disabled=false}});
-$('#clear-records').addEventListener('click',async event=>{if(!records.length)return;const confirmed=await confirmRecordAction({title:'Clear the active dashboard?',message:'All active records will disappear from the working dashboard. Archived records will remain available and the audit trail will stay recoverable.',confirmLabel:'Yes, clear dashboard',danger:true});if(!confirmed)return;const button=event.currentTarget,status=$('#record-action-status');button.disabled=true;status.textContent='Clearing dashboard…';try{const result=await api('DELETE',{mode:'clear'});status.textContent='';showToast('success',result.message);currentPage=1;await load(false)}catch(error){status.textContent='';showToast('error',error.message)}finally{button.disabled=false}});
 $('#record-toast-close').addEventListener('click',()=>{$('#record-toast').hidden=true;clearTimeout(toastTimer)});
 $('#previous').addEventListener('click',()=>{if(currentPage>1){currentPage-=1;render();scrollTo({top:$('#queue').offsetTop-30,behavior:'smooth'})}});
 $('#next').addEventListener('click',()=>{if(currentPage<Math.ceil(records.length/pageSize)){currentPage+=1;render();scrollTo({top:$('#queue').offsetTop-30,behavior:'smooth'})}});
@@ -147,9 +165,5 @@ function preparePrint(){document.querySelectorAll('.draft textarea').forEach(are
 function cleanupPrint(){document.body.classList.remove('print-single');document.querySelectorAll('.is-print-target').forEach(node=>node.classList.remove('is-print-target'));document.querySelectorAll('.draft textarea').forEach(area=>area.style.height='')}
 $('#print-dashboard').addEventListener('click',()=>{preparePrint();window.print()});
 addEventListener('afterprint',cleanupPrint);
-const session=await managementSession();
-if(!session?.access_token){location.replace(`/pm/login/?return=${encodeURIComponent(`${location.pathname}${location.search}`)}`)}else{
-  accessToken=session.access_token;
-  load().catch(renderFeedbackFailure);
-  loadBookings().catch(renderBookingsFailure);
-}
+load().catch(renderFeedbackFailure);
+loadBookings().catch(renderBookingsFailure);
