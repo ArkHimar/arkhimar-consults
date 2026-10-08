@@ -163,6 +163,13 @@ test('account creation requires password confirmation',async()=>{
   assert.match(auth,/Passwords do not match/);
 });
 
+test('authentication credentials cannot fall back into the browser URL',async()=>{
+  const login=await readFile('pm/login/index.html','utf8'),auth=await readFile('pm/auth.js','utf8');
+  assert.match(login,/<form data-auth-form method="post" action="\/pm\/login\/">/);
+  assert.match(auth,/\['password','confirm_password','mfa_code'\]/);
+  assert.match(auth,/history\.replaceState/);
+});
+
 test('password recovery preserves the existing account and returns to sign in',async()=>{
   const auth=await readFile('pm/auth.js','utf8');
   assert.match(auth,/requestedMode==='recovery'&&authParams\.has\('code'\)/);

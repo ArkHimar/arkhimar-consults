@@ -4,6 +4,7 @@ const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
 const authParams=new URLSearchParams(location.search),requestedMode=authParams.get('mode');
 const requestedReturn=authParams.get('return'),safeReturn=requestedReturn?.startsWith('/')&&!requestedReturn.startsWith('//')?requestedReturn:'/pm/';
+if(['password','confirm_password','mfa_code'].some(key=>authParams.has(key))){for(const key of ['password','confirm_password','mfa_code'])authParams.delete(key);history.replaceState(null,'',`${location.pathname}${authParams.size?`?${authParams}`:''}${location.hash}`)}
 const invitationStorageKey='arkhimar.pm.pending-invitation';
 const authFlashKey='arkhimar.pm.auth-flash';
 const invitationFromHash=new URLSearchParams(location.hash.slice(1)).get('invite');

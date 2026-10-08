@@ -27,7 +27,7 @@
         <button type="button" data-auth-mode="signup">Create account</button>
         <button type="button" data-auth-mode="reset">Reset password</button>
       </div>
-      <form data-auth-form>
+      <form data-auth-form method="post" action="/pm/login/">
         <label data-email>Email address<input type="email" name="email" autocomplete="email" required></label>
         <label data-password>Password<input type="password" name="password" minlength="10" autocomplete="current-password" required></label>
         <label data-confirm-password hidden>Confirm password<input type="password" name="confirm_password" minlength="10" autocomplete="new-password"></label>
