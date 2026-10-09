@@ -6,6 +6,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    { "source": "/api/v1/documents/export", "destination": "/api/v1/documents?action=export" },
+    { "source": "/api/v1/documents/shared", "destination": "/api/v1/documents?action=shared" },
     { "source": "/api/carcare/bookings", "destination": "/api/carcare/feedback?action=bookings" },
     { "source": "/api/carcare/email-events", "destination": "/api/carcare/feedback?action=email-events" },
     { "source": "/api/v1/ai/chat", "destination": "/api/v1/ai?action=chat" },
