@@ -149,10 +149,14 @@ test('workspace invitation acceptance supports established users and selects the
 
 test('operational accounts can accept unlimited workspace invitations without weakening the general cap',async()=>{
   const sql=await readFile('supabase/migrations/202610070024_billing_and_privileged_invites.sql','utf8');
+  const serviceGrant=await readFile('supabase/migrations/202610090025_invitation_service_acceptance.sql','utf8');
   assert.match(sql,/emavericks22@gmail\.com/);
   assert.match(sql,/projects@arkhimar\.com/);
   assert.match(sql,/membership_count>=2/);
   assert.match(sql,/signed_in_email=any\(unlimited_emails\)/);
+  assert.match(serviceGrant,/accept_workspace_invitation_service/i);
+  assert.match(serviceGrant,/grant execute on function public\.accept_workspace_invitation_service\(text,uuid,text\) to service_role/i);
+  assert.doesNotMatch(serviceGrant,/grant (?:insert|update|delete).*workspace_members/i);
 });
 
 test('account creation requires password confirmation',async()=>{
