@@ -6,6 +6,16 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    
+{
+  "source": "/portfolio",
+  "destination": "https://arkhimar-portfolio.vercel.app/"
+},
+{
+  "source": "/portfolio/:path*",
+  "destination": "https://arkhimar-portfolio.vercel.app/:path*"
+},
+
     { "source": "/api/v1/documents/export", "destination": "/api/v1/documents?action=export" },
     { "source": "/api/v1/documents/shared", "destination": "/api/v1/documents?action=shared" },
     { "source": "/api/carcare/bookings", "destination": "/api/carcare/feedback?action=bookings" },
