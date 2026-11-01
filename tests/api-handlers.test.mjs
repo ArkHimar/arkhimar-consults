@@ -6,6 +6,7 @@ import invitationHandler from '../api/v1/workspace/invitations.js';
 import exportHandler from '../api/_lib/document-export-handler.js';
 import sharesHandler from '../api/v1/documents/shares.js';
 import sharedHandler from '../api/_lib/document-shared-handler.js';
+import instiserveCapstoneSubmit from '../api/_lib/instiserve-capstone-submit.js';
 import resourceClaimHandler from '../api/v1/resources/claim.js';
 import projectExportHandler from '../api/v1/projects/export.js';
 import authEmailHandler from '../api/v1/auth/email.js';
@@ -34,6 +35,13 @@ test('message API requires an authenticated user session',async()=>{
 test('workspace invitation API requires an authenticated owner or admin session',async()=>{
   const result=response();
   await invitationHandler({method:'POST',headers:{},body:{}},result);
+  assert.equal(result.statusCode,401);
+  assert.equal(result.body.error,'authentication_required');
+});
+
+test('InstiServe capstone submission requires an authenticated ArkHimar session',async()=>{
+  const result=response();
+  await instiserveCapstoneSubmit({method:'POST',headers:{},body:{}},result);
   assert.equal(result.statusCode,401);
   assert.equal(result.body.error,'authentication_required');
 });
