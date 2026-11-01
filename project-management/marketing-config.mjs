@@ -1,4 +1,4 @@
-export const PUBLIC_PM_STAGE='private_beta';
+export const PUBLIC_PM_STAGE='paid_beta';
 
 export const claims={
   lifecycle:{label:'Connected project lifecycle',status:'beta',publishable:true,proof:'/pm/'},
@@ -12,9 +12,9 @@ export const claims={
 };
 
 export const pricingPlans=[
-  {id:'free',name:'Free',annual:0,monthly:0,description:'Build and evaluate a credible project.',cta:'Request early access',features:['Up to 2 active projects','Business Case and Charter','Scope, WBS and basic schedule','Risk and issue registers','TXT and print/PDF export']},
-  {id:'growth',name:'Growth',annual:8,monthly:10,description:'Complete professional planning for growing teams.',cta:'Join the Growth waitlist',features:['Exact per-seat billing','Advanced planning controls','Requirements and traceability','Professional register exports','3–5 guest allowance per paid seat']},
-  {id:'professional',name:'Professional / PMO',annual:16,monthly:20,description:'Govern projects, baselines and performance.',cta:'Become a design partner',features:['Formal approvals and baselines','Integrated change control','Earned value management','Governance and audit history','Portfolio capabilities as released']},
+  {id:'free',name:'Free',annual:0,monthly:0,description:'Build and evaluate a credible project.',cta:'Start free',features:['Up to 2 active projects','Business Case and Charter','Scope, WBS and basic schedule','Risk and issue registers','TXT and print/PDF export']},
+  {id:'growth',name:'Growth',annual:8,monthly:10,description:'Complete professional planning for growing teams.',cta:'Choose Growth',features:['Exact per-seat billing','Advanced planning controls','Requirements and traceability','Professional register exports','3–5 guest allowance per paid seat']},
+  {id:'professional',name:'Professional / PMO',annual:16,monthly:20,description:'Govern projects, baselines and performance.',cta:'Choose Professional',features:['Formal approvals and baselines','Integrated change control','Earned value management','Governance and audit history','Portfolio capabilities as released']},
   {id:'enterprise',name:'Enterprise',annual:null,monthly:null,description:'A supported path for formal organizations.',cta:'Talk to ArkHimar',features:['Security and deployment discovery','Advanced permissions roadmap','Migration and onboarding planning','Commercial terms based on scope','No unearned compliance claims']}
 ];
 

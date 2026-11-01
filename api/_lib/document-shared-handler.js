@@ -1,7 +1,7 @@
 import {z} from 'zod';
-import {adminClient,requireMethod,sendJson,sha256} from '../../_lib/server.js';
-import {loadControlledDocument} from '../../_lib/controlled-documents.js';
-import {exportFilename,renderControlledDocument} from '../../../lib/controlled-document-export.mjs';
+import {adminClient,requireMethod,sendJson,sha256} from './server.js';
+import {loadControlledDocument} from './controlled-documents.js';
+import {exportFilename,renderControlledDocument} from '../../lib/controlled-document-export.mjs';
 
 const schema=z.object({token:z.string().regex(/^akh_share_[a-f0-9]{64}$/)}).strict();
 export default async function handler(req,res){

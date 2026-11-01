@@ -61,6 +61,24 @@ test('project brief delivery is permitted by the production content security pol
   assert.match(policy,/connect-src[^;]*https:\/\/formsubmit\.co(?:\s|;)/);
 });
 
+test('Google Analytics is consent-gated and excluded from private or reference-bearing routes',async()=>{
+  const analytics=await readFile('analytics.js','utf8'),build=await readFile('scripts/build.mjs','utf8');
+  assert.match(analytics,/analytics_storage:'denied'/);
+  assert.match(analytics,/\[data-accept\]/);
+  assert.match(analytics,/\/pm','\/share','\/carcare\/admin','\/carcare\/feedback','\/carcare\/complete/);
+  assert.match(analytics,/page_location:safeLocation\(location\.href\)/);
+  assert.match(analytics,/allow_google_signals:false/);
+  assert.match(build,/PUBLIC_GOOGLE_ANALYTICS_ID/);
+  assert.match(await readFile('dist/index.html','utf8'),/src="\/analytics\.js"/);
+});
+
+test('production CSP permits only the Google endpoints required by GA4 delivery',async()=>{
+  const config=JSON.parse(await readFile('vercel.json','utf8'));
+  const policy=config.headers.flatMap(rule=>rule.headers).find(header=>header.key==='Content-Security-Policy')?.value||'';
+  assert.match(policy,/script-src[^;]*https:\/\/www\.googletagmanager\.com/);
+  assert.match(policy,/connect-src[^;]*https:\/\/\*\.google-analytics\.com/);
+});
+
 test('authenticated database migration grants only the application operations required by the client',async()=>{
   const sql=await readFile('supabase/migrations/202609070003_authenticated_privileges.sql','utf8');
   assert.match(sql,/grant select on table[\s\S]+to authenticated/i);
@@ -129,12 +147,31 @@ test('workspace invitation acceptance supports established users and selects the
   assert.match(auth,/Verification email delivery is temporarily at capacity/);
 });
 
+test('operational accounts can accept unlimited workspace invitations without weakening the general cap',async()=>{
+  const sql=await readFile('supabase/migrations/202610070024_billing_and_privileged_invites.sql','utf8');
+  const serviceGrant=await readFile('supabase/migrations/202610090025_invitation_service_acceptance.sql','utf8');
+  assert.match(sql,/emavericks22@gmail\.com/);
+  assert.match(sql,/projects@arkhimar\.com/);
+  assert.match(sql,/membership_count>=2/);
+  assert.match(sql,/signed_in_email=any\(unlimited_emails\)/);
+  assert.match(serviceGrant,/accept_workspace_invitation_service/i);
+  assert.match(serviceGrant,/grant execute on function public\.accept_workspace_invitation_service\(text,uuid,text\) to service_role/i);
+  assert.doesNotMatch(serviceGrant,/grant (?:insert|update|delete).*workspace_members/i);
+});
+
 test('account creation requires password confirmation',async()=>{
   const login=await readFile('dist/pm/login/index.html','utf8');
   const auth=await readFile('pm/auth.js','utf8');
   assert.match(login,/name="confirm_password"/);
   assert.match(auth,/values\.password!==values\.confirm_password/);
   assert.match(auth,/Passwords do not match/);
+});
+
+test('authentication credentials cannot fall back into the browser URL',async()=>{
+  const login=await readFile('pm/login/index.html','utf8'),auth=await readFile('pm/auth.js','utf8');
+  assert.match(login,/<form data-auth-form method="post" action="\/pm\/login\/">/);
+  assert.match(auth,/\['password','confirm_password','mfa_code'\]/);
+  assert.match(auth,/history\.replaceState/);
 });
 
 test('password recovery preserves the existing account and returns to sign in',async()=>{
@@ -173,7 +210,7 @@ test('controlled documents are tenant-scoped, versioned and immutable after appr
 });
 
 test('external document shares are hashed, expiring, revocable and download limited',async()=>{
-  const sql=await readFile('supabase/migrations/202609070009_document_exports_and_shares.sql','utf8'),shares=await readFile('api/v1/documents/shares.js','utf8'),shared=await readFile('api/v1/documents/shared.js','utf8'),page=await readFile('dist/share/index.html','utf8'),config=JSON.parse(await readFile('vercel.json','utf8')),shareHeaders=config.headers.find(item=>item.source==='/share')?.headers||[];
+  const sql=await readFile('supabase/migrations/202609070009_document_exports_and_shares.sql','utf8'),shares=await readFile('api/v1/documents/shares.js','utf8'),shared=await readFile('api/_lib/document-shared-handler.js','utf8'),page=await readFile('dist/share/index.html','utf8'),config=JSON.parse(await readFile('vercel.json','utf8')),shareHeaders=config.headers.find(item=>item.source==='/share')?.headers||[];
   assert.match(sql,/token_hash text not null unique/);assert.match(sql,/expires_at timestamptz not null/);assert.match(sql,/max_downloads integer/);assert.match(sql,/revoked_at timestamptz/);assert.match(shares,/sha256\(token\)/);assert.match(shares,/approved_version_required/);assert.match(shared,/download_count>=share\.max_downloads/);assert.match(page,/noindex,nofollow/);
   assert.ok(shareHeaders.some(header=>header.key==='X-Robots-Tag'&&header.value==='noindex, nofollow'));assert.ok(shareHeaders.some(header=>header.key==='Referrer-Policy'&&header.value==='no-referrer'));assert.ok(shareHeaders.some(header=>header.key==='Cache-Control'&&header.value==='no-store'));
 });

@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import {adminClient,bearerToken,requestIpHash,requireMethod,sendJson,sha256} from '../../_lib/server.js';
 import {renderEmailHtml,renderEmailText} from '../../../lib/email-template.mjs';
+import instiserveCapstoneSubmit from '../../_lib/instiserve-capstone-submit.js';
 
 const scalar=z.union([z.string().max(5000),z.number(),z.boolean(),z.null()]);
 const schema=z.object({
@@ -14,6 +15,7 @@ const schema=z.object({
 }).strict();
 
 export default async function handler(req,res){
+  if(req.query?.action==='instiserve-capstone')return instiserveCapstoneSubmit(req,res);
   if(!requireMethod(req,res))return;
   if(Number(req.headers['content-length']||0)>262144)return sendJson(res,413,{error:'payload_too_large'});
   const apiKey=req.headers['x-api-key']||bearerToken(req);

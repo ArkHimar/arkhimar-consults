@@ -5,6 +5,22 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/api/v1/integrations/instiserve/capstone-submit", "destination": "/api/v1/forms/submit?action=instiserve-capstone" },
+    { "source": "/api/v1/documents/export", "destination": "/api/v1/documents?action=export" },
+    { "source": "/api/v1/documents/shared", "destination": "/api/v1/documents?action=shared" },
+    { "source": "/api/carcare/bookings", "destination": "/api/carcare/feedback?action=bookings" },
+    { "source": "/api/carcare/email-events", "destination": "/api/carcare/feedback?action=email-events" },
+    { "source": "/api/v1/ai/chat", "destination": "/api/v1/ai?action=chat" },
+    { "source": "/api/v1/ai/context", "destination": "/api/v1/ai?action=context" },
+    { "source": "/api/v1/ai/actions/preview", "destination": "/api/v1/ai?action=preview" },
+    { "source": "/api/v1/ai/actions/execute", "destination": "/api/v1/ai?action=execute" },
+    { "source": "/api/v1/ai/feedback", "destination": "/api/v1/ai?action=feedback" },
+    { "source": "/api/v1/ai/automations", "destination": "/api/v1/ai?action=automations" },
+    { "source": "/api/v1/ai/voice/catalog", "destination": "/api/v1/ai?action=catalog" },
+    { "source": "/api/v1/ai/voice/session", "destination": "/api/v1/ai?action=voice" },
+    { "source": "/api/v1/ai/voice/webhook/vapi", "destination": "/api/v1/ai?action=vapi" }
+  ],
   "redirects": [
     { "source": "/work", "destination": "/projects", "permanent": true },
     { "source": "/works", "destination": "/projects", "permanent": true },
@@ -17,8 +33,8 @@
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self'; connect-src 'self' https://formsubmit.co https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'" }
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(self), geolocation=()" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com; media-src 'self'; connect-src 'self' https://formsubmit.co https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'" }
       ]
     },
     {
@@ -52,6 +68,13 @@
     {
       "source": "/api/(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/carcare/admin(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     }
   ]
 }

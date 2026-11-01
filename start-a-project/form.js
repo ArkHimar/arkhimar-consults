@@ -62,6 +62,7 @@ form?.addEventListener('submit', async event => {
     form.reset();
     validateAttachments();
     statusBox.textContent = 'Thank you. Your project brief and attachments have been received. Our team will be in touch.';
+    globalThis.showSuccessToast?.('Your project brief and attachments were received.','Project brief submitted');
   } catch (error) {
     statusBox.className = 'form-status visible error';
     statusBox.innerHTML = 'We could not send your brief right now. Please email <a href="mailto:projects@arkhimar.com">projects@arkhimar.com</a> directly.';
