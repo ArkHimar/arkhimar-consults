@@ -25,6 +25,7 @@ The production-ready static artifact is written to `dist/` and can be served by 
 ## Routes
 
 - `/` — ArkHimar Consult public website
+- `/portfolio/` — Emmanuel Ayobami's multidisciplinary portfolio, with dedicated automation, development, architecture and design practice pages
 - `/start-a-project/` — complete project enquiry workflow
 - `/carcare/` — customer feedback and protected job-completion front door for the CarCare n8n workflow
 - `/project-management/` — ArkHimar PM public product page

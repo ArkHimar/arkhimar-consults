@@ -61,6 +61,7 @@ export const pages=new Map([...Object.entries(architecturePages),...Object.entri
 for(const [slug,name,description] of services){pages.set(`/services/${slug}`,[`${name} | ArkHimar Consult`,`${description} Discuss your project with ArkHimar Consult in Lagos, Nigeria.`]);}
 
 export const indexableRoutes=[...pages.keys()];
+const portfolioRoutes=['/portfolio','/portfolio/automation','/portfolio/development','/portfolio/architecture','/portfolio/design'];
 
 export function canonicalFor(route='/'){
   const normalized=route==='/'?'/':`/${route.replace(/^\/+|\/+$/g,'')}`;
@@ -81,6 +82,7 @@ export function robotsText(indexable){
 }
 
 export function sitemapXml(routes=indexableRoutes){
-  const urls=routes.map(route=>`  <url><loc>${canonicalFor(route)}</loc></url>`).join('\n');
+  const publicRoutes=routes.length?[...new Set([...routes,...portfolioRoutes])]:routes;
+  const urls=publicRoutes.map(route=>`  <url><loc>${canonicalFor(route)}</loc></url>`).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }

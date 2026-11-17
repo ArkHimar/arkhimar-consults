@@ -6,8 +6,6 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/portfolio", "destination": "https://arkhimar-portfolio.vercel.app/" },
-    { "source": "/portfolio/:path*", "destination": "https://arkhimar-portfolio.vercel.app/:path*" },
     { "source": "/api/v1/integrations/instiserve/capstone-submit", "destination": "/api/v1/forms/submit?action=instiserve-capstone" },
     { "source": "/api/v1/documents/export", "destination": "/api/v1/documents?action=export" },
     { "source": "/api/v1/documents/shared", "destination": "/api/v1/documents?action=shared" },
@@ -36,7 +34,7 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(self), geolocation=()" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://www.google-analytics.com https://*.google-analytics.com; media-src 'self'; connect-src 'self' https://formsubmit.co https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://images.unsplash.com https://www.google-analytics.com https://*.google-analytics.com; media-src 'self'; connect-src 'self' https://formsubmit.co https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'" }
       ]
     },
     {
