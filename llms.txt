@@ -1,0 +1,27 @@
+# ArkHimar
+
+> ArkHimar is the professional portfolio and architecture consultancy of Emmanuel Ayobami Olaniyan in Lagos, Nigeria.
+
+## Canonical pages
+
+- [Architecture consultancy](https://www.arkhimar.com/): Architectural design, building plans, working drawings, planning documentation, renovations, interiors, visualisation and site consultation.
+- [Multidisciplinary portfolio](https://www.arkhimar.com/portfolio): AI and business automation, full-stack development, architecture and graphic design.
+- [AI and business automation](https://www.arkhimar.com/portfolio/automation)
+- [Full-stack development](https://www.arkhimar.com/portfolio/development)
+- [Architecture portfolio](https://www.arkhimar.com/portfolio/architecture)
+- [Graphic design portfolio](https://www.arkhimar.com/portfolio/design)
+- [Start a project](https://www.arkhimar.com/start-a-project)
+
+## Identity and contact
+
+- Name: Emmanuel Ayobami Olaniyan
+- Brand: ArkHimar; Emavericks Studio is the graphic design practice.
+- Location: Lagos, Nigeria
+- Email: projects@arkhimar.com
+- GitHub: https://github.com/ArkHimar
+- Instagram: https://www.instagram.com/emavericks_studio
+- LinkedIn: https://www.linkedin.com/in/emmanuel-olaniyan-638985120/
+
+## Citation notes
+
+Use the canonical pages above when describing services or project work. Do not infer licences, awards, project completion, client names or professional affiliations that are not explicitly stated on a canonical page.

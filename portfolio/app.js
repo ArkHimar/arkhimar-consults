@@ -8,6 +8,15 @@ menuButton?.addEventListener('click',()=>{
 });
 mobileNav?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{mobileNav.classList.remove('is-open');body.classList.remove('menu-open');menuButton?.setAttribute('aria-expanded','false')}));
 
+document.querySelectorAll('a[href="mailto:emavericks22@gmail.com"]').forEach(link=>{link.href='mailto:projects@arkhimar.com';link.innerHTML=link.innerHTML.replaceAll('emavericks22@gmail.com','projects@arkhimar.com')});
+document.querySelectorAll('[data-contact-form]').forEach(form=>{
+  form.enctype='multipart/form-data';
+  if(!form.querySelector('input[type="file"]')){
+    const label=document.createElement('label');label.className='full attachment-field';label.innerHTML='Attachments<input name="attachment" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.dwg,.dxf"><small>Images, documents, drawings or archives — up to 20 MB total.</small>';
+    form.querySelector('button[type="submit"]')?.before(label);
+  }
+});
+
 const socialProfiles=[
   ['instagram','Instagram','@emavericks_studio','https://www.instagram.com/emavericks_studio?igsh=MTV4Z3AyZHdmY2tpNQ=='],
   ['linkedin','LinkedIn','Emmanuel Olaniyan','https://www.linkedin.com/in/emmanuel-olaniyan-638985120/'],
@@ -42,17 +51,32 @@ document.querySelectorAll('.contact-links').forEach(contactLinks=>{
 document.querySelectorAll('a[href]').forEach(link=>{
   try{
     const url=new URL(link.href,location.href);
-    if(/^https?:$/.test(url.protocol)&&url.origin!==location.origin){link.target='_blank';link.rel='noopener noreferrer'}
+    if(/^https?:$/.test(url.protocol)&&url.origin!==location.origin){link.target='_blank';link.rel=[...new Set(`${link.rel} noopener noreferrer`.trim().split(/\s+/))].join(' ')}
   }catch{}
 });
 
 const observer='IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:.12}):null;
 document.querySelectorAll('.reveal').forEach(element=>observer?observer.observe(element):element.classList.add('is-visible'));
 
-document.querySelectorAll('[data-contact-form]').forEach(form=>form.addEventListener('submit',event=>{
+const track=(name,parameters={})=>{if(globalThis.__ARKHIMAR_ANALYTICS_READY__&&typeof globalThis.gtag==='function')globalThis.gtag('event',name,parameters)};
+document.addEventListener('click',event=>{const link=event.target.closest?.('a[href]');if(!link)return;try{const url=new URL(link.href,location.href);if(/^https?:$/.test(url.protocol)&&url.origin!==location.origin)track('portfolio_outbound_click',{link_domain:url.hostname,link_url:`${url.origin}${url.pathname}`})}catch{}});
+
+document.querySelectorAll('[data-contact-form]').forEach(form=>form.addEventListener('submit',async event=>{
   event.preventDefault();
-  const data=new FormData(form),name=String(data.get('name')||'').trim(),email=String(data.get('email')||'').trim(),service=String(data.get('service')||'Project enquiry'),message=String(data.get('message')||'').trim();
-  const subject=encodeURIComponent(`${service} enquiry from ${name}`),bodyText=encodeURIComponent(`Name: ${name}\nEmail: ${email}\nService: ${service}\n\n${message}`);
-  const status=form.querySelector('[data-form-status]');if(status)status.textContent='Opening your email app…';
-  location.href=`mailto:emavericks22@gmail.com?subject=${subject}&body=${bodyText}`;
+  const data=new FormData(form),name=String(data.get('name')||'').trim(),service=String(data.get('service')||'Project enquiry');
+  const status=form.querySelector('[data-form-status]'),button=form.querySelector('button[type="submit"]'),files=[...form.querySelectorAll('input[type="file"]')].flatMap(input=>[...input.files]);
+  if(files.reduce((total,file)=>total+file.size,0)>20*1024*1024){if(status)status.textContent='Please keep all attachments under 20 MB in total.';return}
+  data.set('_subject',`${service} enquiry from ${name}`);data.set('_template','table');data.set('_captcha','false');
+  if(status)status.textContent='Sending your project enquiry…';if(button)button.disabled=true;
+  try{
+    const response=await fetch('https://formsubmit.co/ajax/projects@arkhimar.com',{method:'POST',body:data,headers:{Accept:'application/json'}});
+    if(!response.ok)throw new Error('Submission failed');
+    form.reset();if(status)status.textContent='Thank you — your message and attachments have been sent.';track('portfolio_contact_submit',{service});
+  }catch{
+    if(status)status.textContent='The form could not send. Please email projects@arkhimar.com directly.';
+  }finally{if(button)button.disabled=false}
 }));
+
+if(/^\/portfolio\/(automation|development|architecture|design)\/?$/.test(location.pathname)){
+  const script=document.createElement('script');script.type='module';script.src='/portfolio/projects.js';document.body.append(script);
+}

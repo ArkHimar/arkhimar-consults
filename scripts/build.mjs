@@ -5,7 +5,7 @@ import {renderSeo} from '../seo/render.mjs';
 const output='dist';
 await rm(output,{recursive:true,force:true});
 await mkdir(output,{recursive:true});
-for(const entry of ['index.html','404.html','styles.css','app.js','analytics.js','success-toast.js','robots.txt','sitemap.xml','site.webmanifest','favicon.svg','favicon-32.png','apple-touch-icon.png','assets','lib','resources','start-a-project','carcare','portfolio','project-management','pm','share'])await cp(entry,`${output}/${entry}`,{recursive:true});
+for(const entry of ['index.html','404.html','styles.css','app.js','analytics.js','success-toast.js','robots.txt','sitemap.xml','llms.txt','site.webmanifest','favicon.svg','favicon-32.png','apple-touch-icon.png','assets','lib','resources','start-a-project','carcare','portfolio','project-management','pm','share'])await cp(entry,`${output}/${entry}`,{recursive:true});
 await cp('carcare/customer',`${output}/carcare/feedback`,{recursive:true});
 await cp('carcare/staff',`${output}/carcare/complete`,{recursive:true});
 
@@ -14,16 +14,18 @@ await writeFile(`${output}/runtime-config.js`,`globalThis.__ARKHIMAR_CONFIG__=${
 await build({entryPoints:['auth-nav.js'],outfile:`${output}/auth-nav.js`,bundle:true,format:'esm',target:['es2022'],minify:true,sourcemap:false,legalComments:'none'});
 await build({entryPoints:['pm/pm.js','pm/auth.js'],outdir:`${output}/pm`,entryNames:'[name]',bundle:true,format:'esm',target:['es2022'],minify:true,sourcemap:false,legalComments:'none'});
 await build({entryPoints:['carcare/admin/admin.js'],outfile:`${output}/carcare/admin/admin.js`,bundle:true,format:'esm',target:['es2022'],minify:true,sourcemap:false,legalComments:'none'});
+await build({entryPoints:['portfolio/projects.js'],outfile:`${output}/portfolio/projects.js`,bundle:true,format:'esm',target:['es2022'],minify:true,sourcemap:false,legalComments:'none'});
+await build({entryPoints:['portfolio/admin.js'],outfile:`${output}/portfolio/admin.js`,bundle:true,format:'esm',target:['es2022'],minify:true,sourcemap:false,legalComments:'none'});
 const seoIndexable=process.env.SEO_INDEXABLE==='true'&&process.env.VERCEL_ENV==='production';
 await renderSeo(output,{indexable:seoIndexable,verification:seoIndexable?(process.env.GOOGLE_SITE_VERIFICATION||''):''});
 async function installSuccessToasts(directory){
-  if(directory===`${output}/portfolio`)return;
+  if(directory===`${output}/portfolio/admin`)return;
   for(const entry of await readdir(directory,{withFileTypes:true})){
     const path=`${directory}/${entry.name}`;
     if(entry.isDirectory())await installSuccessToasts(path);
     else if(entry.name.endsWith('.html')){
       const html=await readFile(path,'utf8');
-      let next=html;if(!next.includes('/analytics.js'))next=next.replace('</body>','<script src="/analytics.js"></script></body>');if(!next.includes('/success-toast.js'))next=next.replace('</body>','<script src="/success-toast.js"></script></body>');if(next!==html)await writeFile(path,next);
+      let next=html;if(next.includes('/portfolio/'))next=next.replaceAll('emavericks22@gmail.com','projects@arkhimar.com');if(next.includes('/portfolio/')&&!next.includes('/runtime-config.js'))next=next.replace('</body>','<script src="/runtime-config.js"></script></body>');if(!next.includes('/analytics.js'))next=next.replace('</body>','<script src="/analytics.js"></script></body>');if(!next.includes('/portfolio/')&&!next.includes('/success-toast.js'))next=next.replace('</body>','<script src="/success-toast.js"></script></body>');if(next!==html)await writeFile(path,next);
     }
   }
 }
