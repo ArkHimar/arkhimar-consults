@@ -35,7 +35,7 @@ document.querySelectorAll('.contact-links').forEach(contactLinks=>{
   const socialSection=document.createElement('section');
   socialSection.className='social-profiles';
   socialSection.setAttribute('aria-label','Social media profiles');
-  socialSection.innerHTML=`<p>Follow my work</p><div>${socialProfiles.map(([icon,network,handle,url])=>`<a href="${url}" aria-label="${network}: ${handle}"><svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">${socialIcons[icon]}</svg><span>${network}</span><strong>${handle}</strong><b aria-hidden="true">↗</b></a>`).join('')}</div>`;
+  socialSection.innerHTML=`<p>Follow me on Social Media</p><div>${socialProfiles.map(([icon,network,handle,url])=>`<a href="${url}" aria-label="${network}: ${handle}"><svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">${socialIcons[icon]}</svg><span>${network}</span><strong>${handle}</strong><b aria-hidden="true">↗</b></a>`).join('')}</div>`;
   contactLinks.insertAdjacentElement('afterend',socialSection);
 });
 
